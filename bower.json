@@ -1,0 +1,23 @@
+{
+  "name": "rabbithome",
+  "version": "0.1.0",
+  "homepage": "https://github.com/elconejito/RabbitHome",
+  "authors": [
+    "Harvey Ramos <harvey@harvsworld.com>"
+  ],
+  "moduleType": [
+    "globals"
+  ],
+  "license": "MIT",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "jquery": "~2.1.4",
+    "bootstrap-sass": "~3.3.5"
+  }
+}
