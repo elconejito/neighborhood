@@ -16,4 +16,4 @@ Route::get('/', function () {
 });
 
 Route::resource('location', 'LocationController');
-Route::resource('price', 'PriceController');
+Route::resource('location.price', 'PriceController');
