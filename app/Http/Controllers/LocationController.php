@@ -37,7 +37,10 @@ class LocationController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        // create the new job
+		$location = new Location($request->all());
+		
+		return response()->json( [ 'status' => true ] );
     }
 
     /**
