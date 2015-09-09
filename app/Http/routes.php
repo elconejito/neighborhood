@@ -15,6 +15,8 @@ Route::get('/', function () {
     return view('welcome');
 });
 
+Route::resource('location', 'LocationController');
+Route::resource('location.price', 'PriceController');
 Route::get('/comments', function() {
     $json = [
         [
