@@ -44,10 +44,22 @@
                         </tbody>
                     </table>
                 </div>
-
             </div>
             <script type="text/jsx">
+                var LocationBox = React.createClass({
+                    render: function() {
+                        return (
+                                <div class="one" className="LocationBox" >
+                                    Hello World.
+                                </div>
+                        );
+                    }
+                });
 
+                React.render(
+                        <LocationBox />,
+                        document.getElementById('content')
+                );
             </script>
         </div>
 
