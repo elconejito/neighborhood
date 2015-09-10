@@ -19,7 +19,6 @@
 
         <div class="container">
             <div id="content">
-                <h1>Content</h1>
 
                 @include('partials.forms.location')
 
@@ -30,6 +29,8 @@
                                 <th>#</th>
                                 <th>Address</th>
                                 <th>Type</th>
+                                <th>Details</th>
+                                <th>Actions</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -37,6 +38,8 @@
                                 <td>1234</td>
                                 <td>Street</td>
                                 <td>1</td>
+                                <td><i class="fa fa-info"></i></td>
+                                <td><i class="fa fa-bars"></i></td>
                             </tr>
                         </tbody>
                     </table>
