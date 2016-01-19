@@ -1,9 +1,8 @@
-@import "../bower/bootstrap-sass/assets/stylesheets/bootstrap";
+@import "common/variables";
+
+@import "../bower/bootstrap/scss/bootstrap";
 @import "../bower/font-awesome/scss/font-awesome";
 
-@import "common/_variables";
-@import "common/_global";
-@import "layouts/_header";
-@import "layouts/_footer";
-@import "layouts/_pages";
-@import "components/_forms";
+@import "common/global";
+@import "layouts/header";
+@import "layouts/footer";
