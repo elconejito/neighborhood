@@ -18,14 +18,14 @@ elixir(function(mix) {
             '../bower/bootstrap/js/dist/util.js',
             '../bower/bootstrap/js/dist/alert.js',
             '../bower/bootstrap/js/dist/button.js',
-            // '../bower/bootstrap/js/dist/carousel.js',
+            '../bower/bootstrap/js/dist/carousel.js',
             '../bower/bootstrap/js/dist/collapse.js',
             '../bower/bootstrap/js/dist/dropdown.js',
             '../bower/bootstrap/js/dist/modal.js',
-            // '../bower/bootstrap/js/dist/scrollspy.js',
+            '../bower/bootstrap/js/dist/scrollspy.js',
             '../bower/bootstrap/js/dist/tab.js',
-            // '../bower/bootstrap/js/dist/tooltip.js',
-            // '../bower/bootstrap/js/dist/popover.js'
+            '../bower/bootstrap/js/dist/tooltip.js',
+            '../bower/bootstrap/js/dist/popover.js'
         ],
         'resources/assets/js/vendors/bootstrap.js');
 
