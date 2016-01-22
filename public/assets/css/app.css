@@ -9599,6 +9599,11 @@ a.bg-danger:hover {
   content: "";
 }
 
+body {
+  /* Height of the navbar */
+  padding-top: 70px;
+}
+
 .navbar-static-top {
   margin-bottom: 1rem;
 }
