@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 
 use App\Http\Requests;
 use App\Http\Controllers\Controller;
+use Illuminate\Support\Facades\Redirect;
 
 class LocationController extends Controller
 {
@@ -28,7 +29,7 @@ class LocationController extends Controller
      */
     public function create()
     {
-        //
+        return view('locations.create');
     }
 
     /**
@@ -39,10 +40,16 @@ class LocationController extends Controller
      */
     public function store(Request $request)
     {
-        // create the new job
-		$location = new Location($request->all());
-		
-		return response()->json( [ 'status' => true ] );
+        // create the new Location
+		$location = new Location();
+        $location->number = $request->number;
+        $location->address = $request->address;
+        $location->type = $request->type;
+        $location->details = $request->details;
+
+        $location->save();
+
+        return Redirect('locations');
     }
 
     /**
@@ -53,7 +60,9 @@ class LocationController extends Controller
      */
     public function show($id)
     {
-        //
+        $location = Location::find($id);
+
+        return view('locations.show', compact('location'));
     }
 
     /**
@@ -64,7 +73,9 @@ class LocationController extends Controller
      */
     public function edit($id)
     {
-        //
+        $location = Location::find($id);
+
+        return view('locations.edit', compact('location'));
     }
 
     /**
@@ -76,7 +87,16 @@ class LocationController extends Controller
      */
     public function update(Request $request, $id)
     {
-        //
+        // create the new Location
+        $location = Location::find($id);
+        $location->number = $request->number;
+        $location->address = $request->address;
+        $location->type = $request->type;
+        $location->details = $request->details;
+
+        $location->save();
+
+        return Redirect('locations');
     }
 
     /**

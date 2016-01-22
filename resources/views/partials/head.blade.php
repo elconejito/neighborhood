@@ -7,7 +7,7 @@
     <meta name="description" content="@yield('description')">
     <meta name="author" content="@yield('author')">
 
-    <title>@yield('title') | Bang</title>
+    <title>@yield('title') | RabbitHome</title>
 
     <!-- Fonts -->
     <link href="//fonts.googleapis.com/css?family=Lato:100" rel="stylesheet" type="text/css">
