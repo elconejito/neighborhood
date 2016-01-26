@@ -3605,5 +3605,4 @@ var Popover = (function ($) {
 //# sourceMappingURL=popover.js.map
 
 //# sourceMappingURL=bootstrap.js.map
-
 //# sourceMappingURL=vendors.js.map

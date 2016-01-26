@@ -10,9 +10,28 @@
         @if ( $locations->isEmpty() )
             <p>No Locations yet.</p>
         @else
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>#</th>
+                    <th>Address</th>
+                    <th>Last Price</th>
+                    <th>Sale Date</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
             @foreach ( $locations as $location )
-                {{ $location->number }} {{ $location->address }}
+                <tr>
+                    <td><a href="{{ route('locations.show', $location->id) }}">{{ $location->number }}</a></td>
+                    <td>{{ $location->address }}</td>
+                    <td><a href="#" class="btn btn-success btn-sm"><i class="fa fa-plus fa-fw"></i></a> last price</td>
+                    <td>Sale Date</td>
+                    <td><a href="#" class="btn btn-secondary btn-sm"><i class="fa fa-pencil"></i></a> <a href="#" class="btn btn-danger btn-sm"><i class="fa fa-trash"></i></a></td>
+                </tr>
             @endforeach
+            </tbody>
+        </table>
         @endif
     </div><!-- /.container -->
 @endsection

@@ -7,6 +7,7 @@
 
         <h1><small>Location</small><br />{{ $location->label }}</h1>
         <div class="row">
+            <p></p>
         </div>
 
     </div><!-- /.container -->
