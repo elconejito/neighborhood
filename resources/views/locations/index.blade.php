@@ -25,9 +25,9 @@
                 <tr>
                     <td><a href="{{ route('locations.show', $location->id) }}">{{ $location->number }}</a></td>
                     <td>{{ $location->address }}</td>
-                    <td><a href="#" class="btn btn-success btn-sm"><i class="fa fa-plus fa-fw"></i></a> last price</td>
+                    <td><a href="{{ route('locations.prices.create', $location->id) }}" class="btn btn-success btn-sm"><i class="fa fa-plus fa-fw"></i></a> last price</td>
                     <td>Sale Date</td>
-                    <td><a href="#" class="btn btn-secondary btn-sm"><i class="fa fa-pencil"></i></a> <a href="#" class="btn btn-danger btn-sm"><i class="fa fa-trash"></i></a></td>
+                    <td><a href="{{ route('locations.edit', $location->id) }}" class="btn btn-secondary btn-sm"><i class="fa fa-pencil"></i></a> <a href="#" class="btn btn-danger btn-sm"><i class="fa fa-trash"></i></a></td>
                 </tr>
             @endforeach
             </tbody>
