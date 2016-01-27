@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Location;
 use Illuminate\Http\Request;
 
 use App\Http\Requests;
@@ -14,9 +15,15 @@ class PriceController extends Controller
      *
      * @return Response
      */
-    public function index()
+    public function index($location_id)
     {
-        //
+        if ( $location_id ) {
+            $prices = Price::where('location_id', $location_id);
+        } else {
+            $prices = Price::all();
+        }
+        
+        return view('prices.index', compact('prices'));
     }
 
     /**
@@ -24,9 +31,11 @@ class PriceController extends Controller
      *
      * @return Response
      */
-    public function create()
+    public function create($location_id)
     {
-        //
+        $location = Location::find($location_id);
+        
+        return view('prices.create', compact('location'));
     }
 
     /**
@@ -37,7 +46,16 @@ class PriceController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        // create the new Location
+		$price = new Price();
+        $price->type = $request->type;
+        $price->price = $request->price;
+        $price->price_date = $request->price_date;
+        $price->location_id = $request->location_id;
+
+        $price->save();
+
+        return Redirect('locations');
     }
 
     /**
