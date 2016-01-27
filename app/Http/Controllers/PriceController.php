@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Location;
+use App\Price;
 use Illuminate\Http\Request;
 
 use App\Http\Requests;
@@ -44,14 +45,14 @@ class PriceController extends Controller
      * @param  Request  $request
      * @return Response
      */
-    public function store(Request $request)
+    public function store($location_id, Request $request)
     {
         // create the new Location
 		$price = new Price();
         $price->type = $request->type;
         $price->price = $request->price;
         $price->price_date = $request->price_date;
-        $price->location_id = $request->location_id;
+        $price->location_id = $location_id;
 
         $price->save();
 
