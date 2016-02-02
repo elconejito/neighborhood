@@ -28,6 +28,11 @@ elixir(function(mix) {
             '../bower/bootstrap/js/dist/popover.js'
         ],
         'resources/assets/js/vendors/bootstrap.js');
+    
+    
+    mix.scripts(
+        '../bower/d3/d3.js',
+        'resources/assets/js/vendors/d3.js');
 
     // Concat all the vendor files together
     mix.scriptsIn('resources/assets/js/vendors', 'public/assets/js/vendors.js');
