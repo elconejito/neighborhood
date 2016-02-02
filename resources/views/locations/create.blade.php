@@ -31,6 +31,36 @@
                 </div>
             </div>
             <div class="form-group row">
+                <label for="bedrooms" class="col-sm-2 form-control-label">Bedrooms</label>
+                <div class="col-sm-10">
+                    <input type="text" class="form-control" id="bedrooms" name="bedrooms" placeholder="Bedrooms">
+                </div>
+            </div>
+            <div class="form-group row">
+                <label for="bathrooms" class="col-sm-2 form-control-label">Bathrooms</label>
+                <div class="col-sm-10">
+                    <input type="text" class="form-control" id="bathrooms" name="bathrooms" placeholder="Bathrooms">
+                </div>
+            </div>
+            <div class="form-group row">
+                <label for="sqft" class="col-sm-2 form-control-label">SqFt</label>
+                <div class="col-sm-10">
+                    <input type="text" class="form-control" id="sqft" name="sqft" placeholder="SqFt">
+                </div>
+            </div>
+            <div class="form-group row">
+                <label for="built" class="col-sm-2 form-control-label">Built</label>
+                <div class="col-sm-10">
+                    <input type="text" class="form-control" id="built" name="built" placeholder="Built">
+                </div>
+            </div>
+            <div class="form-group row">
+                <label for="mlsid" class="col-sm-2 form-control-label">MLS ID</label>
+                <div class="col-sm-10">
+                    <input type="text" class="form-control" id="mlsid" name="mlsid" placeholder="MLS ID">
+                </div>
+            </div>
+            <div class="form-group row">
                 <label for="details" class="col-sm-2 form-control-label">Details</label>
                 <div class="col-sm-10">
                     <textarea class="form-control" id="details" name="details" rows="3"></textarea>

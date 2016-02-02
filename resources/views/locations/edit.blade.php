@@ -32,6 +32,36 @@
                 </div>
             </div>
             <div class="form-group row">
+                <label for="bedrooms" class="col-sm-2 form-control-label">Bedrooms</label>
+                <div class="col-sm-10">
+                    <input type="text" class="form-control" id="bedrooms" name="bedrooms" value="{{ $location->bedrooms }}">
+                </div>
+            </div>
+            <div class="form-group row">
+                <label for="bathrooms" class="col-sm-2 form-control-label">Bathrooms</label>
+                <div class="col-sm-10">
+                    <input type="text" class="form-control" id="bathrooms" name="bathrooms" value="{{ $location->bathrooms }}">
+                </div>
+            </div>
+            <div class="form-group row">
+                <label for="sqft" class="col-sm-2 form-control-label">SqFt</label>
+                <div class="col-sm-10">
+                    <input type="text" class="form-control" id="sqft" name="sqft" value="{{ $location->sqft }}">
+                </div>
+            </div>
+            <div class="form-group row">
+                <label for="built" class="col-sm-2 form-control-label">Built</label>
+                <div class="col-sm-10">
+                    <input type="text" class="form-control" id="built" name="built" value="{{ $location->built }}">
+                </div>
+            </div>
+            <div class="form-group row">
+                <label for="mlsid" class="col-sm-2 form-control-label">MLS ID</label>
+                <div class="col-sm-10">
+                    <input type="text" class="form-control" id="mlsid" name="mlsid" value="{{ $location->mlsid }}">
+                </div>
+            </div>
+            <div class="form-group row">
                 <label for="details" class="col-sm-2 form-control-label">Details</label>
                 <div class="col-sm-10">
                     <textarea class="form-control" id="details" name="details" rows="3">{{ $location->details }}</textarea>

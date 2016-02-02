@@ -45,6 +45,11 @@ class LocationController extends Controller
         $location->number = $request->number;
         $location->address = $request->address;
         $location->type = $request->type;
+        $location->bedrooms = $request->bedrooms;
+        $location->bathrooms = $request->bathrooms;
+        $location->sqft = $request->sqft;
+        $location->built = $request->built;
+        $location->mlsid = $request->mlsid;
         $location->details = $request->details;
 
         $location->save();
@@ -92,6 +97,11 @@ class LocationController extends Controller
         $location->number = $request->number;
         $location->address = $request->address;
         $location->type = $request->type;
+        $location->bedrooms = $request->bedrooms;
+        $location->bathrooms = $request->bathrooms;
+        $location->sqft = $request->sqft;
+        $location->built = $request->built;
+        $location->mlsid = $request->mlsid;
         $location->details = $request->details;
 
         $location->save();
