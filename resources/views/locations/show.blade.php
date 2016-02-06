@@ -4,7 +4,7 @@
 
 @section('content')
     <div class="container">
-
+        {!! Breadcrumbs::render('location', $location) !!}
         <h1>{{ $location->number }}<br /><small>{{ $location->address }}</small></h1>
         <div class="row">
             <div class="col-md-3">

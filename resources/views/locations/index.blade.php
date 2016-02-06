@@ -4,7 +4,7 @@
 
 @section('content')
     <div class="container">
-
+        {!! Breadcrumbs::render('locations') !!}
         <h1>Location</h1>
         <p><a href="{{ route('locations.create') }}"><i class="fa fa-plus"></i> Add New</a></p>
         @if ( $locations->isEmpty() )
