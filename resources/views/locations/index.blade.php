@@ -13,23 +13,34 @@
         <table class="table">
             <thead>
                 <tr>
+                    <th>&nbsp;</th>
                     <th>#</th>
                     <th>Address</th>
                     <th>Latest Price</th>
                     <th>Sale Price</th>
                     <th>Sale Date</th>
-                    <th>Actions</th>
                 </tr>
             </thead>
             <tbody>
             @foreach ( $locations as $location )
                 <tr>
-                    <td><a href="{{ route('locations.show', $location->id) }}">{{ $location->number }}</a></td>
-                    <td>{{ $location->address }} <a href="{{ route('locations.prices.create', $location->id) }}" class="btn btn-success btn-sm pull-right"><i class="fa fa-plus fa-fw"></i> Price</a></td>
+                    <td>
+                        <div class="dropdown">
+                            <button class="btn btn-secondary btn-sm" type="button" id="dropdownMenu{{ $location->id }}" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                <i class="fa fa-bars"></i>
+                            </button>
+                            <div class="dropdown-menu" aria-labelledby="dropdownMenu{{ $location->id }}">
+                                <a class="dropdown-item" href="{{ route('locations.prices.create', $location->id) }}"><i class="fa fa-plus fa-fw"></i> Price</a>
+                                <a class="dropdown-item" href="{{ route('locations.edit', $location->id) }}"><i class="fa fa-pencil"></i> edit</a>
+                                <a class="dropdown-item" href="#"><i class="fa fa-trash"></i> Delete</a>
+                            </div>
+                        </div>
+                    </td>
+                    <td><a href="{{ route('locations.show', $location->id) }}">{{ $location->number }}</a> {{ $location->address }}</td>
+                    <td></td>
                     <td>@if ( $location->latestPrice() ) ${{ number_format($location->latestPrice()->price, 0, '.', ',') }} @else - @endif</td>
                     <td>@if ( $location->latestSalePrice() ) ${{ number_format($location->latestSalePrice()->price, 0, '.', ',') }} @else - @endif</td>
                     <td>@if ( $location->latestSalePrice() ) {{ $location->latestSalePrice()->price_date->toFormattedDateString() }} @else - @endif</td>
-                    <td><a href="{{ route('locations.edit', $location->id) }}" class="btn btn-secondary btn-sm"><i class="fa fa-pencil"></i></a> <a href="#" class="btn btn-danger btn-sm"><i class="fa fa-trash"></i></a></td>
                 </tr>
             @endforeach
             </tbody>
