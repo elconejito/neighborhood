@@ -18,7 +18,7 @@ class LocationController extends Controller
      */
     public function index()
     {
-        $locations = Location::all();
+        $locations = Location::orderBy('address')->orderBy('number')->get();
         return view('locations.index', compact('locations'));
     }
 
