@@ -15,7 +15,9 @@
                 <tr>
                     <th>&nbsp;</th>
                     <th>Address</th>
-                    <th></th>
+                    <th>Type</th>
+                    <th>BR</th>
+                    <th>BA</th>
                     <th>Latest Price</th>
                     <th>Sale Price</th>
                     <th>Sale Date</th>
@@ -36,8 +38,10 @@
                             </div>
                         </div>
                     </td>
-                    <td><a href="{{ route('locations.show', $location->id) }}">{{ $location->number }}</a> {{ $location->address }}</td>
-                    <td></td>
+                    <td><a href="{{ route('locations.show', $location->id) }}">{{ $location->number }} {{ $location->address }}</a></td>
+                    <td>{{ ( $location->type == 1 ? 'Interior' : 'End Unit' ) }}</td>
+                    <td>{{ $location->bedrooms }}</td>
+                    <td>{{ $location->bathrooms }}</td>
                     <td>@if ( $location->latestPrice() ) ${{ number_format($location->latestPrice()->price, 0, '.', ',') }} @else - @endif</td>
                     <td>@if ( $location->latestSalePrice() ) ${{ number_format($location->latestSalePrice()->price, 0, '.', ',') }} @else - @endif</td>
                     <td>@if ( $location->latestSalePrice() ) {{ $location->latestSalePrice()->price_date->toFormattedDateString() }} @else - @endif</td>
