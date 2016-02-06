@@ -37,21 +37,32 @@
                 <table class="table">
                     <thead>
                         <tr>
+                            <th>&nbsp;</th>
                             <th>Date</th>
-                            <th>Type</th>
                             <th>Price</th>
                         </tr>
                     </thead>
                     <tbody>
                     @foreach ( $location->prices()->get() as $price )
-                        <tr class="{{ ( $price->type == 1 ? 'table-info' : '' ) }}">
-                            <td>{{ $price->price_date }}</td>
-                            <td>{{ $price->price }}</td>
-                            <td><a href="{{ route('locations.prices.edit', [$location->id, $price->id]) }}" class="btn btn-secondary btn-sm"><i class="fa fa-pencil"></i></a> <a href="#" class="btn btn-danger btn-sm"><i class="fa fa-trash"></i></a></td>
+                        <tr class="{{ ( $price->type == 2 ? 'table-success' : '' ) }}">
+                            <td>
+                                <div class="dropdown">
+                                    <button class="btn btn-secondary btn-sm" type="button" id="dropdownMenu{{ $price->id }}" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                        <i class="fa fa-bars"></i>
+                                    </button>
+                                    <div class="dropdown-menu" aria-labelledby="dropdownMenu{{ $price->id }}">
+                                        <a class="dropdown-item" href="{{ route('locations.prices.edit', [$location->id, $price->id]) }}"><i class="fa fa-pencil"></i> edit</a>
+                                        <a class="dropdown-item" href="#"><i class="fa fa-trash"></i> Delete</a>
+                                    </div>
+                                </div>
+                            </td>
+                            <td>{{ $price->price_date->toFormattedDateString() }}</td>
+                            <td>${{ number_format($price->price, 0, '.', ',') }}</td>
                         </tr>
                     @endforeach
                     </tbody>
                 </table>
+                <a href="{{ route('locations.prices.create', $location->id) }}" class="btn btn-success btn-sm pull-right"><i class="fa fa-plus fa-fw"></i> Price</a>
             </div>
             <div class="col-md-5">
                 <h3>Price Trend</h3>
