@@ -45,14 +45,14 @@
                     <tbody>
                     @foreach ( $location->prices()->get() as $price )
                         <tr class="{{ ( $price->type == 2 ? 'table-success' : '' ) }}">
-                            <td>
+                            <td class="row-menu">
                                 <div class="dropdown">
                                     <button class="btn btn-secondary btn-sm" type="button" id="dropdownMenu{{ $price->id }}" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                                         <i class="fa fa-bars"></i>
                                     </button>
                                     <div class="dropdown-menu" aria-labelledby="dropdownMenu{{ $price->id }}">
-                                        <a class="dropdown-item" href="{{ route('locations.prices.edit', [$location->id, $price->id]) }}"><i class="fa fa-pencil"></i> edit</a>
-                                        <a class="dropdown-item" href="#"><i class="fa fa-trash"></i> Delete</a>
+                                        <a class="dropdown-item" href="{{ route('locations.prices.edit', [$location->id, $price->id]) }}"><i class="fa fa-pencil fa-fw"></i> Edit</a>
+                                        <a class="dropdown-item bg-danger" href="#"><i class="fa fa-trash fa-fw"></i> Delete</a>
                                     </div>
                                 </div>
                             </td>

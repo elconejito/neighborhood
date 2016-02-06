@@ -14,8 +14,8 @@
             <thead>
                 <tr>
                     <th>&nbsp;</th>
-                    <th>#</th>
                     <th>Address</th>
+                    <th></th>
                     <th>Latest Price</th>
                     <th>Sale Price</th>
                     <th>Sale Date</th>
@@ -24,15 +24,15 @@
             <tbody>
             @foreach ( $locations as $location )
                 <tr>
-                    <td>
+                    <td class="row-menu">
                         <div class="dropdown">
                             <button class="btn btn-secondary btn-sm" type="button" id="dropdownMenu{{ $location->id }}" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                                 <i class="fa fa-bars"></i>
                             </button>
                             <div class="dropdown-menu" aria-labelledby="dropdownMenu{{ $location->id }}">
                                 <a class="dropdown-item" href="{{ route('locations.prices.create', $location->id) }}"><i class="fa fa-plus fa-fw"></i> Price</a>
-                                <a class="dropdown-item" href="{{ route('locations.edit', $location->id) }}"><i class="fa fa-pencil"></i> edit</a>
-                                <a class="dropdown-item" href="#"><i class="fa fa-trash"></i> Delete</a>
+                                <a class="dropdown-item" href="{{ route('locations.edit', $location->id) }}"><i class="fa fa-pencil fa-fw"></i> Edit</a>
+                                <a class="dropdown-item bg-danger" href="#"><i class="fa fa-trash fa-fw"></i> Delete</a>
                             </div>
                         </div>
                     </td>

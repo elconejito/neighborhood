@@ -3605,6 +3605,7 @@ var Popover = (function ($) {
 //# sourceMappingURL=popover.js.map
 
 //# sourceMappingURL=bootstrap.js.map
+
 !function() {
   var d3 = {
     version: "3.5.14"
