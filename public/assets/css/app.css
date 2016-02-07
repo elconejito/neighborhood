@@ -9599,9 +9599,27 @@ a.bg-danger:hover {
   content: "";
 }
 
+html {
+  height: 100%;
+}
+
 body {
   /* Height of the navbar */
   padding-top: 70px;
+  display: -webkit-flex;
+  display: -ms-flexbox;
+  display: flex;
+  min-height: 100%;
+  -webkit-flex-direction: column;
+  -ms-flex-direction: column;
+  flex-direction: column;
+}
+
+.main-content {
+  -webkit-flex: 1 0 auto;
+  -ms-flex: 1 0 auto;
+  flex: 1 0 auto;
+  width: 100%;
 }
 
 .table .row-menu {
@@ -9616,4 +9634,8 @@ body {
 
 .navbar-static-top {
   margin-bottom: 1rem;
+}
+
+footer.page-footer {
+  width: 100%;
 }

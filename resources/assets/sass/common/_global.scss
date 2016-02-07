@@ -1,6 +1,17 @@
+html {
+  height: 100%;
+}
 body {
   /* Height of the navbar */
   padding-top: 70px;
+  display: flex;
+  min-height: 100%;
+  flex-direction: column;
+}
+
+.main-content {
+  flex: 1 0 auto;
+  width: 100%;
 }
 
 .table {
