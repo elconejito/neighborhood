@@ -9,9 +9,11 @@
 
 @include('partials.errors')
 
+<div class="container main-content">
 @section('content')
     This is the default content
 @show
+</div><!-- /.container.main-content -->
 
 @include('partials.footer')
 
