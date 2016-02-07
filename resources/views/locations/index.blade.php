@@ -4,8 +4,8 @@
 
 @section('content')
     {!! Breadcrumbs::render('locations') !!}
+    <a href="{{ route('locations.create') }}" class="btn btn-success-outline pull-right" ><i class="fa fa-plus"></i> Add New Location</a>
     <h1>Location</h1>
-    <p><a href="{{ route('locations.create') }}"><i class="fa fa-plus"></i> Add New</a></p>
     @if ( $locations->isEmpty() )
         <p>No Locations yet.</p>
     @else

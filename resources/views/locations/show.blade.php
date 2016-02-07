@@ -4,10 +4,15 @@
 
 @section('content')
     {!! Breadcrumbs::render('location', $location) !!}
-    <h1>{{ $location->number }}<br /><small>{{ $location->address }}</small></h1>
+
+    <h1>{{ $location->number }} {{ $location->address }}</h1>
+    <div class="btn-group" role="group">
+        <a class="btn btn-secondary" href="{{ route('locations.edit', $location->id) }}"><i class="fa fa-pencil fa-fw"></i> Edit</a>
+        <a class="btn btn-danger" href="#"><i class="fa fa-trash fa-fw"></i> Delete</a>
+    </div>
     <div class="row">
         <div class="col-md-3">
-            <h3>Stats</h3>
+            <h3 class="section-heading">Stats</h3>
             <ul class="list-group">
                 <li class="list-group-item">
                     <span class="label label-default pull-xs-right">{{ $location->bedrooms }}</span>
@@ -32,7 +37,7 @@
             </ul>
         </div>
         <div class="col-md-4">
-            <h3>Price History</h3>
+            <h3 class="section-heading">Price History</h3>
             <table class="table">
                 <thead>
                     <tr>
@@ -64,12 +69,12 @@
             <a href="{{ route('locations.prices.create', $location->id) }}" class="btn btn-success btn-sm pull-right"><i class="fa fa-plus fa-fw"></i> Price</a>
         </div>
         <div class="col-md-5">
-            <h3>Price Trend</h3>
+            <h3 class="section-heading">Price Trend</h3>
         </div>
     </div>
     <div class="row">
         <div class="col-md-12">
-            <h3>Details</h3>
+            <h3 class="section-heading">Details</h3>
             <p>{{ $location->details }}</p>
         </div>
     </div>

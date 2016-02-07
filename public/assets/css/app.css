@@ -9637,5 +9637,10 @@ body {
 }
 
 footer.page-footer {
+  padding: 1rem;
   width: 100%;
+}
+
+.section-heading {
+  margin-top: 2rem;
 }
