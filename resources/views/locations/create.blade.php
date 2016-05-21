@@ -61,7 +61,8 @@
         <div class="form-group row">
             <label for="details" class="col-sm-2 form-control-label">Details</label>
             <div class="col-sm-10">
-                <textarea class="form-control" id="details" name="details" rows="3"></textarea>
+                <input type="hidden" id="details" name="details">
+                <trix-editor input="details"></trix-editor>
             </div>
         </div>
 

@@ -75,7 +75,7 @@
     <div class="row">
         <div class="col-md-12">
             <h3 class="section-heading">Details</h3>
-            <p>{{ $location->details }}</p>
+            {!! $location->details !!}
         </div>
     </div>
 @endsection
