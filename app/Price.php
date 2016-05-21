@@ -9,6 +9,6 @@ class Price extends Model
     protected $dates = ['price_date', 'created_at', 'updated_at', 'deleted_at'];
 
     public function location() {
-        $this->belongsTo('App/Location');
+        return $this->belongsTo('App\Location');
     }
 }

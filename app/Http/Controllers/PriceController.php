@@ -47,16 +47,19 @@ class PriceController extends Controller
      */
     public function store($location_id, Request $request)
     {
+        $location = Location::find($location_id);
+
         // create the new Location
 		$price = new Price();
         $price->type = $request->type;
         $price->price = $request->price;
         $price->price_date = $request->price_date;
-        $price->location_id = $location_id;
+
+        $price->location()->associate($location);
 
         $price->save();
 
-        return Redirect('locations');
+        return redirect()->action('LocationController@show', $price->location->id);
     }
 
     /**
@@ -65,9 +68,9 @@ class PriceController extends Controller
      * @param  int  $id
      * @return Response
      */
-    public function show($id)
+    public function show($location_id, $id)
     {
-        //
+        return view('prices.show', [ 'price' => Price::find($id) ]);
     }
 
     /**
@@ -76,9 +79,9 @@ class PriceController extends Controller
      * @param  int  $id
      * @return Response
      */
-    public function edit($id)
+    public function edit($location_id, $id)
     {
-        //
+        return view('prices.edit', [ 'price' => Price::find($id) ]);
     }
 
     /**
@@ -88,9 +91,20 @@ class PriceController extends Controller
      * @param  int  $id
      * @return Response
      */
-    public function update(Request $request, $id)
+    public function update(Request $request, $location_id, $id)
     {
-        //
+        $location = Location::find($location_id);
+        $price = Price::find($id);
+
+        $price->type = $request->type;
+        $price->price = $request->price;
+        $price->price_date = $request->price_date;
+
+        $price->location()->associate($location);
+
+        $price->save();
+
+        return redirect()->action('LocationController@show', $price->location->id);
     }
 
     /**

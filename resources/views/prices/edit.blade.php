@@ -1,49 +1,44 @@
 @extends('layouts.master')
 
-@section('title', 'Edit | Location')
+@section('title', 'Edit | Price')
 
 @section('content')
-    <div class="container">
+    {!! Breadcrumbs::render('priceEdit', $price) !!}
+    <h1>Edit Price<br /><small>{{ $price->location->number }} {{ $price->location->address }}</small></h1>
+    <div class="row">
+        <div class="col-sm-12">
+            <form action="{{ route('locations.prices.update', [$price->location->id, $price->id]) }}" method="post" name="location-edit">
+                {{ csrf_field() }}
+                <input type="hidden" name="_method" value="put" />
+                <div class="form-group row">
+                    <label for="type" class="col-sm-2 form-control-label">Type</label>
+                    <div class="col-sm-10">
+                        <select class="form-control" id="type" name="type">
+                            <option value="1" {{ ($price->type == 1 ? 'selected="selected"': '') }}>Listing</option>
+                            <option value="2" {{ ($price->type == 2 ? 'selected="selected"': '') }}>Sale</option>
+                            <option value="3" {{ ($price->type == 3 ? 'selected="selected"': '') }}>Change</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="form-group row">
+                    <label for="price" class="col-sm-2 form-control-label">Price</label>
+                    <div class="col-sm-10">
+                        <input type="text" class="form-control" id="price" name="price" placeholder="Price" value="{{ $price->price }}">
+                    </div>
+                </div>
+                <div class="form-group row">
+                    <label for="price_date" class="col-sm-2 form-control-label">Price Date</label>
+                    <div class="col-sm-10">
+                        <input type="text" class="form-control" id="price_date" name="price_date" value="{{ $price->price_date }}">
+                    </div>
+                </div>
 
-        <h1>Edit Location</h1>
-        <form action="{{ route('locations.update', $location->id) }}" method="post" name="location-edit">
-            {{ csrf_field() }}
-            <input type="hidden" name="_method" value="put" />
-            <div class="form-group row">
-                <label for="number" class="col-sm-2 form-control-label">Number</label>
-                <div class="col-sm-10">
-                    <input type="text" class="form-control" id="number" name="number" value="{{ $location->number }}">
+                <div class="form-group row">
+                    <div class="col-sm-offset-2 col-sm-10">
+                        <button type="submit" class="btn btn-primary">Save</button>
+                    </div>
                 </div>
-            </div>
-            <div class="form-group row">
-                <label for="address" class="col-sm-2 form-control-label">Address</label>
-                <div class="col-sm-10">
-                    <input type="text" class="form-control" id="address" name="address" value="{{ $location->address }}">
-                </div>
-            </div>
-            <div class="form-group row">
-                <label for="type" class="col-sm-2 form-control-label">Type</label>
-                <div class="col-sm-10">
-                    <select class="form-control" id="type" name="type">
-                        <option value="1" {{ ($location->type == 1 ? 'selected="selected"': '') }}>Interior Townhouse</option>
-                        <option value="2" {{ ($location->type == 2 ? 'selected="selected"': '') }}>End Unit Townhouse</option>
-                        <option value="3" {{ ($location->type == 3 ? 'selected="selected"': '') }}>Single Family</option>
-                    </select>
-                </div>
-            </div>
-            <div class="form-group row">
-                <label for="details" class="col-sm-2 form-control-label">Details</label>
-                <div class="col-sm-10">
-                    <textarea class="form-control" id="details" name="details" rows="3">{{ $location->details }}</textarea>
-                </div>
-            </div>
-            
-            <div class="form-group row">
-                <div class="col-sm-offset-2 col-sm-10">
-                    <button type="submit" class="btn btn-primary">Save</button>
-                </div>
-            </div>
-        </form>
-
-    </div><!-- /.container -->
+            </form>
+        </div>
+    </div>
 @endsection

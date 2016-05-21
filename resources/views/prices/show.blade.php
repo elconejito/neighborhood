@@ -5,10 +5,7 @@
 @section('content')
     <div class="container">
 
-        <h1><small>Location</small><br />{{ $location->label }}</h1>
-        <div class="row">
-            <p></p>
-        </div>
+        <h1>Price.Show</h1>
 
     </div><!-- /.container -->
 @endsection
