@@ -4,7 +4,6 @@
 
 @section('content')
     {!! Breadcrumbs::render('location', $location) !!}
-
     <h1>{{ $location->number }} {{ $location->address }}</h1>
     <div class="btn-group" role="group">
         <a class="btn btn-secondary" href="{{ route('locations.edit', $location->id) }}"><i class="fa fa-pencil fa-fw"></i> Edit</a>
