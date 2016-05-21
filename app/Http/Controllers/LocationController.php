@@ -54,7 +54,7 @@ class LocationController extends Controller
 
         $location->save();
 
-        return Redirect('locations');
+        return redirect()->action('LocationController@show', $location->id);
     }
 
     /**
@@ -106,7 +106,7 @@ class LocationController extends Controller
 
         $location->save();
 
-        return Redirect('locations');
+        return redirect()->action('LocationController@show', $location->id);
     }
 
     /**
