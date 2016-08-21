@@ -4,6 +4,7 @@
     "gulp": "^3.8.8"
   },
   "dependencies": {
+    "d3": "^4.2.2",
     "laravel-elixir": "^3.0.0"
   }
 }
