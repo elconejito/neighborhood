@@ -23,24 +23,11 @@
         </div>
         <div class="col-sm-4">
             <h3>Sales per Month</h3>
-            <div class="chart">
-                <div class="bar"></div>
-                <div class="bar"></div>
-                <div class="bar"></div>
-                <div class="bar"></div>
-                <div class="bar"></div>
-                <div class="bar"></div>
-                <div class="bar"></div>
-                <div class="bar"></div>
-                <div class="bar"></div>
-                <div class="bar"></div>
-                <div class="bar"></div>
-                <div class="bar"></div>
-            </div>
+            <div class="chart"></div>
         </div>
         <div class="col-sm-4">
             <h3>Listings per Month</h3>
-            <div class="chart">
+            <div class="charts">
                 <div class="bar"></div>
                 <div class="bar"></div>
                 <div class="bar"></div>
