@@ -1,9 +1,37 @@
+.charts {
+  .bar {
+    font-size: 10px;
+    background-color: $brand-primary;
+    padding: $btn-padding-y $btn-padding-x;
+    margin: 1px;
+    color: #ffffff;
+  }
+}
+
 .chart {
-    .bar {
-        font: 10px;
-        background-color: $brand-primary;
-        padding: $btn-padding-y $btn-padding-x;
-        margin: 1px;
-        color: #ffffff;
-    }
+  rect {
+    fill: $brand-primary;
+  }
+  text {
+    font-size: 10px;
+    fill: #ffffff;
+  }
+  .bar {
+    fill: $brand-primary;
+  }
+
+  .axis text {
+    fill: $body-color;
+  }
+
+  .axis path,
+  .axis line {
+    fill: none;
+    stroke: $body-color;
+    shape-rendering: crispEdges;
+  }
+
+  .x.axis path {
+    display: none;
+  }
 }
