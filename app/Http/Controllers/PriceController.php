@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use DB;
 use App\Location;
 use App\Price;
 use Illuminate\Http\Request;
@@ -116,5 +117,16 @@ class PriceController extends Controller
     public function destroy($id)
     {
         //
+    }
+    
+    public function stats()
+    {
+        $prices = Price::where('type', 2)
+        ->where('price_date', '>=', DB::raw('DATE_SUB(NOW(),INTERVAL 1 YEAR)'))
+        ->select(DB::raw('COUNT(*) AS count, YEAR(`price_date`) AS year, Month(`price_date`) AS month'))
+        ->groupBy(DB::raw('YEAR(`price_date`), Month(`price_date`)'))
+        ->get();
+        
+        return response()->json( $prices );
     }
 }
