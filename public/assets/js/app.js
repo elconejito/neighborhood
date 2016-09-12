@@ -3657,7 +3657,7 @@ $( document ).ready(function() {
             console.log('Starting price $.get()');
             console.log(data);
 
-            x.domain(data.map(function(d) { return monthNames[d.month - 1] + d.month; }));
+            x.domain(data.map(function(d) { return monthNames[d.month - 1]; }));
             y.domain([0, d3.max(data, function (d) { return d.count; })]);
 
             // Add the X-Axis labels all the way at the bottom
@@ -3670,10 +3670,23 @@ $( document ).ready(function() {
                     .data(data)
                 .enter().append("rect")
                     .attr("class", "bar")
-                    .attr("x", function(d) { return x(monthNames[d.month - 1] + d.month); })
+                    .attr("x", function(d) { return x(monthNames[d.month - 1]); })
                     .attr("y", function(d) { return y(d.count); })
                     .attr("height", function(d) { return chartHeight - y(d.count); })
                     .attr("width", x.bandwidth());
+            
+            console.log('after .bar');
+            
+            chart.selectAll(".label")
+                    .data(data)
+                .enter().append("text")
+                    .attr("class", "label")
+                    .attr("x", function(d) { return x(monthNames[d.month - 1]) + (x.bandwidth() / 2); })
+                    .attr("y", function(d) { return y(d.count) - 15; })
+                    .attr("dy", ".35em")
+                    .text(function(d) { return d.count; });
+                    
+            console.log('after text');
         });
 });
 //# sourceMappingURL=app.js.map

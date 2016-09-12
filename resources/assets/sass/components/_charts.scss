@@ -13,14 +13,16 @@
     fill: $brand-primary;
   }
   text {
-    font-size: 10px;
     fill: #ffffff;
   }
   .bar {
     fill: $brand-primary;
   }
-
+  .label {
+    fill: $body-color;
+  }
   .axis text {
+    font-size: 14px;
     fill: $body-color;
   }
 
