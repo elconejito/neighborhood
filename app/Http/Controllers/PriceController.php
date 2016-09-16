@@ -119,14 +119,27 @@ class PriceController extends Controller
         //
     }
     
-    public function stats()
+    public function stats($method)
     {
-        $prices = Price::where('type', 2)
-        ->where('price_date', '>=', DB::raw('DATE_SUB(NOW(),INTERVAL 1 YEAR)'))
-        ->select(DB::raw('COUNT(*) AS count, YEAR(`price_date`) AS year, Month(`price_date`) AS month'))
-        ->groupBy(DB::raw('YEAR(`price_date`), Month(`price_date`)'))
-        ->get();
+        switch ($method) {
+            case 'salescount':
+                $return = Price::where('type', 2)
+                    ->where('price_date', '>=', DB::raw('DATE_SUB(NOW(),INTERVAL 1 YEAR)'))
+                    ->select(DB::raw('COUNT(*) AS count, YEAR(`price_date`) AS year, Month(`price_date`) AS month'))
+                    ->groupBy(DB::raw('YEAR(`price_date`), Month(`price_date`)'))
+                    ->get();
+                break;
+            case 'listingcount':
+                $return = Price::where('type', 1)
+                    ->where('price_date', '>=', DB::raw('DATE_SUB(NOW(),INTERVAL 1 YEAR)'))
+                    ->select(DB::raw('COUNT(*) AS count, YEAR(`price_date`) AS year, Month(`price_date`) AS month'))
+                    ->groupBy(DB::raw('YEAR(`price_date`), Month(`price_date`)'))
+                    ->get();
+                break;
+            default:
+                break;
+        }
         
-        return response()->json( $prices );
+        return response()->json( $return );
     }
 }

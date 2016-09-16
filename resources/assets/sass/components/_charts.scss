@@ -9,17 +9,15 @@
 }
 
 .chart {
-  rect {
-    fill: $brand-primary;
-  }
-  text {
-    fill: #ffffff;
-  }
   .bar {
     fill: $brand-primary;
   }
   .label {
+    text-anchor: middle;
     fill: $body-color;
+  }
+  .label-inside {
+    fill: #ffffff;
   }
   .axis text {
     font-size: 14px;

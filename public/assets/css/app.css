@@ -7518,17 +7518,15 @@ body {
   margin: 1px;
   color: #ffffff; }
 
-.chart rect {
-  fill: #0275d8; }
-
-.chart text {
-  fill: #ffffff; }
-
 .chart .bar {
   fill: #0275d8; }
 
 .chart .label {
+  text-anchor: middle;
   fill: #373a3c; }
+
+.chart .label-inside {
+  fill: #ffffff; }
 
 .chart .axis text {
   font-size: 14px;

@@ -23,11 +23,11 @@
         </div>
         <div class="col-sm-4">
             <h3>Sales per Month</h3>
-            <svg class="chart"></svg>
+            <svg id="sales" class="chart" data-method="salescount"></svg>
         </div>
         <div class="col-sm-4">
             <h3>Listings per Month</h3>
-            <div class="charts"></div>
+            <svg id="listings" class="chart" data-method="listingcount"></svg>
         </div>
     </div>
 @endsection
