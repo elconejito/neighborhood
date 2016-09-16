@@ -17,7 +17,7 @@
     "tests"
   ],
   "dependencies": {
-    "bootstrap": "v4.0.0-alpha.3",
+    "bootstrap": "v4.0.0-alpha.4",
     "d3": "^4.2.2",
     "font-awesome": "^4.6.0",
     "jquery": "^2.1.4",
