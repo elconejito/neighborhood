@@ -72,11 +72,15 @@ var buildChart = function(selector, stat) {
 
 $( document ).ready(function() {
     console.log("ready!");
-    console.log("Starting D3");
     
-    $(".chart").each(function() {
+    $(".data-chart").each(function() {
         buildChart(this, $(this).data('method'));
     });
     
-    console.log('Finished D3');
+    $(".data-list").each(function() {
+        $.get('api/stats/' + $(this).data('method'))
+            .done(function(data) {
+                console.log(data);
+            });
+    });
 });

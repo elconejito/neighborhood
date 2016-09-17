@@ -7496,34 +7496,27 @@ body {
   padding: 0 0.15rem;
   width: 44px; }
 
-.charts .bar {
-  font-size: 10px;
-  background-color: #0275d8;
-  padding: 0.5rem 1rem;
-  margin: 1px;
-  color: #ffffff; }
-
-.chart .bar {
+.data-chart .bar {
   fill: #0275d8; }
 
-.chart .label {
+.data-chart .label {
   text-anchor: middle;
   fill: #373a3c; }
 
-.chart .label-inside {
+.data-chart .label-inside {
   fill: #ffffff; }
 
-.chart .axis text {
+.data-chart .axis text {
   font-size: 14px;
   fill: #373a3c; }
 
-.chart .axis path,
-.chart .axis line {
+.data-chart .axis path,
+.data-chart .axis line {
   fill: none;
   stroke: #373a3c;
   shape-rendering: crispEdges; }
 
-.chart .x.axis path {
+.data-chart .x.axis path {
   display: none; }
 
 .navbar-static-top {
