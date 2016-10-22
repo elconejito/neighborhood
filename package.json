@@ -1,4 +1,7 @@
 {
+  "name": "rabbithome",
+  "version": "0.1.0",
+  "homepage": "https://github.com/elconejito/RabbitHome",
   "private": true,
   "scripts": {
     "prod": "gulp --production",
@@ -6,9 +9,14 @@
   },
   "devDependencies": {
     "gulp": "^3.9.1",
-    "laravel-elixir": "^6.0.0-9"
+    "laravel-elixir": "^6.0.0-11",
+    "laravel-elixir-webpack-official": "^1.0.2"
   },
   "dependencies": {
-    "d3": "^4.2.2"
+    "bootstrap": "^4.0.0-alpha.5",
+    "d3": "^4.2.8",
+    "font-awesome": "^4.6.3",
+    "jquery": "^3.1.0",
+    "trix": "^0.9.9"
   }
 }
