@@ -1,5 +1,4 @@
-process.env.DISABLE_NOTIFIER = true;
-var elixir = require('laravel-elixir');
+const elixir = require('laravel-elixir');
 
 /*
  |--------------------------------------------------------------------------
@@ -12,7 +11,7 @@ var elixir = require('laravel-elixir');
  |
  */
 
-elixir(function(mix) {
+elixir(mix => {
     /**
      * Mix Vendor JS files
      */

@@ -1,15 +1,15 @@
-// https://d3js.org Version 4.2.3. Copyright 2016 Mike Bostock.
+// https://d3js.org Version 4.2.8. Copyright 2016 Mike Bostock.
 (function (global, factory) {
   typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports) :
   typeof define === 'function' && define.amd ? define(['exports'], factory) :
   (factory((global.d3 = global.d3 || {})));
 }(this, (function (exports) { 'use strict';
 
-var version = "4.2.3";
+var version = "4.2.8";
 
 var ascending = function(a, b) {
   return a < b ? -1 : a > b ? 1 : a >= b ? 0 : NaN;
-}
+};
 
 var bisector = function(compare) {
   if (compare.length === 1) compare = ascendingComparator(compare);
@@ -35,7 +35,7 @@ var bisector = function(compare) {
       return lo;
     }
   };
-}
+};
 
 function ascendingComparator(f) {
   return function(d, x) {
@@ -49,11 +49,11 @@ var bisectLeft = ascendingBisect.left;
 
 var descending = function(a, b) {
   return b < a ? -1 : b > a ? 1 : b >= a ? 0 : NaN;
-}
+};
 
 var number = function(x) {
   return x === null ? NaN : +x;
-}
+};
 
 var variance = function(array, f) {
   var n = array.length,
@@ -85,12 +85,12 @@ var variance = function(array, f) {
   }
 
   if (j > 1) return s / (j - 1);
-}
+};
 
 var deviation = function(array, f) {
   var v = variance(array, f);
   return v ? Math.sqrt(v) : v;
-}
+};
 
 var extent = function(array, f) {
   var i = -1,
@@ -116,7 +116,7 @@ var extent = function(array, f) {
   }
 
   return [a, c];
-}
+};
 
 var array = Array.prototype;
 
@@ -127,11 +127,11 @@ var constant$1 = function(x) {
   return function() {
     return x;
   };
-}
+};
 
 var identity = function(x) {
   return x;
-}
+};
 
 var range = function(start, stop, step) {
   start = +start, stop = +stop, step = (n = arguments.length) < 2 ? (stop = start, start = 0, 1) : n < 3 ? 1 : +step;
@@ -145,7 +145,7 @@ var range = function(start, stop, step) {
   }
 
   return range;
-}
+};
 
 var e10 = Math.sqrt(50);
 var e5 = Math.sqrt(10);
@@ -158,7 +158,7 @@ var ticks = function(start, stop, count) {
     Math.floor(stop / step) * step + step / 2, // inclusive
     step
   );
-}
+};
 
 function tickStep(start, stop, count) {
   var step0 = Math.abs(stop - start) / Math.max(0, count),
@@ -172,7 +172,7 @@ function tickStep(start, stop, count) {
 
 var sturges = function(values) {
   return Math.ceil(Math.log(values.length) / Math.LN2) + 1;
-}
+};
 
 var histogram = function() {
   var value = identity,
@@ -236,7 +236,7 @@ var histogram = function() {
   };
 
   return histogram;
-}
+};
 
 var threshold = function(array, p, f) {
   if (f == null) f = number;
@@ -249,16 +249,16 @@ var threshold = function(array, p, f) {
       a = +f(array[i], i, array),
       b = +f(array[i + 1], i + 1, array);
   return a + (b - a) * (h - i);
-}
+};
 
 var freedmanDiaconis = function(values, min, max) {
   values = map.call(values, number).sort(ascending);
   return Math.ceil((max - min) / (2 * (threshold(values, 0.75) - threshold(values, 0.25)) * Math.pow(values.length, -1 / 3)));
-}
+};
 
 var scott = function(values, min, max) {
   return Math.ceil((max - min) / (3.5 * deviation(values) * Math.pow(values.length, -1 / 3)));
-}
+};
 
 var max = function(array, f) {
   var i = -1,
@@ -277,7 +277,7 @@ var max = function(array, f) {
   }
 
   return a;
-}
+};
 
 var mean = function(array, f) {
   var s = 0,
@@ -295,7 +295,7 @@ var mean = function(array, f) {
   }
 
   if (j) return s / j;
-}
+};
 
 var median = function(array, f) {
   var numbers = [],
@@ -312,7 +312,7 @@ var median = function(array, f) {
   }
 
   return threshold(numbers.sort(ascending), 0.5);
-}
+};
 
 var merge = function(arrays) {
   var n = arrays.length,
@@ -334,7 +334,7 @@ var merge = function(arrays) {
   }
 
   return merged;
-}
+};
 
 var min = function(array, f) {
   var i = -1,
@@ -353,19 +353,19 @@ var min = function(array, f) {
   }
 
   return a;
-}
+};
 
 var pairs = function(array) {
   var i = 0, n = array.length - 1, p = array[0], pairs = new Array(n < 0 ? 0 : n);
   while (i < n) pairs[i] = [p, p = array[++i]];
   return pairs;
-}
+};
 
 var permute = function(array, indexes) {
   var i = indexes.length, permutes = new Array(i);
   while (i--) permutes[i] = array[indexes[i]];
   return permutes;
-}
+};
 
 var scan = function(array, compare) {
   if (!(n = array.length)) return;
@@ -380,7 +380,7 @@ var scan = function(array, compare) {
   while (++i < n) if (compare(xi = array[i], xj) < 0 || compare(xj, xj) !== 0) xj = xi, j = i;
 
   if (compare(xj, xj) === 0) return j;
-}
+};
 
 var shuffle = function(array, i0, i1) {
   var m = (i1 == null ? array.length : i1) - (i0 = i0 == null ? 0 : +i0),
@@ -395,7 +395,7 @@ var shuffle = function(array, i0, i1) {
   }
 
   return array;
-}
+};
 
 var sum = function(array, f) {
   var s = 0,
@@ -412,7 +412,7 @@ var sum = function(array, f) {
   }
 
   return s;
-}
+};
 
 var transpose = function(matrix) {
   if (!(n = matrix.length)) return [];
@@ -422,7 +422,7 @@ var transpose = function(matrix) {
     }
   }
   return transpose;
-}
+};
 
 function length(d) {
   return d.length;
@@ -430,7 +430,7 @@ function length(d) {
 
 var zip = function() {
   return transpose(arguments);
-}
+};
 
 var prefix = "$";
 
@@ -560,7 +560,7 @@ var nest = function() {
     sortValues: function(order) { sortValues = order; return nest; },
     rollup: function(f) { rollup = f; return nest; }
   };
-}
+};
 
 function createObject() {
   return {};
@@ -618,19 +618,19 @@ var keys = function(map) {
   var keys = [];
   for (var key in map) keys.push(key);
   return keys;
-}
+};
 
 var values = function(map) {
   var values = [];
   for (var key in map) values.push(map[key]);
   return values;
-}
+};
 
 var entries = function(map) {
   var entries = [];
   for (var key in map) entries.push({key: key, value: map[key]});
   return entries;
-}
+};
 
 var uniform = function(min, max) {
   min = min == null ? 0 : +min;
@@ -640,7 +640,7 @@ var uniform = function(min, max) {
   return function() {
     return Math.random() * max + min;
   };
-}
+};
 
 var normal = function(mu, sigma) {
   var x, r;
@@ -661,34 +661,34 @@ var normal = function(mu, sigma) {
 
     return mu + sigma * y * Math.sqrt(-2 * Math.log(r) / r);
   };
-}
+};
 
 var logNormal = function() {
   var randomNormal = normal.apply(this, arguments);
   return function() {
     return Math.exp(randomNormal());
   };
-}
+};
 
 var irwinHall = function(n) {
   return function() {
     for (var sum = 0, i = 0; i < n; ++i) sum += Math.random();
     return sum;
   };
-}
+};
 
 var bates = function(n) {
   var randomIrwinHall = irwinHall(n);
   return function() {
     return randomIrwinHall() / n;
   };
-}
+};
 
 var exponential = function(lambda) {
   return function() {
     return -Math.log(1 - Math.random()) / lambda;
   };
-}
+};
 
 function linear(t) {
   return +t;
@@ -915,7 +915,7 @@ var area = function(polygon) {
   }
 
   return area / 2;
-}
+};
 
 var centroid = function(polygon) {
   var i = -1,
@@ -936,7 +936,7 @@ var centroid = function(polygon) {
   }
 
   return k *= 3, [x / k, y / k];
-}
+};
 
 // Returns the 2D cross product of AB and AC vectors, i.e., the z-component of
 // the 3D cross product in a quadrant I Cartesian coordinate system (+x is
@@ -944,7 +944,7 @@ var centroid = function(polygon) {
 // negative if clockwise, and zero if the points are collinear.
 var cross = function(a, b, c) {
   return (b[0] - a[0]) * (c[1] - a[1]) - (b[1] - a[1]) * (c[0] - a[0]);
-}
+};
 
 function lexicographicOrder(a, b) {
   return a[0] - b[0] || a[1] - b[1];
@@ -992,7 +992,7 @@ var hull = function(points) {
   for (i = +skipLeft; i < lowerIndexes.length - skipRight; ++i) hull.push(points[sortedPoints[lowerIndexes[i]][2]]);
 
   return hull;
-}
+};
 
 var contains = function(polygon, point) {
   var n = polygon.length,
@@ -1009,7 +1009,7 @@ var contains = function(polygon, point) {
   }
 
   return inside;
-}
+};
 
 var length$1 = function(polygon) {
   var i = -1,
@@ -1033,7 +1033,7 @@ var length$1 = function(polygon) {
   }
 
   return perimeter;
-}
+};
 
 var pi$1 = Math.PI;
 var tau$1 = 2 * pi$1;
@@ -1183,7 +1183,7 @@ var tree_add = function(d) {
   var x = +this._x.call(null, d),
       y = +this._y.call(null, d);
   return add(this.cover(x, y), x, y, d);
-}
+};
 
 function add(tree, x, y, d) {
   if (isNaN(x) || isNaN(y)) return tree; // ignore invalid points
@@ -1322,7 +1322,7 @@ var tree_cover = function(x, y) {
   this._x1 = x1;
   this._y1 = y1;
   return this;
-}
+};
 
 var tree_data = function() {
   var data = [];
@@ -1330,13 +1330,13 @@ var tree_data = function() {
     if (!node.length) do data.push(node.data); while (node = node.next)
   });
   return data;
-}
+};
 
 var tree_extent = function(_) {
   return arguments.length
       ? this.cover(+_[0][0], +_[0][1]).cover(+_[1][0], +_[1][1])
       : isNaN(this._x0) ? undefined : [[this._x0, this._y0], [this._x1, this._y1]];
-}
+};
 
 var Quad = function(node, x0, y0, x1, y1) {
   this.node = node;
@@ -1344,7 +1344,7 @@ var Quad = function(node, x0, y0, x1, y1) {
   this.y0 = y0;
   this.x1 = x1;
   this.y1 = y1;
-}
+};
 
 var tree_find = function(x, y, radius) {
   var data,
@@ -1413,7 +1413,7 @@ var tree_find = function(x, y, radius) {
   }
 
   return data;
-}
+};
 
 var tree_remove = function(d) {
   if (isNaN(x = +this._x.call(null, d)) || isNaN(y = +this._y.call(null, d))) return this; // ignore invalid points
@@ -1471,7 +1471,7 @@ var tree_remove = function(d) {
   }
 
   return this;
-}
+};
 
 function removeAll(data) {
   for (var i = 0, n = data.length; i < n; ++i) this.remove(data[i]);
@@ -1480,7 +1480,7 @@ function removeAll(data) {
 
 var tree_root = function() {
   return this._root;
-}
+};
 
 var tree_size = function() {
   var size = 0;
@@ -1488,7 +1488,7 @@ var tree_size = function() {
     if (!node.length) do ++size; while (node = node.next)
   });
   return size;
-}
+};
 
 var tree_visit = function(callback) {
   var quads = [], q, node = this._root, child, x0, y0, x1, y1;
@@ -1503,7 +1503,7 @@ var tree_visit = function(callback) {
     }
   }
   return this;
-}
+};
 
 var tree_visitAfter = function(callback) {
   var quads = [], next = [], q;
@@ -1523,7 +1523,7 @@ var tree_visitAfter = function(callback) {
     callback(q.node, q.x0, q.y0, q.x1, q.y1);
   }
   return this;
-}
+};
 
 function defaultX(d) {
   return d[0];
@@ -1531,7 +1531,7 @@ function defaultX(d) {
 
 var tree_x = function(_) {
   return arguments.length ? (this._x = _, this) : this._x;
-}
+};
 
 function defaultY(d) {
   return d[1];
@@ -1539,7 +1539,7 @@ function defaultY(d) {
 
 var tree_y = function(_) {
   return arguments.length ? (this._y = _, this) : this._y;
-}
+};
 
 function quadtree(nodes, x, y) {
   var tree = new Quadtree(x == null ? defaultX : x, y == null ? defaultY : y, NaN, NaN, NaN, NaN);
@@ -1724,7 +1724,7 @@ var constant$2 = function(x) {
   return function constant() {
     return x;
   };
-}
+};
 
 var epsilon$1 = 1e-12;
 var pi$2 = Math.PI;
@@ -1989,7 +1989,7 @@ var arc = function() {
   };
 
   return arc;
-}
+};
 
 function Linear(context) {
   this._context = context;
@@ -2021,7 +2021,7 @@ Linear.prototype = {
 
 var curveLinear = function(context) {
   return new Linear(context);
-}
+};
 
 function x(p) {
   return p[0];
@@ -2080,7 +2080,7 @@ var line = function() {
   };
 
   return line;
-}
+};
 
 var area$1 = function() {
   var x0 = x,
@@ -2184,15 +2184,15 @@ var area$1 = function() {
   };
 
   return area;
-}
+};
 
 var descending$1 = function(a, b) {
   return b < a ? -1 : b > a ? 1 : b >= a ? 0 : NaN;
-}
+};
 
 var identity$1 = function(d) {
   return d;
-}
+};
 
 var pie = function() {
   var value = identity$1,
@@ -2267,7 +2267,7 @@ var pie = function() {
   };
 
   return pie;
-}
+};
 
 var curveRadialLinear = curveRadial(curveLinear);
 
@@ -2319,7 +2319,7 @@ function radialLine(l) {
 
 var radialLine$1 = function() {
   return radialLine(line().curve(curveRadialLinear));
-}
+};
 
 var radialArea = function() {
   var a = area$1().curve(curveRadialLinear),
@@ -2345,7 +2345,7 @@ var radialArea = function() {
   };
 
   return a;
-}
+};
 
 var circle = {
   draw: function(context, size) {
@@ -2494,9 +2494,9 @@ var symbol = function() {
   };
 
   return symbol;
-}
+};
 
-var noop = function() {}
+var noop = function() {};
 
 function point(that, x, y) {
   that._context.bezierCurveTo(
@@ -2548,7 +2548,7 @@ Basis.prototype = {
 
 var basis = function(context) {
   return new Basis(context);
-}
+};
 
 function BasisClosed(context) {
   this._context = context;
@@ -2598,7 +2598,7 @@ BasisClosed.prototype = {
 
 var basisClosed = function(context) {
   return new BasisClosed(context);
-}
+};
 
 function BasisOpen(context) {
   this._context = context;
@@ -2636,7 +2636,7 @@ BasisOpen.prototype = {
 
 var basisOpen = function(context) {
   return new BasisOpen(context);
-}
+};
 
 function Bundle(context, beta) {
   this._basis = new Basis(context);
@@ -3101,7 +3101,7 @@ LinearClosed.prototype = {
 
 var linearClosed = function(context) {
   return new LinearClosed(context);
-}
+};
 
 function sign(x) {
   return x < 0 ? -1 : 1;
@@ -3179,7 +3179,7 @@ MonotoneX.prototype = {
     this._y0 = this._y1, this._y1 = y;
     this._t0 = t1;
   }
-}
+};
 
 function MonotoneY(context) {
   this._context = new ReflectContext(context);
@@ -3272,7 +3272,7 @@ function controlPoints(x) {
 
 var natural = function(context) {
   return new Natural(context);
-}
+};
 
 function Step(context, t) {
   this._context = context;
@@ -3318,7 +3318,7 @@ Step.prototype = {
 
 var step = function(context) {
   return new Step(context, 0.5);
-}
+};
 
 function stepBefore(context) {
   return new Step(context, 0);
@@ -3338,13 +3338,13 @@ var none = function(series, order) {
       s1[j][1] += s1[j][0] = isNaN(s0[j][1]) ? s0[j][0] : s0[j][1];
     }
   }
-}
+};
 
 var none$1 = function(series) {
   var n = series.length, o = new Array(n);
   while (--n >= 0) o[n] = n;
   return o;
-}
+};
 
 function stackValue(d, key) {
   return d[key];
@@ -3397,7 +3397,7 @@ var stack = function() {
   };
 
   return stack;
-}
+};
 
 var expand = function(series, order) {
   if (!((n = series.length) > 0)) return;
@@ -3406,7 +3406,7 @@ var expand = function(series, order) {
     if (y) for (i = 0; i < n; ++i) series[i][j][1] /= y;
   }
   none(series, order);
-}
+};
 
 var silhouette = function(series, order) {
   if (!((n = series.length) > 0)) return;
@@ -3415,7 +3415,7 @@ var silhouette = function(series, order) {
     s0[j][1] += s0[j][0] = -y / 2;
   }
   none(series, order);
-}
+};
 
 var wiggle = function(series, order) {
   if (!((n = series.length) > 0) || !((m = (s0 = series[order[0]]).length) > 0)) return;
@@ -3438,12 +3438,12 @@ var wiggle = function(series, order) {
   }
   s0[j - 1][1] += s0[j - 1][0] = y;
   none(series, order);
-}
+};
 
 var ascending$1 = function(series) {
   var sums = series.map(sum$1);
   return none$1(series).sort(function(a, b) { return sums[a] - sums[b]; });
-}
+};
 
 function sum$1(series) {
   var s = 0, i = -1, n = series.length, v;
@@ -3453,7 +3453,7 @@ function sum$1(series) {
 
 var descending$2 = function(series) {
   return ascending$1(series).reverse();
-}
+};
 
 var insideOut = function(series) {
   var n = series.length,
@@ -3478,16 +3478,16 @@ var insideOut = function(series) {
   }
 
   return bottoms.reverse().concat(tops);
-}
+};
 
 var reverse = function(series) {
   return none$1(series).reverse();
-}
+};
 
 var define = function(constructor, factory, prototype) {
   constructor.prototype = factory.prototype = prototype;
   prototype.constructor = constructor;
-}
+};
 
 function extend(parent, definition) {
   var prototype = Object.create(parent.prototype);
@@ -4005,7 +4005,7 @@ var basis$2 = function(values) {
         v3 = i < n - 1 ? values[i + 2] : 2 * v2 - v1;
     return basis$1((t - i / n) * n, v0, v1, v2, v3);
   };
-}
+};
 
 var basisClosed$1 = function(values) {
   var n = values.length;
@@ -4017,13 +4017,13 @@ var basisClosed$1 = function(values) {
         v3 = values[(i + 2) % n];
     return basis$1((t - i / n) * n, v0, v1, v2, v3);
   };
-}
+};
 
 var constant$3 = function(x) {
   return function() {
     return x;
   };
-}
+};
 
 function linear$1(a, d) {
   return function(t) {
@@ -4118,20 +4118,20 @@ var array$1 = function(a, b) {
     for (i = 0; i < na; ++i) c[i] = x[i](t);
     return c;
   };
-}
+};
 
 var date = function(a, b) {
   var d = new Date;
   return a = +a, b -= a, function(t) {
     return d.setTime(a + b * t), d;
   };
-}
+};
 
 var interpolateNumber = function(a, b) {
   return a = +a, b -= a, function(t) {
     return a + b * t;
   };
-}
+};
 
 var object = function(a, b) {
   var i = {},
@@ -4153,7 +4153,7 @@ var object = function(a, b) {
     for (k in i) c[k] = i[k](t);
     return c;
   };
-}
+};
 
 var reA = /[-+]?(?:\d+\.?\d*|\.?\d+)(?:[eE][-+]?\d+)?/g;
 var reB = new RegExp(reA.source, "g");
@@ -4216,7 +4216,7 @@ var interpolateString = function(a, b) {
           for (var i = 0, o; i < b; ++i) s[(o = q[i]).i] = o.x(t);
           return s.join("");
         });
-}
+};
 
 var interpolate = function(a, b) {
   var t = typeof b, c;
@@ -4228,13 +4228,13 @@ var interpolate = function(a, b) {
       : Array.isArray(b) ? array$1
       : isNaN(b) ? object
       : interpolateNumber)(a, b);
-}
+};
 
 var interpolateRound = function(a, b) {
   return a = +a, b -= a, function(t) {
     return Math.round(a + b * t);
   };
-}
+};
 
 var degrees = 180 / Math.PI;
 
@@ -4261,7 +4261,7 @@ var decompose = function(a, b, c, d, e, f) {
     scaleX: scaleX,
     scaleY: scaleY
   };
-}
+};
 
 var cssNode;
 var cssRoot;
@@ -4385,7 +4385,7 @@ var interpolateZoom = function(p0, p1) {
         uy0 + t * dy,
         w0 * Math.exp(rho * t * S)
       ];
-    }
+    };
   }
 
   // General case.
@@ -4405,13 +4405,13 @@ var interpolateZoom = function(p0, p1) {
         uy0 + u * dy,
         w0 * coshr0 / cosh(rho * s + r0)
       ];
-    }
+    };
   }
 
   i.duration = S * 1000;
 
   return i;
-}
+};
 
 function hsl$1(hue$$1) {
   return function(start, end) {
@@ -4496,7 +4496,7 @@ var quantize = function(interpolator, n) {
   var samples = new Array(n);
   for (var i = 0; i < n; ++i) samples[i] = interpolator(i / (n - 1));
   return samples;
-}
+};
 
 var noop$1 = {value: function() {}};
 
@@ -4714,7 +4714,7 @@ var dsv = function(delimiter) {
     format: format,
     formatRows: formatRows
   };
-}
+};
 
 var csv = dsv(",");
 
@@ -4864,7 +4864,7 @@ var request = function(url, callback) {
   }
 
   return request;
-}
+};
 
 function fixCallback(callback) {
   return function(error, xhr) {
@@ -4888,7 +4888,7 @@ var type = function(defaultMimeType, response) {
     }
     return r;
   };
-}
+};
 
 var html = type("text/html", function(xhr) {
   return document.createRange().createContextualFragment(xhr.responseText);
@@ -4916,7 +4916,7 @@ var dsv$1 = function(defaultMimeType, parse) {
     r.row(row);
     return callback ? r.get(callback) : r;
   };
-}
+};
 
 function responseOf(parse, row) {
   return function(request$$1) {
@@ -5047,7 +5047,7 @@ var timeout$1 = function(callback, delay, time) {
     callback(elapsed + delay);
   }, delay, time);
   return t;
-}
+};
 
 var interval$1 = function(callback, delay, time) {
   var t = new Timer, total = delay;
@@ -5059,7 +5059,7 @@ var interval$1 = function(callback, delay, time) {
     callback(elapsed);
   }, delay, time);
   return t;
-}
+};
 
 var t0$1 = new Date;
 var t1$1 = new Date;
@@ -5097,9 +5097,9 @@ function newInterval(floori, offseti, count, field) {
 
   interval.filter = function(test) {
     return newInterval(function(date) {
-      while (floori(date), !test(date)) date.setTime(date - 1);
+      if (date >= date) while (floori(date), !test(date)) date.setTime(date - 1);
     }, function(date, step) {
-      while (--step >= 0) while (offseti(date, 1), !test(date)) {} // eslint-disable-line no-empty
+      if (date >= date) while (--step >= 0) while (offseti(date, 1), !test(date)) {} // eslint-disable-line no-empty
     });
   };
 
@@ -5380,11 +5380,11 @@ var formatDecimal = function(x, p) {
     coefficient.length > 1 ? coefficient[0] + coefficient.slice(2) : coefficient,
     +x.slice(i + 1)
   ];
-}
+};
 
 var exponent$1 = function(x) {
   return x = formatDecimal(Math.abs(x)), x ? x[1] : NaN;
-}
+};
 
 var formatGroup = function(grouping, thousands) {
   return function(value, width) {
@@ -5403,7 +5403,7 @@ var formatGroup = function(grouping, thousands) {
 
     return t.reverse().join(thousands);
   };
-}
+};
 
 var formatDefault = function(x, p) {
   x = x.toPrecision(p);
@@ -5418,7 +5418,7 @@ var formatDefault = function(x, p) {
   }
 
   return i0 > 0 ? x.slice(0, i0) + x.slice(i1 + 1) : x;
-}
+};
 
 var prefixExponent;
 
@@ -5433,7 +5433,7 @@ var formatPrefixAuto = function(x, p) {
       : i > n ? coefficient + new Array(i - n + 1).join("0")
       : i > 0 ? coefficient.slice(0, i) + "." + coefficient.slice(i)
       : "0." + new Array(1 - i).join("0") + formatDecimal(x, Math.max(0, p + i - 1))[0]; // less than 1y!
-}
+};
 
 var formatRounded = function(x, p) {
   var d = formatDecimal(x, p);
@@ -5443,7 +5443,7 @@ var formatRounded = function(x, p) {
   return exponent < 0 ? "0." + new Array(-exponent).join("0") + coefficient
       : coefficient.length > exponent + 1 ? coefficient.slice(0, exponent + 1) + "." + coefficient.slice(exponent + 1)
       : coefficient + new Array(exponent - coefficient.length + 2).join("0");
-}
+};
 
 var formatTypes = {
   "": formatDefault,
@@ -5467,7 +5467,7 @@ var re = /^(?:(.)?([<>=^]))?([+\-\( ])?([$#])?(0)?(\d+)?(,)?(\.\d+)?([a-z%])?$/i
 
 var formatSpecifier = function(specifier) {
   return new FormatSpecifier(specifier);
-}
+};
 
 function FormatSpecifier(specifier) {
   if (!(match = re.exec(specifier))) throw new Error("invalid format: " + specifier);
@@ -5649,7 +5649,7 @@ var formatLocale = function(locale) {
     format: newFormat,
     formatPrefix: formatPrefix
   };
-}
+};
 
 var locale$1;
 
@@ -5671,16 +5671,16 @@ function defaultLocale(definition) {
 
 var precisionFixed = function(step) {
   return Math.max(0, -exponent$1(Math.abs(step)));
-}
+};
 
 var precisionPrefix = function(step, value) {
   return Math.max(0, Math.max(-8, Math.min(8, Math.floor(exponent$1(value) / 3))) * 3 - exponent$1(Math.abs(step)));
-}
+};
 
 var precisionRound = function(step, max) {
   step = Math.abs(step), max = Math.abs(max) - step;
   return Math.max(0, exponent$1(max) - exponent$1(step)) + 1;
-}
+};
 
 function localDate(d) {
   if (0 <= d.y && d.y < 100) {
@@ -6407,11 +6407,11 @@ var constant$4 = function(x) {
   return function() {
     return x;
   };
-}
+};
 
 var number$1 = function(x) {
   return +x;
-}
+};
 
 var unit = [0, 1];
 
@@ -6548,7 +6548,7 @@ var tickFormat = function(domain, count, specifier) {
     }
   }
   return exports.format(specifier);
-}
+};
 
 function linearish(scale) {
   var domain = scale.domain;
@@ -6630,7 +6630,7 @@ var nice = function(domain, interval) {
   domain[i0] = interval.floor(x0);
   domain[i1] = interval.ceil(x1);
   return domain;
-}
+};
 
 function deinterpolate(a, b) {
   return (b = Math.log(b / a))
@@ -7039,17 +7039,17 @@ function calendar(year$$1, month$$1, week, day$$1, hour$$1, minute$$1, second$$1
 
 var time = function() {
   return calendar(year, month, sunday, day, hour, minute, second, millisecond, exports.timeFormat).domain([new Date(2000, 0, 1), new Date(2000, 0, 2)]);
-}
+};
 
 var utcTime = function() {
   return calendar(utcYear, utcMonth, utcSunday, utcDay, utcHour, utcMinute, second, millisecond, exports.utcFormat).domain([Date.UTC(2000, 0, 1), Date.UTC(2000, 0, 2)]);
-}
+};
 
 var colors = function(s) {
   return s.match(/.{6}/g).map(function(x) {
     return "#" + x;
   });
-}
+};
 
 var category10 = colors("1f77b4ff7f0e2ca02cd627289467bd8c564be377c27f7f7fbcbd2217becf");
 
@@ -7074,7 +7074,7 @@ var rainbow$1 = function(t) {
   rainbow.s = 1.5 - 1.5 * ts;
   rainbow.l = 0.8 - 0.9 * ts;
   return rainbow + "";
-}
+};
 
 function ramp(range) {
   var n = range.length;
@@ -7134,7 +7134,7 @@ var namespace = function(name) {
   var prefix = name += "", i = prefix.indexOf(":");
   if (i >= 0 && (prefix = name.slice(0, i)) !== "xmlns") name = name.slice(i + 1);
   return namespaces.hasOwnProperty(prefix) ? {space: namespaces[prefix], local: name} : name;
-}
+};
 
 function creatorInherit(name) {
   return function() {
@@ -7157,7 +7157,7 @@ var creator = function(name) {
   return (fullname.local
       ? creatorFixed
       : creatorInherit)(fullname);
-}
+};
 
 var nextId = 0;
 
@@ -7213,6 +7213,13 @@ var matcher$1 = matcher;
 var filterEvents = {};
 
 exports.event = null;
+
+if (typeof document !== "undefined") {
+  var element$1 = document.documentElement;
+  if (!("onmouseenter" in element$1)) {
+    filterEvents = {mouseenter: "mouseover", mouseleave: "mouseout"};
+  }
+}
 
 function filterContextListener(listener, index, group) {
   listener = contextListener(listener, index, group);
@@ -7298,7 +7305,7 @@ var selection_on = function(typename, value, capture) {
   if (capture == null) capture = false;
   for (i = 0; i < n; ++i) this.each(on(typenames[i], value, capture));
   return this;
-}
+};
 
 function customEvent(event1, listener, that, args) {
   var event0 = exports.event;
@@ -7315,7 +7322,7 @@ var sourceEvent = function() {
   var current = exports.event, source;
   while (source = current.sourceEvent) current = source;
   return current;
-}
+};
 
 var point$5 = function(node, event) {
   var svg = node.ownerSVGElement || node;
@@ -7329,13 +7336,13 @@ var point$5 = function(node, event) {
 
   var rect = node.getBoundingClientRect();
   return [event.clientX - rect.left - node.clientLeft, event.clientY - rect.top - node.clientTop];
-}
+};
 
 var mouse = function(node) {
   var event = sourceEvent();
   if (event.changedTouches) event = event.changedTouches[0];
   return point$5(node, event);
-}
+};
 
 function none$2() {}
 
@@ -7343,7 +7350,7 @@ var selector = function(selector) {
   return selector == null ? none$2 : function() {
     return this.querySelector(selector);
   };
-}
+};
 
 var selection_select = function(select) {
   if (typeof select !== "function") select = selector(select);
@@ -7358,7 +7365,7 @@ var selection_select = function(select) {
   }
 
   return new Selection(subgroups, this._parents);
-}
+};
 
 function empty() {
   return [];
@@ -7368,7 +7375,7 @@ var selectorAll = function(selector) {
   return selector == null ? empty : function() {
     return this.querySelectorAll(selector);
   };
-}
+};
 
 var selection_selectAll = function(select) {
   if (typeof select !== "function") select = selectorAll(select);
@@ -7383,7 +7390,7 @@ var selection_selectAll = function(select) {
   }
 
   return new Selection(subgroups, parents);
-}
+};
 
 var selection_filter = function(match) {
   if (typeof match !== "function") match = matcher$1(match);
@@ -7397,15 +7404,15 @@ var selection_filter = function(match) {
   }
 
   return new Selection(subgroups, this._parents);
-}
+};
 
 var sparse = function(update) {
   return new Array(update.length);
-}
+};
 
 var selection_enter = function() {
   return new Selection(this._enter || this._groups.map(sparse), this._parents);
-}
+};
 
 function EnterNode(parent, datum) {
   this.ownerDocument = parent.ownerDocument;
@@ -7427,7 +7434,7 @@ var constant$5 = function(x) {
   return function() {
     return x;
   };
-}
+};
 
 var keyPrefix = "$"; // Protect against keys like “__proto__”.
 
@@ -7532,7 +7539,7 @@ var selection_data = function(value, key) {
     for (var i0 = 0, i1 = 0, previous, next; i0 < dataLength; ++i0) {
       if (previous = enterGroup[i0]) {
         if (i0 >= i1) i1 = i0 + 1;
-        while (!(next = updateGroup[i1]) && ++i1 < dataLength)
+        while (!(next = updateGroup[i1]) && ++i1 < dataLength);
         previous._next = next || null;
       }
     }
@@ -7542,11 +7549,11 @@ var selection_data = function(value, key) {
   update._enter = enter;
   update._exit = exit;
   return update;
-}
+};
 
 var selection_exit = function() {
   return new Selection(this._exit || this._groups.map(sparse), this._parents);
-}
+};
 
 var selection_merge = function(selection) {
 
@@ -7563,7 +7570,7 @@ var selection_merge = function(selection) {
   }
 
   return new Selection(merges, this._parents);
-}
+};
 
 var selection_order = function() {
 
@@ -7577,7 +7584,7 @@ var selection_order = function() {
   }
 
   return this;
-}
+};
 
 var selection_sort = function(compare) {
   if (!compare) compare = ascending$2;
@@ -7596,7 +7603,7 @@ var selection_sort = function(compare) {
   }
 
   return new Selection(sortgroups, this._parents).order();
-}
+};
 
 function ascending$2(a, b) {
   return a < b ? -1 : a > b ? 1 : a >= b ? 0 : NaN;
@@ -7607,13 +7614,13 @@ var selection_call = function() {
   arguments[0] = this;
   callback.apply(null, arguments);
   return this;
-}
+};
 
 var selection_nodes = function() {
   var nodes = new Array(this.size()), i = -1;
   this.each(function() { nodes[++i] = this; });
   return nodes;
-}
+};
 
 var selection_node = function() {
 
@@ -7625,17 +7632,17 @@ var selection_node = function() {
   }
 
   return null;
-}
+};
 
 var selection_size = function() {
   var size = 0;
   this.each(function() { ++size; });
   return size;
-}
+};
 
 var selection_empty = function() {
   return !this.node();
-}
+};
 
 var selection_each = function(callback) {
 
@@ -7646,7 +7653,7 @@ var selection_each = function(callback) {
   }
 
   return this;
-}
+};
 
 function attrRemove(name) {
   return function() {
@@ -7702,13 +7709,13 @@ var selection_attr = function(name, value) {
       ? (fullname.local ? attrRemoveNS : attrRemove) : (typeof value === "function"
       ? (fullname.local ? attrFunctionNS : attrFunction)
       : (fullname.local ? attrConstantNS : attrConstant)))(fullname, value));
-}
+};
 
 var window = function(node) {
   return (node.ownerDocument && node.ownerDocument.defaultView) // node is a Node
       || (node.document && node) // node is a Window
       || node.defaultView; // node is a Document
-}
+};
 
 function styleRemove(name) {
   return function() {
@@ -7740,7 +7747,7 @@ var selection_style = function(name, value, priority) {
       : window(node = this.node())
           .getComputedStyle(node, null)
           .getPropertyValue(name);
-}
+};
 
 function propertyRemove(name) {
   return function() {
@@ -7769,7 +7776,7 @@ var selection_property = function(name, value) {
           ? propertyFunction
           : propertyConstant)(name, value))
       : this.node()[name];
-}
+};
 
 function classArray(string) {
   return string.trim().split(/^|\s+/);
@@ -7845,7 +7852,7 @@ var selection_classed = function(name, value) {
       ? classedFunction : value
       ? classedTrue
       : classedFalse)(names, value));
-}
+};
 
 function textRemove() {
   this.textContent = "";
@@ -7871,7 +7878,7 @@ var selection_text = function(value) {
           ? textFunction
           : textConstant)(value))
       : this.node().textContent;
-}
+};
 
 function htmlRemove() {
   this.innerHTML = "";
@@ -7897,7 +7904,7 @@ var selection_html = function(value) {
           ? htmlFunction
           : htmlConstant)(value))
       : this.node().innerHTML;
-}
+};
 
 function raise$1() {
   if (this.nextSibling) this.parentNode.appendChild(this);
@@ -7905,7 +7912,7 @@ function raise$1() {
 
 var selection_raise = function() {
   return this.each(raise$1);
-}
+};
 
 function lower() {
   if (this.previousSibling) this.parentNode.insertBefore(this, this.parentNode.firstChild);
@@ -7913,14 +7920,14 @@ function lower() {
 
 var selection_lower = function() {
   return this.each(lower);
-}
+};
 
 var selection_append = function(name) {
   var create = typeof name === "function" ? name : creator(name);
   return this.select(function() {
     return this.appendChild(create.apply(this, arguments));
   });
-}
+};
 
 function constantNull() {
   return null;
@@ -7932,7 +7939,7 @@ var selection_insert = function(name, before) {
   return this.select(function() {
     return this.insertBefore(create.apply(this, arguments), select.apply(this, arguments) || null);
   });
-}
+};
 
 function remove() {
   var parent = this.parentNode;
@@ -7941,13 +7948,13 @@ function remove() {
 
 var selection_remove = function() {
   return this.each(remove);
-}
+};
 
 var selection_datum = function(value) {
   return arguments.length
       ? this.property("__data__", value)
       : this.node().__data__;
-}
+};
 
 function dispatchEvent(node, type, params) {
   var window$$1 = window(node),
@@ -7980,7 +7987,7 @@ var selection_dispatch = function(type, params) {
   return this.each((typeof params === "function"
       ? dispatchFunction
       : dispatchConstant)(type, params));
-}
+};
 
 var root = [null];
 
@@ -8030,13 +8037,13 @@ var select = function(selector) {
   return typeof selector === "string"
       ? new Selection([[document.querySelector(selector)]], [document.documentElement])
       : new Selection([[selector]], root);
-}
+};
 
 var selectAll = function(selector) {
   return typeof selector === "string"
       ? new Selection([document.querySelectorAll(selector)], [document.documentElement])
       : new Selection([selector == null ? [] : selector], root);
-}
+};
 
 var touch = function(node, touches, identifier) {
   if (arguments.length < 3) identifier = touches, touches = sourceEvent().changedTouches;
@@ -8048,7 +8055,7 @@ var touch = function(node, touches, identifier) {
   }
 
   return null;
-}
+};
 
 var touches = function(node, touches) {
   if (touches == null) touches = sourceEvent().touches;
@@ -8058,7 +8065,7 @@ var touches = function(node, touches) {
   }
 
   return points;
-}
+};
 
 var emptyOn = dispatch("start", "end", "interrupt");
 var emptyTween = [];
@@ -8088,7 +8095,7 @@ var schedule = function(node, name, id, index, group, timing) {
     timer: null,
     state: CREATED
   });
-}
+};
 
 function init(node, id) {
   var schedule = node.__transition;
@@ -8226,7 +8233,7 @@ var interrupt = function(node, name) {
 
   for (i in schedules) {
     if ((schedule = schedules[i]).name !== name) { empty = false; continue; }
-    active = schedule.state === STARTED;
+    active = schedule.state > STARTING && schedule.state < ENDING;
     schedule.state = ENDED;
     schedule.timer.stop();
     if (active) schedule.on.call("interrupt", node, node.__data__, schedule.index, schedule.group);
@@ -8234,13 +8241,13 @@ var interrupt = function(node, name) {
   }
 
   if (empty) delete node.__transition;
-}
+};
 
 var selection_interrupt = function(name) {
   return this.each(function() {
     interrupt(this, name);
   });
-}
+};
 
 function tweenRemove(id, name) {
   var tween0, tween1;
@@ -8307,7 +8314,7 @@ var transition_tween = function(name, value) {
   }
 
   return this.each((value == null ? tweenRemove : tweenFunction)(id, name, value));
-}
+};
 
 function tweenValue(transition, name, value) {
   var id = transition._id;
@@ -8328,7 +8335,7 @@ var interpolate$1 = function(a, b) {
       : b instanceof color ? interpolateRgb
       : (c = color(b)) ? (b = c, interpolateRgb)
       : interpolateString)(a, b);
-}
+};
 
 function attrRemove$1(name) {
   return function() {
@@ -8398,7 +8405,7 @@ var transition_attr = function(name, value) {
       ? (fullname.local ? attrFunctionNS$1 : attrFunction$1)(fullname, i, tweenValue(this, "attr." + name, value))
       : value == null ? (fullname.local ? attrRemoveNS$1 : attrRemove$1)(fullname)
       : (fullname.local ? attrConstantNS$1 : attrConstant$1)(fullname, i, value));
-}
+};
 
 function attrTweenNS(fullname, value) {
   function tween() {
@@ -8429,7 +8436,7 @@ var transition_attrTween = function(name, value) {
   if (typeof value !== "function") throw new Error;
   var fullname = namespace(name);
   return this.tween(key, (fullname.local ? attrTweenNS : attrTween)(fullname, value));
-}
+};
 
 function delayFunction(id, value) {
   return function() {
@@ -8451,7 +8458,7 @@ var transition_delay = function(value) {
           ? delayFunction
           : delayConstant)(id, value))
       : get$1(this.node(), id).delay;
-}
+};
 
 function durationFunction(id, value) {
   return function() {
@@ -8473,7 +8480,7 @@ var transition_duration = function(value) {
           ? durationFunction
           : durationConstant)(id, value))
       : get$1(this.node(), id).duration;
-}
+};
 
 function easeConstant(id, value) {
   if (typeof value !== "function") throw new Error;
@@ -8488,7 +8495,7 @@ var transition_ease = function(value) {
   return arguments.length
       ? this.each(easeConstant(id, value))
       : get$1(this.node(), id).ease;
-}
+};
 
 var transition_filter = function(match) {
   if (typeof match !== "function") match = matcher$1(match);
@@ -8502,7 +8509,7 @@ var transition_filter = function(match) {
   }
 
   return new Transition(subgroups, this._parents, this._name, this._id);
-}
+};
 
 var transition_merge = function(transition) {
   if (transition._id !== this._id) throw new Error;
@@ -8520,7 +8527,7 @@ var transition_merge = function(transition) {
   }
 
   return new Transition(merges, this._parents, this._name, this._id);
-}
+};
 
 function start$1(name) {
   return (name + "").trim().split(/^|\s+/).every(function(t) {
@@ -8551,7 +8558,7 @@ var transition_on = function(name, listener) {
   return arguments.length < 2
       ? get$1(this.node(), id).on.on(name)
       : this.each(onFunction(id, name, listener));
-}
+};
 
 function removeFunction(id) {
   return function() {
@@ -8563,7 +8570,7 @@ function removeFunction(id) {
 
 var transition_remove = function() {
   return this.on("end.remove", removeFunction(this._id));
-}
+};
 
 var transition_select = function(select$$1) {
   var name = this._name,
@@ -8582,7 +8589,7 @@ var transition_select = function(select$$1) {
   }
 
   return new Transition(subgroups, this._parents, name, id);
-}
+};
 
 var transition_selectAll = function(select$$1) {
   var name = this._name,
@@ -8605,13 +8612,13 @@ var transition_selectAll = function(select$$1) {
   }
 
   return new Transition(subgroups, parents, name, id);
-}
+};
 
 var Selection$1 = selection.prototype.constructor;
 
 var transition_selection = function() {
   return new Selection$1(this._groups, this._parents);
-}
+};
 
 function styleRemove$1(name, interpolate$$1) {
   var value00,
@@ -8667,7 +8674,7 @@ var transition_style = function(name, value, priority) {
       : this.styleTween(name, typeof value === "function"
           ? styleFunction$1(name, i, tweenValue(this, "style." + name, value))
           : styleConstant$1(name, i, value), priority);
-}
+};
 
 function styleTween(name, value, priority) {
   function tween() {
@@ -8686,7 +8693,7 @@ var transition_styleTween = function(name, value, priority) {
   if (value == null) return this.tween(key, null);
   if (typeof value !== "function") throw new Error;
   return this.tween(key, styleTween(name, value, priority == null ? "" : priority));
-}
+};
 
 function textConstant$1(value) {
   return function() {
@@ -8705,7 +8712,7 @@ var transition_text = function(value) {
   return this.tween("text", typeof value === "function"
       ? textFunction$1(tweenValue(this, "text", value))
       : textConstant$1(value == null ? "" : value + ""));
-}
+};
 
 var transition_transition = function() {
   var name = this._name,
@@ -8727,7 +8734,7 @@ var transition_transition = function() {
   }
 
   return new Transition(groups, this._parents, name, id1);
-}
+};
 
 var id = 0;
 
@@ -8811,7 +8818,7 @@ var selection_transition = function(name) {
   }
 
   return new Transition(groups, this._parents, name, id);
-}
+};
 
 selection.prototype.interrupt = selection_interrupt;
 selection.prototype.transition = selection_transition;
@@ -8833,13 +8840,13 @@ var active = function(node, name) {
   }
 
   return null;
-}
+};
 
 var slice$4 = Array.prototype.slice;
 
 var identity$5 = function(x) {
   return x;
-}
+};
 
 var top = 1;
 var right = 2;
@@ -9095,7 +9102,7 @@ var cluster = function() {
   };
 
   return cluster;
-}
+};
 
 var node_each = function(callback) {
   var node = this, current, next = [node], children, i, n;
@@ -9109,7 +9116,7 @@ var node_each = function(callback) {
     }
   } while (next.length);
   return this;
-}
+};
 
 var node_eachBefore = function(callback) {
   var node = this, nodes = [node], children, i;
@@ -9120,7 +9127,7 @@ var node_eachBefore = function(callback) {
     }
   }
   return this;
-}
+};
 
 var node_eachAfter = function(callback) {
   var node = this, nodes = [node], next = [], children, i, n;
@@ -9134,7 +9141,7 @@ var node_eachAfter = function(callback) {
     callback(node);
   }
   return this;
-}
+};
 
 var node_sum = function(value) {
   return this.eachAfter(function(node) {
@@ -9144,7 +9151,7 @@ var node_sum = function(value) {
     while (--i >= 0) sum += children[i].value;
     node.value = sum;
   });
-}
+};
 
 var node_sort = function(compare) {
   return this.eachBefore(function(node) {
@@ -9152,7 +9159,7 @@ var node_sort = function(compare) {
       node.children.sort(compare);
     }
   });
-}
+};
 
 var node_path = function(end) {
   var start = this,
@@ -9168,7 +9175,7 @@ var node_path = function(end) {
     end = end.parent;
   }
   return nodes;
-}
+};
 
 function leastCommonAncestor(a, b) {
   if (a === b) return a;
@@ -9191,7 +9198,7 @@ var node_ancestors = function() {
     nodes.push(node);
   }
   return nodes;
-}
+};
 
 var node_descendants = function() {
   var nodes = [];
@@ -9199,7 +9206,7 @@ var node_descendants = function() {
     nodes.push(node);
   });
   return nodes;
-}
+};
 
 var node_leaves = function() {
   var leaves = [];
@@ -9209,7 +9216,7 @@ var node_leaves = function() {
     }
   });
   return leaves;
-}
+};
 
 var node_links = function() {
   var root = this, links = [];
@@ -9219,7 +9226,7 @@ var node_links = function() {
     }
   });
   return links;
-}
+};
 
 function hierarchy(data, children) {
   var root = new Node(data),
@@ -9310,11 +9317,11 @@ var shuffle$1 = function(array) {
     head: head,
     tail: node
   };
-}
+};
 
 var enclose = function(circles) {
   return encloseN(shuffle$1(circles), []);
-}
+};
 
 function encloses(a, b) {
   var dx = b.x - a.x,
@@ -9545,7 +9552,7 @@ function packEnclose(circles) {
 var siblings = function(circles) {
   packEnclose(circles);
   return circles;
-}
+};
 
 function optional(f) {
   return f == null ? null : required(f);
@@ -9564,7 +9571,7 @@ var constant$6 = function(x) {
   return function() {
     return x;
   };
-}
+};
 
 function defaultRadius(d) {
   return Math.sqrt(d.value);
@@ -9604,7 +9611,7 @@ var index = function() {
   };
 
   return pack;
-}
+};
 
 function radiusLeaf(radius) {
   return function(node) {
@@ -9647,7 +9654,7 @@ var roundNode = function(node) {
   node.y0 = Math.round(node.y0);
   node.x1 = Math.round(node.x1);
   node.y1 = Math.round(node.y1);
-}
+};
 
 var treemapDice = function(parent, x0, y0, x1, y1) {
   var nodes = parent.children,
@@ -9660,7 +9667,7 @@ var treemapDice = function(parent, x0, y0, x1, y1) {
     node = nodes[i], node.y0 = y0, node.y1 = y1;
     node.x0 = x0, node.x1 = x0 += node.value * k;
   }
-}
+};
 
 var partition = function() {
   var dx = 1,
@@ -9710,7 +9717,7 @@ var partition = function() {
   };
 
   return partition;
-}
+};
 
 var keyPrefix$1 = "$";
 var preroot = {depth: -1};
@@ -9781,7 +9788,7 @@ var stratify = function() {
   };
 
   return stratify;
-}
+};
 
 function defaultSeparation$1(a, b) {
   return a.parent === b.parent ? 1 : 2;
@@ -10017,7 +10024,7 @@ var tree = function() {
   };
 
   return tree;
-}
+};
 
 var treemapSlice = function(parent, x0, y0, x1, y1) {
   var nodes = parent.children,
@@ -10030,7 +10037,7 @@ var treemapSlice = function(parent, x0, y0, x1, y1) {
     node = nodes[i], node.x0 = x0, node.x1 = x1;
     node.y0 = y0, node.y1 = y0 += node.value * k;
   }
-}
+};
 
 var phi = (1 + Math.sqrt(5)) / 2;
 
@@ -10181,7 +10188,7 @@ var index$1 = function() {
   };
 
   return treemap;
-}
+};
 
 var binary = function(parent, x0, y0, x1, y1) {
   var nodes = parent.children,
@@ -10226,11 +10233,11 @@ var binary = function(parent, x0, y0, x1, y1) {
       partition(k, j, valueRight, xk, y0, x1, y1);
     }
   }
-}
+};
 
 var sliceDice = function(parent, x0, y0, x1, y1) {
   (parent.depth & 1 ? treemapSlice : treemapDice)(parent, x0, y0, x1, y1);
-}
+};
 
 var resquarify = (function custom(ratio) {
 
@@ -10300,17 +10307,17 @@ var center$1 = function(x, y) {
   };
 
   return force;
-}
+};
 
 var constant$7 = function(x) {
   return function() {
     return x;
   };
-}
+};
 
 var jiggle = function() {
   return (Math.random() - 0.5) * 1e-6;
-}
+};
 
 function x$1(d) {
   return d.x + d.vx;
@@ -10380,9 +10387,16 @@ var collide = function(radius) {
     }
   }
 
-  force.initialize = function(_) {
-    var i, n = (nodes = _).length; radii = new Array(n);
+  function initialize() {
+    if (!nodes) return;
+    var i, n = nodes.length;
+    radii = new Array(n);
     for (i = 0; i < n; ++i) radii[i] = +radius(nodes[i], i, nodes);
+  }
+
+  force.initialize = function(_) {
+    nodes = _;
+    initialize();
   };
 
   force.iterations = function(_) {
@@ -10394,14 +10408,20 @@ var collide = function(radius) {
   };
 
   force.radius = function(_) {
-    return arguments.length ? (radius = typeof _ === "function" ? _ : constant$7(+_), force) : radius;
+    return arguments.length ? (radius = typeof _ === "function" ? _ : constant$7(+_), initialize(), force) : radius;
   };
 
   return force;
-}
+};
 
 function index$2(d, i) {
   return i;
+}
+
+function find(nodeById, nodeId) {
+  var node = nodeById.get(nodeId);
+  if (!node) throw new Error("missing: " + nodeId);
+  return node;
 }
 
 var link = function(links) {
@@ -10453,8 +10473,8 @@ var link = function(links) {
 
     for (i = 0; i < m; ++i) {
       link = links[i], link.index = i;
-      if (typeof link.source !== "object") link.source = nodeById.get(link.source);
-      if (typeof link.target !== "object") link.target = nodeById.get(link.target);
+      if (typeof link.source !== "object") link.source = find(nodeById, link.source);
+      if (typeof link.target !== "object") link.target = find(nodeById, link.target);
       ++count[link.source.index], ++count[link.target.index];
     }
 
@@ -10508,7 +10528,7 @@ var link = function(links) {
   };
 
   return force;
-}
+};
 
 function x$2(d) {
   return d.x;
@@ -10648,7 +10668,7 @@ var simulation = function(nodes) {
       return arguments.length > 1 ? (event.on(name, _), simulation) : event.on(name);
     }
   };
-}
+};
 
 var manyBody = function() {
   var nodes,
@@ -10758,7 +10778,7 @@ var manyBody = function() {
   };
 
   return force;
-}
+};
 
 var x$3 = function(x) {
   var strength = constant$7(0.1),
@@ -10798,7 +10818,7 @@ var x$3 = function(x) {
   };
 
   return force;
-}
+};
 
 var y$3 = function(y) {
   var strength = constant$7(0.1),
@@ -10838,7 +10858,7 @@ var y$3 = function(y) {
   };
 
   return force;
-}
+};
 
 function nopropagation() {
   exports.event.stopImmediatePropagation();
@@ -10847,7 +10867,7 @@ function nopropagation() {
 var noevent = function() {
   exports.event.preventDefault();
   exports.event.stopImmediatePropagation();
-}
+};
 
 var dragDisable = function(view) {
   var root = view.document.documentElement,
@@ -10858,7 +10878,7 @@ var dragDisable = function(view) {
     root.__noselect = root.style.MozUserSelect;
     root.style.MozUserSelect = "none";
   }
-}
+};
 
 function yesdrag(view, noclick) {
   var root = view.document.documentElement,
@@ -10879,7 +10899,7 @@ var constant$8 = function(x) {
   return function() {
     return x;
   };
-}
+};
 
 function DragEvent(target, type, subject, id, active, x, y, dx, dy, dispatch) {
   this.target = target;
@@ -11035,13 +11055,13 @@ var drag = function() {
   };
 
   return drag;
-}
+};
 
 var constant$9 = function(x) {
   return function() {
     return x;
   };
-}
+};
 
 function x$4(d) {
   return d[0];
@@ -11953,7 +11973,7 @@ Diagram.prototype = {
       };
     });
   }
-}
+};
 
 var voronoi = function() {
   var x$$1 = x$4,
@@ -11998,13 +12018,13 @@ var voronoi = function() {
   };
 
   return voronoi;
-}
+};
 
 var constant$10 = function(x) {
   return function() {
     return x;
   };
-}
+};
 
 function ZoomEvent(target, type, transform) {
   this.target = target;
@@ -12070,7 +12090,7 @@ function nopropagation$1() {
 var noevent$1 = function() {
   exports.event.preventDefault();
   exports.event.stopImmediatePropagation();
-}
+};
 
 // Ignore right-click, since that should open the context menu.
 function defaultFilter$1() {
@@ -12423,19 +12443,19 @@ var zoom = function() {
   };
 
   return zoom;
-}
+};
 
 var constant$11 = function(x) {
   return function() {
     return x;
   };
-}
+};
 
 var BrushEvent = function(target, type, selection) {
   this.target = target;
   this.type = type;
   this.selection = selection;
-}
+};
 
 function nopropagation$2() {
   exports.event.stopImmediatePropagation();
@@ -12444,7 +12464,7 @@ function nopropagation$2() {
 var noevent$2 = function() {
   exports.event.preventDefault();
   exports.event.stopImmediatePropagation();
-}
+};
 
 var MODE_DRAG = {name: "drag"};
 var MODE_SPACE = {name: "space"};
@@ -12569,7 +12589,7 @@ function brushY() {
 
 var brush = function() {
   return brush$1(XY);
-}
+};
 
 function brush$1(dim) {
   var extent = defaultExtent$1,
@@ -12848,8 +12868,7 @@ function brush$1(dim) {
         if (type in flipY) overlay.attr("cursor", cursors[type = flipY[type]]);
       }
 
-      selection$$1 = state.selection; // May be set by brush.move!
-
+      if (state.selection) selection$$1 = state.selection; // May be set by brush.move!
       if (lockX) w1 = selection$$1[0][0], e1 = selection$$1[1][0];
       if (lockY) n1 = selection$$1[0][1], s1 = selection$$1[1][1];
 
@@ -12876,6 +12895,7 @@ function brush$1(dim) {
       }
       group.attr("pointer-events", "all");
       overlay.attr("cursor", cursors.overlay);
+      if (state.selection) selection$$1 = state.selection; // May be set by brush.move (on start)!
       if (empty$1(selection$$1)) state.selection = null, redraw.call(that);
       emit.end();
     }
@@ -13101,7 +13121,7 @@ var chord = function() {
   };
 
   return chord;
-}
+};
 
 var slice$5 = Array.prototype.slice;
 
@@ -13109,7 +13129,7 @@ var constant$12 = function(x) {
   return function() {
     return x;
   };
-}
+};
 
 function defaultSource(d) {
   return d.source;
@@ -13192,7 +13212,7 @@ var ribbon = function() {
   };
 
   return ribbon;
-}
+};
 
 // Adds floating point numbers with twice the normal precision.
 // Reference: J. R. Shewchuk, Adaptive Precision Floating-Point Arithmetic and
@@ -13203,7 +13223,7 @@ var ribbon = function() {
 
 var adder = function() {
   return new Adder;
-}
+};
 
 function Adder() {
   this.reset();
@@ -13341,7 +13361,7 @@ var geoStream = function(object, stream) {
   } else {
     streamGeometry(object, stream);
   }
-}
+};
 
 var areaRingSum = adder();
 
@@ -13411,7 +13431,7 @@ var area$2 = function(object) {
   areaSum.reset();
   geoStream(object, areaStream);
   return areaSum * 2;
-}
+};
 
 function spherical(cartesian) {
   return [atan2(cartesian[1], cartesian[0]), asin$1(cartesian[2])];
@@ -13616,7 +13636,7 @@ var bounds = function(feature) {
   return lambda0$1 === Infinity || phi0 === Infinity
       ? [[NaN, NaN], [NaN, NaN]]
       : [[lambda0$1, phi0], [lambda1, phi1]];
-}
+};
 
 var W0;
 var W1;
@@ -13764,13 +13784,13 @@ var centroid$1 = function(object) {
   }
 
   return [atan2(y, x) * degrees$1, asin$1(z / sqrt$1(m)) * degrees$1];
-}
+};
 
 var constant$13 = function(x) {
   return function() {
     return x;
   };
-}
+};
 
 var compose = function(a, b) {
 
@@ -13783,7 +13803,7 @@ var compose = function(a, b) {
   };
 
   return compose;
-}
+};
 
 function rotationIdentity(lambda, phi) {
   return [lambda > pi$4 ? lambda - tau$4 : lambda < -pi$4 ? lambda + tau$4 : lambda, phi];
@@ -13857,7 +13877,7 @@ var rotation = function(rotate) {
   };
 
   return forward;
-}
+};
 
 // Generates a circle centered at [0°, 0°], with a given radius and precision.
 function circleStream(stream, radius, delta, direction, t0, t1) {
@@ -13925,7 +13945,7 @@ var circle$1 = function() {
   };
 
   return circle;
-}
+};
 
 var clipBuffer = function() {
   var lines = [],
@@ -13948,7 +13968,7 @@ var clipBuffer = function() {
       return result;
     }
   };
-}
+};
 
 var clipLine = function(a, b, x0, y0, x1, y1) {
   var ax = a[0],
@@ -14008,11 +14028,11 @@ var clipLine = function(a, b, x0, y0, x1, y1) {
   if (t0 > 0) a[0] = ax + t0 * dx, a[1] = ay + t0 * dy;
   if (t1 < 1) b[0] = ax + t1 * dx, b[1] = ay + t1 * dy;
   return true;
-}
+};
 
 var pointEqual = function(a, b) {
   return abs(a[0] - b[0]) < epsilon$4 && abs(a[1] - b[1]) < epsilon$4;
-}
+};
 
 function Intersection(point, points, other, entry) {
   this.x = point;
@@ -14097,7 +14117,7 @@ var clipPolygon = function(segments, compareIntersection, startInside, interpola
     } while (!current.v);
     stream.lineEnd();
   }
-}
+};
 
 function link$1(array) {
   if (!(n = array.length)) return;
@@ -14295,7 +14315,7 @@ var extent$1 = function() {
       return arguments.length ? (x0 = +_[0][0], y0 = +_[0][1], x1 = +_[1][0], y1 = +_[1][1], cache = cacheStream = null, clip) : [[x0, y0], [x1, y1]];
     }
   };
-}
+};
 
 var lengthSum = adder();
 var lambda0$2;
@@ -14344,7 +14364,7 @@ var length$2 = function(object) {
   lengthSum.reset();
   geoStream(object, lengthStream);
   return +lengthSum;
-}
+};
 
 var coordinates = [null, null];
 var object$1 = {type: "LineString", coordinates: coordinates};
@@ -14353,7 +14373,7 @@ var distance = function(a, b) {
   coordinates[0] = a;
   coordinates[1] = b;
   return length$2(object$1);
-}
+};
 
 function graticuleX(y0, y1, dy) {
   var y = range(y0, y1 - epsilon$4, dy).concat(y1);
@@ -14452,7 +14472,7 @@ var graticule = function() {
   return graticule
       .extentMajor([[-180, -90 + epsilon$4], [180, 90 - epsilon$4]])
       .extentMinor([[-180, -80 - epsilon$4], [180, 80 + epsilon$4]]);
-}
+};
 
 var interpolate$2 = function(a, b) {
   var x0 = a[0] * radians,
@@ -14487,11 +14507,11 @@ var interpolate$2 = function(a, b) {
   interpolate.distance = d;
 
   return interpolate;
-}
+};
 
 var identity$7 = function(x) {
   return x;
-}
+};
 
 var areaSum$1 = adder();
 var areaRingSum$1 = adder();
@@ -14806,7 +14826,7 @@ var index$3 = function() {
   };
 
   return path.projection(null).context(null);
-}
+};
 
 var sum$2 = adder();
 
@@ -14871,7 +14891,7 @@ var polygonContains = function(polygon, point) {
   // same side as the South pole.
 
   return (angle < -epsilon$4 || angle < epsilon$4 && sum$2 < -epsilon$4) ^ (winding & 1);
-}
+};
 
 var clip = function(pointVisible, clipLine, interpolate, start) {
   return function(rotate, sink) {
@@ -14990,7 +15010,7 @@ var clip = function(pointVisible, clipLine, interpolate, start) {
 
     return clip;
   };
-}
+};
 
 function validSegment(segment) {
   return segment.length > 1;
@@ -15267,13 +15287,13 @@ var clipCircle = function(radius, delta) {
   }
 
   return clip(visible, clipLine, interpolate, smallRadius ? [0, -radius] : [-pi$4, radius - pi$4]);
-}
+};
 
 var transform$1 = function(prototype) {
   return {
     stream: transform$2(prototype)
   };
-}
+};
 
 function transform$2(prototype) {
   function T() {}
@@ -15339,7 +15359,7 @@ var cosMinDistance = cos$1(30 * radians); // cos(minimum angular distance)
 
 var resample = function(project, delta2) {
   return +delta2 ? resample$1(project, delta2) : resampleNone(project);
-}
+};
 
 function resampleNone(project) {
   return transform$2({
@@ -15538,11 +15558,27 @@ function conicProjection(projectAt) {
   return p;
 }
 
+function cylindricalEqualAreaRaw(phi0) {
+  var cosPhi0 = cos$1(phi0);
+
+  function forward(lambda, phi) {
+    return [lambda * cosPhi0, sin$1(phi) / cosPhi0];
+  }
+
+  forward.invert = function(x, y) {
+    return [x / cosPhi0, asin$1(y * cosPhi0)];
+  };
+
+  return forward;
+}
+
 function conicEqualAreaRaw(y0, y1) {
-  var sy0 = sin$1(y0),
-      n = (sy0 + sin$1(y1)) / 2,
-      c = 1 + sy0 * (2 * n - sy0),
-      r0 = sqrt$1(c) / n;
+  var sy0 = sin$1(y0), n = (sy0 + sin$1(y1)) / 2;
+
+  // Are the parallels symmetrical around the Equator?
+  if (abs(n) < epsilon$4) return cylindricalEqualAreaRaw(y0);
+
+  var c = 1 + sy0 * (2 * n - sy0), r0 = sqrt$1(c) / n;
 
   function project(x, y) {
     var r = sqrt$1(c - 2 * n * sin$1(y)) / n;
@@ -15551,7 +15587,7 @@ function conicEqualAreaRaw(y0, y1) {
 
   project.invert = function(x, y) {
     var r0y = r0 - y;
-    return [atan2(x, r0y) / n, asin$1((c - (x * x + r0y * r0y) * n * n) / (2 * n))];
+    return [atan2(x, abs(r0y)) / n * sign$1(r0y), asin$1((c - (x * x + r0y * r0y) * n * n) / (2 * n))];
   };
 
   return project;
@@ -15561,7 +15597,7 @@ var conicEqualArea = function() {
   return conicProjection(conicEqualAreaRaw)
       .scale(155.424)
       .center([0, 33.6442]);
-}
+};
 
 var albers = function() {
   return conicEqualArea()
@@ -15570,7 +15606,7 @@ var albers = function() {
       .translate([480, 250])
       .rotate([96, 0])
       .center([-0.6, 38.7]);
-}
+};
 
 // The projections must have mutually exclusive clip regions on the sphere,
 // as this will avoid emitting interleaving lines and polygons.
@@ -15624,7 +15660,7 @@ var albersUsa = function() {
   albersUsa.precision = function(_) {
     if (!arguments.length) return lower48.precision();
     lower48.precision(_), alaska.precision(_), hawaii.precision(_);
-    return albersUsa;
+    return reset();
   };
 
   albersUsa.scale = function(_) {
@@ -15652,15 +15688,20 @@ var albersUsa = function() {
         .clipExtent([[x - 0.214 * k + epsilon$4, y + 0.166 * k + epsilon$4], [x - 0.115 * k - epsilon$4, y + 0.234 * k - epsilon$4]])
         .stream(pointStream);
 
-    return albersUsa;
+    return reset();
   };
 
   albersUsa.fitExtent = fitExtent(albersUsa);
 
   albersUsa.fitSize = fitSize(albersUsa);
 
+  function reset() {
+    cache = cacheStream = null;
+    return albersUsa;
+  }
+
   return albersUsa.scale(1070);
-}
+};
 
 function azimuthalRaw(scale) {
   return function(x, y) {
@@ -15699,7 +15740,7 @@ var azimuthalEqualArea = function() {
   return projection(azimuthalEqualAreaRaw)
       .scale(124.75)
       .clipAngle(180 - 1e-3);
-}
+};
 
 var azimuthalEquidistantRaw = azimuthalRaw(function(c) {
   return (c = acos(c)) && c / sin$1(c);
@@ -15713,7 +15754,7 @@ var azimuthalEquidistant = function() {
   return projection(azimuthalEquidistantRaw)
       .scale(79.4188)
       .clipAngle(180 - 1e-3);
-}
+};
 
 function mercatorRaw(lambda, phi) {
   return [lambda, log$1(tan((halfPi$3 + phi) / 2))];
@@ -15726,7 +15767,7 @@ mercatorRaw.invert = function(x, y) {
 var mercator = function() {
   return mercatorProjection(mercatorRaw)
       .scale(961 / tau$4);
-}
+};
 
 function mercatorProjection(project) {
   var m = projection(project),
@@ -15777,7 +15818,7 @@ function conicConformalRaw(y0, y1) {
 
   project.invert = function(x, y) {
     var fy = f - y, r = sign$1(n) * sqrt$1(x * x + fy * fy);
-    return [atan2(x, fy) / n, 2 * atan(pow$1(f / r, 1 / n)) - halfPi$3];
+    return [atan2(x, abs(fy)) / n * sign$1(fy), 2 * atan(pow$1(f / r, 1 / n)) - halfPi$3];
   };
 
   return project;
@@ -15787,7 +15828,7 @@ var conicConformal = function() {
   return conicProjection(conicConformalRaw)
       .scale(109.5)
       .parallels([30, 30]);
-}
+};
 
 function equirectangularRaw(lambda, phi) {
   return [lambda, phi];
@@ -15798,7 +15839,7 @@ equirectangularRaw.invert = equirectangularRaw;
 var equirectangular = function() {
   return projection(equirectangularRaw)
       .scale(152.63);
-}
+};
 
 function conicEquidistantRaw(y0, y1) {
   var cy0 = cos$1(y0),
@@ -15814,7 +15855,7 @@ function conicEquidistantRaw(y0, y1) {
 
   project.invert = function(x, y) {
     var gy = g - y;
-    return [atan2(x, gy) / n, g - sign$1(n) * sqrt$1(x * x + gy * gy)];
+    return [atan2(x, abs(gy)) / n * sign$1(gy), g - sign$1(n) * sqrt$1(x * x + gy * gy)];
   };
 
   return project;
@@ -15824,7 +15865,7 @@ var conicEquidistant = function() {
   return conicProjection(conicEquidistantRaw)
       .scale(131.154)
       .center([0, 13.9389]);
-}
+};
 
 function gnomonicRaw(x, y) {
   var cy = cos$1(y), k = cos$1(x) * cy;
@@ -15837,7 +15878,7 @@ var gnomonic = function() {
   return projection(gnomonicRaw)
       .scale(144.049)
       .clipAngle(60);
-}
+};
 
 function orthographicRaw(x, y) {
   return [cos$1(y) * sin$1(x), sin$1(y)];
@@ -15849,7 +15890,7 @@ var orthographic = function() {
   return projection(orthographicRaw)
       .scale(249.5)
       .clipAngle(90 + epsilon$4);
-}
+};
 
 function stereographicRaw(x, y) {
   var cy = cos$1(y), k = 1 + cos$1(x) * cy;
@@ -15864,7 +15905,7 @@ var stereographic = function() {
   return projection(stereographicRaw)
       .scale(250)
       .clipAngle(142);
-}
+};
 
 function transverseMercatorRaw(lambda, phi) {
   return [log$1(tan((halfPi$3 + phi) / 2)), -lambda];
@@ -15889,7 +15930,7 @@ var transverseMercator = function() {
 
   return rotate([0, 0, 90])
       .scale(159.155);
-}
+};
 
 exports.version = version;
 exports.bisect = bisectRight;
@@ -16270,7 +16311,9 @@ exports.geoTransverseMercatorRaw = transverseMercatorRaw;
 Object.defineProperty(exports, '__esModule', { value: true });
 
 })));
+
 //# sourceMappingURL=d3.js.map
+
 /*! tether 1.3.7 */
 
 (function(root, factory) {
@@ -18080,6 +18123,7 @@ return Tether;
 }));
 
 //# sourceMappingURL=tether.js.map
+
 /*
 Trix 0.9.9
 Copyright © 2016 Basecamp, LLC
@@ -18092,4 +18136,5 @@ break;case"childList":e.push.apply(e,t.addedNodes),e.push.apply(e,t.removedNodes
 if(r=this.getSelectedRange(),a=r[0],o=r[1],i=r,n=this.getBlock(),a===o){if(s=this.document.locationFromPosition(a),"backward"===t&&0===s.offset&&this.canDecreaseBlockAttributeLevel()&&(n.isListItem()?this.decreaseListLevel():this.decreaseBlockAttributeLevel(),this.setSelection(a),n.isEmpty()))return;i=this.getExpandedRangeInDirection(t),"backward"===t&&(e=this.getAttachmentAtRange(i))}return e?(this.editAttachment(e),!1):(this.setDocument(this.document.removeTextAtRange(i)),this.setSelection(i[0]),n.isListItem()?!1:void 0)},p.prototype.moveTextFromRange=function(t){var e;return e=this.getSelectedRange()[0],this.setDocument(this.document.moveTextFromRangeToPosition(t,e)),this.setSelection(e)},p.prototype.removeAttachment=function(t){var e;return(e=this.document.getRangeOfAttachment(t))?(this.stopEditingAttachment(),this.setDocument(this.document.removeTextAtRange(e)),this.setSelection(e[0])):void 0},p.prototype.removeLastBlockAttribute=function(){var t,e,n,o;return n=this.getSelectedRange(),o=n[0],e=n[1],t=this.document.getBlockAtPosition(e),this.removeCurrentAttribute(t.getLastAttribute()),this.setSelection(o)},d=" ",p.prototype.insertPlaceholder=function(){return this.placeholderPosition=this.getPosition(),this.insertString(d)},p.prototype.selectPlaceholder=function(){return null!=this.placeholderPosition?(this.setSelectedRange([this.placeholderPosition,this.placeholderPosition+d.length]),this.getSelectedRange()):void 0},p.prototype.forgetPlaceholder=function(){return this.placeholderPosition=null},p.prototype.hasCurrentAttribute=function(t){return null!=this.currentAttributes[t]},p.prototype.toggleCurrentAttribute=function(t){var e;return(e=!this.currentAttributes[t])?this.setCurrentAttribute(t,e):this.removeCurrentAttribute(t)},p.prototype.canSetCurrentAttribute=function(t){return i(t)?this.canSetCurrentBlockAttribute(t):this.canSetCurrentTextAttribute(t)},p.prototype.canSetCurrentTextAttribute=function(t){switch(t){case"href":return!this.selectionContainsAttachmentWithAttribute(t);default:return!0}},p.prototype.canSetCurrentBlockAttribute=function(){var t;return t=this.getBlock(),!t.isTerminalBlock()},p.prototype.setCurrentAttribute=function(t,e){return i(t)?this.setBlockAttribute(t,e):(this.setTextAttribute(t,e),this.currentAttributes[t]=e,this.notifyDelegateOfCurrentAttributesChange())},p.prototype.setTextAttribute=function(e,n){var o,i,r,s;if(i=this.getSelectedRange())return r=i[0],o=i[1],r!==o?this.setDocument(this.document.addAttributeAtRange(e,n,i)):"href"===e?(s=t.Text.textForStringWithAttributes(n,{href:n}),this.insertText(s)):void 0},p.prototype.setBlockAttribute=function(t,e){var n,o;if(o=this.getSelectedRange())return this.canSetCurrentAttribute(t)?(n=this.getBlock(),this.setDocument(this.document.applyBlockAttributeAtRange(t,e,o)),this.setSelection(o)):void 0},p.prototype.removeCurrentAttribute=function(t){return i(t)?(this.removeBlockAttribute(t),this.updateCurrentAttributes()):(this.removeTextAttribute(t),delete this.currentAttributes[t],this.notifyDelegateOfCurrentAttributesChange())},p.prototype.removeTextAttribute=function(t){var e;if(e=this.getSelectedRange())return this.setDocument(this.document.removeAttributeAtRange(t,e))},p.prototype.removeBlockAttribute=function(t){var e;if(e=this.getSelectedRange())return this.setDocument(this.document.removeAttributeAtRange(t,e))},p.prototype.canDecreaseNestingLevel=function(){var t;return(null!=(t=this.getBlock())?t.getNestingLevel():void 0)>0},p.prototype.canIncreaseNestingLevel=function(){var t,n,o;if(t=this.getBlock())return(null!=(o=i(t.getLastNestableAttribute()))?o.listAttribute:0)?(n=this.getPreviousBlock())?e(n.getListItemAttributes(),t.getListItemAttributes()):void 0:t.getNestingLevel()>0},p.prototype.decreaseNestingLevel=function(){var t;if(t=this.getBlock())return this.setDocument(this.document.replaceBlock(t,t.decreaseNestingLevel()))},p.prototype.increaseNestingLevel=function(){var t;if(t=this.getBlock())return this.setDocument(this.document.replaceBlock(t,t.increaseNestingLevel()))},p.prototype.canDecreaseBlockAttributeLevel=function(){var t;return(null!=(t=this.getBlock())?t.getAttributeLevel():void 0)>0},p.prototype.decreaseBlockAttributeLevel=function(){var t,e;return(t=null!=(e=this.getBlock())?e.getLastAttribute():void 0)?this.removeCurrentAttribute(t):void 0},p.prototype.decreaseListLevel=function(){var t,e,n,o,i,r;for(r=this.getSelectedRange()[0],i=this.document.locationFromPosition(r).index,n=i,t=this.getBlock().getAttributeLevel();(e=this.document.getBlockAtIndex(n+1))&&e.isListItem()&&e.getAttributeLevel()>t;)n++;return r=this.document.positionFromLocation({index:i,offset:0}),o=this.document.positionFromLocation({index:n,offset:0}),this.setDocument(this.document.removeLastListAttributeAtRange([r,o]))},p.prototype.updateCurrentAttributes=function(){var t,e,n,i,r,s;if(s=this.getSelectedRange({ignoreLock:!0})){for(e=this.document.getCommonAttributesAtRange(s),r=o(),n=0,i=r.length;i>n;n++)t=r[n],e[t]||this.canSetCurrentAttribute(t)||(e[t]=!1);if(!a(e,this.currentAttributes))return this.currentAttributes=e,this.notifyDelegateOfCurrentAttributesChange()}},p.prototype.getCurrentAttributes=function(){return n.call({},this.currentAttributes)},p.prototype.getCurrentTextAttributes=function(){var t,e,n,o;t={},n=this.currentAttributes;for(e in n)o=n[e],r(e)&&(t[e]=o);return t},p.prototype.freezeSelection=function(){return this.setCurrentAttribute("frozen",!0)},p.prototype.thawSelection=function(){return this.removeCurrentAttribute("frozen")},p.prototype.hasFrozenSelection=function(){return this.hasCurrentAttribute("frozen")},p.proxyMethod("getSelectionManager().getPointRange"),p.proxyMethod("getSelectionManager().setLocationRangeFromPointRange"),p.proxyMethod("getSelectionManager().locationIsCursorTarget"),p.proxyMethod("getSelectionManager().selectionIsExpanded"),p.proxyMethod("delegate?.getSelectionManager"),p.prototype.setSelection=function(t){var e,n;return e=this.document.locationRangeFromRange(t),null!=(n=this.delegate)?n.compositionDidRequestChangingSelectionToLocationRange(e):void 0},p.prototype.getSelectedRange=function(){var t;return(t=this.getLocationRange())?this.document.rangeFromLocationRange(t):void 0},p.prototype.setSelectedRange=function(t){var e;return e=this.document.locationRangeFromRange(t),this.getSelectionManager().setLocationRange(e)},p.prototype.getPosition=function(){var t;return(t=this.getLocationRange())?this.document.positionFromLocation(t[0]):void 0},p.prototype.getLocationRange=function(t){var e;return null!=(e=this.getSelectionManager().getLocationRange(t))?e:s({index:0,offset:0})},p.prototype.getExpandedRangeInDirection=function(t){var e,n,o;return n=this.getSelectedRange(),o=n[0],e=n[1],"backward"===t?o=this.translateUTF16PositionFromOffset(o,-1):e=this.translateUTF16PositionFromOffset(e,1),s([o,e])},p.prototype.moveCursorInDirection=function(t){var e,n,o,i;return this.editingAttachment?o=this.document.getRangeOfAttachment(this.editingAttachment):(i=this.getSelectedRange(),o=this.getExpandedRangeInDirection(t),n=!u(i,o)),this.setSelectedRange("backward"===t?o[0]:o[1]),n&&(e=this.getAttachmentAtRange(o))?this.editAttachment(e):void 0},p.prototype.expandSelectionInDirection=function(t){var e;return e=this.getExpandedRangeInDirection(t),this.setSelectedRange(e)},p.prototype.expandSelectionForEditing=function(){return this.hasCurrentAttribute("href")?this.expandSelectionAroundCommonAttribute("href"):void 0},p.prototype.expandSelectionAroundCommonAttribute=function(t){var e,n;return e=this.getPosition(),n=this.document.getRangeOfCommonAttributeAtPosition(t,e),this.setSelectedRange(n)},p.prototype.selectionContainsAttachmentWithAttribute=function(t){var e,n,o,i,r;if(r=this.getSelectedRange()){for(i=this.document.getDocumentAtRange(r).getAttachments(),n=0,o=i.length;o>n;n++)if(e=i[n],e.hasAttribute(t))return!0;return!1}},p.prototype.selectionIsInCursorTarget=function(){return this.editingAttachment||this.positionIsCursorTarget(this.getPosition())},p.prototype.positionIsCursorTarget=function(t){var e;return(e=this.document.locationFromPosition(t))?this.locationIsCursorTarget(e):void 0},p.prototype.positionIsBlockBreak=function(t){var e;return null!=(e=this.document.getPieceAtPosition(t))?e.isBlockBreak():void 0},p.prototype.getSelectedDocument=function(){var t;return(t=this.getSelectedRange())?this.document.getDocumentAtRange(t):void 0},p.prototype.getAttachments=function(){return this.attachments.slice(0)},p.prototype.refreshAttachments=function(){var t,e,n,o,i,r,s,a,u,l,h;for(n=this.document.getAttachments(),a=c(this.attachments,n),t=a.added,h=a.removed,o=0,r=h.length;r>o;o++)e=h[o],e.delegate=null,null!=(u=this.delegate)&&"function"==typeof u.compositionDidRemoveAttachment&&u.compositionDidRemoveAttachment(e);for(i=0,s=t.length;s>i;i++)e=t[i],e.delegate=this,null!=(l=this.delegate)&&"function"==typeof l.compositionDidAddAttachment&&l.compositionDidAddAttachment(e);return this.attachments=n},p.prototype.attachmentDidChangeAttributes=function(t){var e;return this.revision++,null!=(e=this.delegate)&&"function"==typeof e.compositionDidEditAttachment?e.compositionDidEditAttachment(t):void 0},p.prototype.editAttachment=function(t){var e;if(t!==this.editingAttachment)return this.stopEditingAttachment(),this.editingAttachment=t,null!=(e=this.delegate)&&"function"==typeof e.compositionDidStartEditingAttachment?e.compositionDidStartEditingAttachment(this.editingAttachment):void 0},p.prototype.stopEditingAttachment=function(){var t;if(this.editingAttachment)return null!=(t=this.delegate)&&"function"==typeof t.compositionDidStopEditingAttachment&&t.compositionDidStopEditingAttachment(this.editingAttachment),this.editingAttachment=null},p.prototype.canEditAttachmentCaption=function(){var t;return null!=(t=this.editingAttachment)?t.isPreviewable():void 0},p.prototype.updateAttributesForAttachment=function(t,e){return this.setDocument(this.document.updateAttributesForAttachment(t,e))},p.prototype.removeAttributeForAttachment=function(t,e){return this.setDocument(this.document.removeAttributeForAttachment(t,e))},p.prototype.breakFormattedBlock=function(e){var n,o,i,r,s;return o=e.document,n=e.block,r=e.startPosition,s=[r-1,r],n.getBlockBreakPosition()===e.startLocation.offset?(n.breaksOnReturn()&&"\n"===e.nextCharacter?r+=1:o=o.removeTextAtRange(s),s=[r,r]):"\n"===e.nextCharacter?"\n"===e.previousCharacter?s=[r-1,r+1]:(s=[r,r+1],r+=1):e.startLocation.offset-1!==0&&(r+=1),i=new t.Document([n.removeLastAttribute().copyWithoutText()]),this.setDocument(o.insertDocumentAtRange(i,s)),this.setSelection(r)},p.prototype.getPreviousBlock=function(){var t,e;return(e=this.getLocationRange())&&(t=e[0].index,t>0)?this.document.getBlockAtIndex(t-1):void 0},p.prototype.getBlock=function(){var t;return(t=this.getLocationRange())?this.document.getBlockAtIndex(t[0].index):void 0},p.prototype.getAttachmentAtRange=function(e){var n;return n=this.document.getDocumentAtRange(e),n.toString()===t.OBJECT_REPLACEMENT_CHARACTER+"\n"?n.getAttachments()[0]:void 0},p.prototype.notifyDelegateOfCurrentAttributesChange=function(){var t;return null!=(t=this.delegate)&&"function"==typeof t.compositionDidChangeCurrentAttributes?t.compositionDidChangeCurrentAttributes(this.currentAttributes):void 0},p.prototype.notifyDelegateOfInsertionAtRange=function(t){var e;return null!=(e=this.delegate)&&"function"==typeof e.compositionDidPerformInsertionAtRange?e.compositionDidPerformInsertionAtRange(t):void 0},p.prototype.translateUTF16PositionFromOffset=function(t,e){var n,o;return o=this.document.toUTF16String(),n=o.offsetFromUCS2Offset(t),o.offsetToUCS2Offset(n+e)},p}(t.BasicObject)}.call(this),function(){var e=function(t,e){function o(){this.constructor=t}for(var i in e)n.call(e,i)&&(t[i]=e[i]);return o.prototype=e.prototype,t.prototype=new o,t.__super__=e.prototype,t},n={}.hasOwnProperty;t.UndoManager=function(t){function n(t){this.composition=t,this.undoEntries=[],this.redoEntries=[]}var o;return e(n,t),n.prototype.recordUndoEntry=function(t,e){var n,i,r,s,a;return s=null!=e?e:{},i=s.context,n=s.consolidatable,r=this.undoEntries.slice(-1)[0],n&&o(r,t,i)?void 0:(a=this.createEntry({description:t,context:i}),this.undoEntries.push(a),this.redoEntries=[])},n.prototype.undo=function(){var t,e;return(e=this.undoEntries.pop())?(t=this.createEntry(e),this.redoEntries.push(t),this.composition.loadSnapshot(e.snapshot)):void 0},n.prototype.redo=function(){var t,e;return(t=this.redoEntries.pop())?(e=this.createEntry(t),this.undoEntries.push(e),this.composition.loadSnapshot(t.snapshot)):void 0},n.prototype.canUndo=function(){return this.undoEntries.length>0},n.prototype.canRedo=function(){return this.redoEntries.length>0},n.prototype.createEntry=function(t){var e,n,o;return o=null!=t?t:{},n=o.description,e=o.context,{description:null!=n?n.toString():void 0,context:JSON.stringify(e),snapshot:this.composition.getSnapshot()}},o=function(t,e,n){return(null!=t?t.description:void 0)===(null!=e?e.toString():void 0)&&(null!=t?t.context:void 0)===JSON.stringify(n)},n}(t.BasicObject)}.call(this),function(){t.Editor=function(){function e(e,n,o){this.composition=e,this.selectionManager=n,this.element=o,this.undoManager=new t.UndoManager(this.composition)}return e.prototype.loadDocument=function(t){return this.loadSnapshot({document:t,selectedRange:[0,0]})},e.prototype.loadHTML=function(e){return null==e&&(e=""),this.loadDocument(t.Document.fromHTML(e,{referenceElement:this.element}))},e.prototype.loadJSON=function(e){var n,o;return n=e.document,o=e.selectedRange,n=t.Document.fromJSON(n),this.loadSnapshot({document:n,selectedRange:o})},e.prototype.loadSnapshot=function(e){return this.undoManager=new t.UndoManager(this.composition),this.composition.loadSnapshot(e)},e.prototype.getDocument=function(){return this.composition.document},e.prototype.getSelectedDocument=function(){return this.composition.getSelectedDocument()},e.prototype.getSnapshot=function(){return this.composition.getSnapshot()},e.prototype.toJSON=function(){return this.getSnapshot()},e.prototype.deleteInDirection=function(t){return this.composition.deleteInDirection(t)},e.prototype.insertAttachment=function(t){return this.composition.insertAttachment(t)},e.prototype.insertDocument=function(t){return this.composition.insertDocument(t)},e.prototype.insertFile=function(t){return this.composition.insertFile(t)},e.prototype.insertHTML=function(t){return this.composition.insertHTML(t)},e.prototype.insertString=function(t){return this.composition.insertString(t)},e.prototype.insertText=function(t){return this.composition.insertText(t)},e.prototype.insertLineBreak=function(){return this.composition.insertLineBreak()},e.prototype.getSelectedRange=function(){return this.composition.getSelectedRange()},e.prototype.getPosition=function(){return this.composition.getPosition()},e.prototype.getClientRectAtPosition=function(t){var e;return e=this.getDocument().locationRangeFromRange([t,t+1]),this.selectionManager.getClientRectAtLocationRange(e)},e.prototype.expandSelectionInDirection=function(t){return this.composition.expandSelectionInDirection(t)},e.prototype.moveCursorInDirection=function(t){return this.composition.moveCursorInDirection(t)},e.prototype.setSelectedRange=function(t){return this.composition.setSelectedRange(t)},e.prototype.activateAttribute=function(t,e){return null==e&&(e=!0),this.composition.setCurrentAttribute(t,e)},e.prototype.attributeIsActive=function(t){return this.composition.hasCurrentAttribute(t)},e.prototype.canActivateAttribute=function(t){return this.composition.canSetCurrentAttribute(t)},e.prototype.deactivateAttribute=function(t){return this.composition.removeCurrentAttribute(t)},e.prototype.canDecreaseNestingLevel=function(){return this.composition.canDecreaseNestingLevel()},e.prototype.canIncreaseNestingLevel=function(){return this.composition.canIncreaseNestingLevel()},e.prototype.decreaseNestingLevel=function(){return this.canDecreaseNestingLevel()?this.composition.decreaseNestingLevel():void 0},e.prototype.increaseNestingLevel=function(){return this.canIncreaseNestingLevel()?this.composition.increaseNestingLevel():void 0},e.prototype.canDecreaseIndentationLevel=function(){return this.canDecreaseNestingLevel()},e.prototype.canIncreaseIndentationLevel=function(){return this.canIncreaseNestingLevel()},e.prototype.decreaseIndentationLevel=function(){return this.decreaseNestingLevel()},e.prototype.increaseIndentationLevel=function(){return this.increaseNestingLevel()},e.prototype.canRedo=function(){return this.undoManager.canRedo()},e.prototype.canUndo=function(){return this.undoManager.canUndo()},e.prototype.recordUndoEntry=function(t,e){var n,o,i;return i=null!=e?e:{},o=i.context,n=i.consolidatable,this.undoManager.recordUndoEntry(t,{context:o,consolidatable:n})},e.prototype.redo=function(){return this.canRedo()?this.undoManager.redo():void 0},e.prototype.undo=function(){return this.canUndo()?this.undoManager.undo():void 0},e}()}.call(this),function(){var e=function(t,e){function o(){this.constructor=t}for(var i in e)n.call(e,i)&&(t[i]=e[i]);return o.prototype=e.prototype,t.prototype=new o,t.__super__=e.prototype,t},n={}.hasOwnProperty;t.ManagedAttachment=function(t){function n(t,e){var n;this.attachmentManager=t,this.attachment=e,n=this.attachment,this.id=n.id,this.file=n.file}return e(n,t),n.prototype.remove=function(){return this.attachmentManager.requestRemovalOfAttachment(this.attachment)},n.proxyMethod("attachment.getAttribute"),n.proxyMethod("attachment.hasAttribute"),n.proxyMethod("attachment.setAttribute"),n.proxyMethod("attachment.getAttributes"),n.proxyMethod("attachment.setAttributes"),n.proxyMethod("attachment.isPending"),n.proxyMethod("attachment.isPreviewable"),n.proxyMethod("attachment.getURL"),n.proxyMethod("attachment.getHref"),n.proxyMethod("attachment.getFilename"),n.proxyMethod("attachment.getFilesize"),n.proxyMethod("attachment.getFormattedFilesize"),n.proxyMethod("attachment.getExtension"),n.proxyMethod("attachment.getContentType"),n.proxyMethod("attachment.getFile"),n.proxyMethod("attachment.setFile"),n.proxyMethod("attachment.releaseFile"),n.proxyMethod("attachment.getUploadProgress"),n.proxyMethod("attachment.setUploadProgress"),n}(t.BasicObject)}.call(this),function(){var e=function(t,e){function o(){this.constructor=t}for(var i in e)n.call(e,i)&&(t[i]=e[i]);return o.prototype=e.prototype,t.prototype=new o,t.__super__=e.prototype,t},n={}.hasOwnProperty;t.AttachmentManager=function(n){function o(t){var e,n,o;for(null==t&&(t=[]),this.managedAttachments={},n=0,o=t.length;o>n;n++)e=t[n],this.manageAttachment(e)}return e(o,n),o.prototype.getAttachments=function(){var t,e,n,o;n=this.managedAttachments,o=[];for(e in n)t=n[e],o.push(t);return o},o.prototype.manageAttachment=function(e){var n,o;return null!=(n=this.managedAttachments)[o=e.id]?n[o]:n[o]=new t.ManagedAttachment(this,e)},o.prototype.attachmentIsManaged=function(t){return t.id in this.managedAttachments},o.prototype.requestRemovalOfAttachment=function(t){var e;return this.attachmentIsManaged(t)&&null!=(e=this.delegate)&&"function"==typeof e.attachmentManagerDidRequestRemovalOfAttachment?e.attachmentManagerDidRequestRemovalOfAttachment(t):void 0},o.prototype.unmanageAttachment=function(t){var e;return e=this.managedAttachments[t.id],delete this.managedAttachments[t.id],e},o}(t.BasicObject)}.call(this),function(){var e,n,o,i,r,s,a,u,c,l,h,p,d;e=t.elementContainsNode,n=t.findChildIndexOfNode,o=t.findClosestElementFromNode,i=t.findNodeFromContainerAndOffset,a=t.nodeIsBlockStart,u=t.nodeIsBlockStartComment,s=t.nodeIsBlockContainer,c=t.nodeIsCursorTarget,l=t.nodeIsEmptyTextNode,h=t.nodeIsTextNode,r=t.nodeIsAttachmentElement,p=t.tagName,d=t.walkTree,t.LocationMapper=function(){function t(t){this.element=t}var o,i,f,g;return t.prototype.findLocationFromContainerAndOffset=function(t,o,r){var s,u,l,p,g,m,y;for(m=(null!=r?r:{strict:!0}).strict,u=0,l=!1,p={index:0,offset:0},(s=this.findAttachmentElementParentForNode(t))&&(t=s.parentNode,o=n(s)),y=d(this.element,{usingFilter:f});y.nextNode();){if(g=y.currentNode,g===t&&h(t)){c(g)||(p.offset+=o);break}if(g.parentNode===t){if(u++===o)break}else if(!e(t,g)&&u>0)break;a(g,{strict:m})?(l&&p.index++,p.offset=0,l=!0):p.offset+=i(g)}return p},t.prototype.findContainerAndOffsetFromLocation=function(t){var e,o,i,r,a,u;if(0===t.index&&0===t.offset){for(e=this.element,r=0;e.firstChild;)if(e=e.firstChild,s(e)){r=1;break}return[e,r]}if(a=this.findNodeAndOffsetFromLocation(t),o=a[0],i=a[1],o){if(h(o))e=o,u=o.textContent,r=t.offset-i;else{if(e=o.parentNode,!s(e))for(;o===e.lastChild&&(o=e,e=e.parentNode,!s(e)););r=n(o),0!==t.offset&&r++}return[e,r]}},t.prototype.findNodeAndOffsetFromLocation=function(t){var e,n,o,r,s,a,u,l;for(u=0,l=this.getSignificantNodesForIndex(t.index),n=0,o=l.length;o>n;n++){if(e=l[n],r=i(e),t.offset<=u+r)if(h(e)){if(s=e,a=u,t.offset===a&&c(s))break}else s||(s=e,a=u);if(u+=r,u>t.offset)break}return[s,a]},t.prototype.findAttachmentElementParentForNode=function(t){for(;t&&t!==this.element;){if(r(t))return t;t=t.parentNode}},t.prototype.getSignificantNodesForIndex=function(t){var e,n,i,r,s;for(i=[],s=d(this.element,{usingFilter:o}),r=!1;s.nextNode();)if(n=s.currentNode,u(n)){if("undefined"!=typeof e&&null!==e?e++:e=0,e===t)r=!0;else if(r)break}else r&&i.push(n);return i},i=function(t){var e;return t.nodeType===Node.TEXT_NODE?c(t)?0:(e=t.textContent,e.length):"br"===p(t)||r(t)?1:0},o=function(t){return g(t)===NodeFilter.FILTER_ACCEPT?f(t):NodeFilter.FILTER_REJECT},g=function(t){return l(t)?NodeFilter.FILTER_REJECT:NodeFilter.FILTER_ACCEPT},f=function(t){return r(t.parentNode)?NodeFilter.FILTER_REJECT:NodeFilter.FILTER_ACCEPT},t}()}.call(this),function(){var e,n,o=[].slice;e=t.getDOMRange,n=t.setDOMRange,t.PointMapper=function(){function t(){}return t.prototype.createDOMRangeFromPoint=function(t){var o,i,r,s,a,u,c,l;if(c=t.x,l=t.y,document.caretPositionFromPoint)return a=document.caretPositionFromPoint(c,l),r=a.offsetNode,i=a.offset,o=document.createRange(),o.setStart(r,i),o;if(document.caretRangeFromPoint)return document.caretRangeFromPoint(c,l);if(document.body.createTextRange){s=e();try{u=document.body.createTextRange(),u.moveToPoint(c,l),u.select()}catch(h){}return o=e(),n(s),o}},t.prototype.getClientRectsForDOMRange=function(t){var e,n,i;return n=o.call(t.getClientRects()),i=n[0],e=n[n.length-1],[i,e]},t}()}.call(this),function(){var e,n=function(t,e){return function(){return t.apply(e,arguments)}},o=function(t,e){function n(){this.constructor=t}for(var o in e)i.call(e,o)&&(t[o]=e[o]);return n.prototype=e.prototype,t.prototype=new n,t.__super__=e.prototype,t},i={}.hasOwnProperty,r=[].indexOf||function(t){for(var e=0,n=this.length;n>e;e++)if(e in this&&this[e]===t)return e;return-1};e=t.getDOMRange,t.SelectionChangeObserver=function(t){function i(){this.run=n(this.run,this),this.update=n(this.update,this),this.selectionManagers=[]}var s;return o(i,t),i.prototype.start=function(){return this.started?void 0:(this.started=!0,"onselectionchange"in document?document.addEventListener("selectionchange",this.update,!0):this.run())},i.prototype.stop=function(){return this.started?(this.started=!1,document.removeEventListener("selectionchange",this.update,!0)):void 0},i.prototype.registerSelectionManager=function(t){return r.call(this.selectionManagers,t)<0?(this.selectionManagers.push(t),this.start()):void 0},i.prototype.unregisterSelectionManager=function(t){var e;return this.selectionManagers=function(){var n,o,i,r;for(i=this.selectionManagers,r=[],n=0,o=i.length;o>n;n++)e=i[n],e!==t&&r.push(e);return r}.call(this),0===this.selectionManagers.length?this.stop():void 0},i.prototype.notifySelectionManagersOfSelectionChange=function(){var t,e,n,o,i;for(n=this.selectionManagers,o=[],t=0,e=n.length;e>t;t++)i=n[t],o.push(i.selectionDidChange());return o},i.prototype.update=function(){var t;return t=e(),s(t,this.domRange)?void 0:(this.domRange=t,this.notifySelectionManagersOfSelectionChange())},i.prototype.reset=function(){return this.domRange=null,this.update()},i.prototype.run=function(){return this.started?(this.update(),requestAnimationFrame(this.run)):void 0},s=function(t,e){return(null!=t?t.startContainer:void 0)===(null!=e?e.startContainer:void 0)&&(null!=t?t.startOffset:void 0)===(null!=e?e.startOffset:void 0)&&(null!=t?t.endContainer:void 0)===(null!=e?e.endContainer:void 0)&&(null!=t?t.endOffset:void 0)===(null!=e?e.endOffset:void 0)},i}(t.BasicObject),null==t.selectionChangeObserver&&(t.selectionChangeObserver=new t.SelectionChangeObserver)}.call(this),function(){var e,n,o,i,r,s,a,u,c,l,h,p,d=function(t,e){return function(){return t.apply(e,arguments)}},f=function(t,e){function n(){this.constructor=t}for(var o in e)g.call(e,o)&&(t[o]=e[o]);return n.prototype=e.prototype,t.prototype=new n,t.__super__=e.prototype,t},g={}.hasOwnProperty;i=t.getDOMSelection,o=t.getDOMRange,p=t.setDOMRange,e=t.defer,n=t.elementContainsNode,u=t.nodeIsCursorTarget,a=t.innerElementIsActive,r=t.handleEvent,s=t.handleEventOnce,c=t.normalizeRange,l=t.rangeIsCollapsed,h=t.rangesAreEqual,t.SelectionManager=function(e){function s(e){this.element=e,this.selectionDidChange=d(this.selectionDidChange,this),this.didMouseDown=d(this.didMouseDown,this),this.locationMapper=new t.LocationMapper(this.element),this.pointMapper=new t.PointMapper,this.lockCount=0,r("mousedown",{onElement:this.element,withCallback:this.didMouseDown})}return f(s,e),s.prototype.getLocationRange=function(t){var e,n;return null==t&&(t={}),e=t.strict===!1?this.createLocationRangeFromDOMRange(o(),{strict:!1}):t.ignoreLock?this.currentLocationRange:null!=(n=this.lockedLocationRange)?n:this.currentLocationRange},s.prototype.setLocationRange=function(t){var e;if(!this.lockedLocationRange)return t=c(t),(e=this.createDOMRangeFromLocationRange(t))?(p(e),this.updateCurrentLocationRange(t)):void 0},s.prototype.setLocationRangeFromPointRange=function(t){var e,n;return t=c(t),n=this.getLocationAtPoint(t[0]),e=this.getLocationAtPoint(t[1]),this.setLocationRange([n,e])},s.prototype.getClientRectAtLocationRange=function(t){var e;return(e=this.createDOMRangeFromLocationRange(t))?this.getClientRectsForDOMRange(e)[1]:void 0},s.prototype.locationIsCursorTarget=function(t){var e,n,o;return o=this.findNodeAndOffsetFromLocation(t),e=o[0],n=o[1],u(e)},s.prototype.lock=function(){return 0===this.lockCount++?(this.updateCurrentLocationRange(),this.lockedLocationRange=this.getLocationRange()):void 0},s.prototype.unlock=function(){var t;return 0===--this.lockCount&&(t=this.lockedLocationRange,this.lockedLocationRange=null,null!=t)?this.setLocationRange(t):void 0},s.prototype.clearSelection=function(){var t;return null!=(t=i())?t.removeAllRanges():void 0},s.prototype.selectionIsCollapsed=function(){var t;return(null!=(t=o())?t.collapsed:void 0)===!0},s.prototype.selectionIsExpanded=function(){return!this.selectionIsCollapsed()},s.proxyMethod("locationMapper.findLocationFromContainerAndOffset"),s.proxyMethod("locationMapper.findContainerAndOffsetFromLocation"),s.proxyMethod("locationMapper.findNodeAndOffsetFromLocation"),s.proxyMethod("pointMapper.createDOMRangeFromPoint"),s.proxyMethod("pointMapper.getClientRectsForDOMRange"),s.prototype.didMouseDown=function(){return this.pauseTemporarily()},s.prototype.pauseTemporarily=function(){var t,e,o,i;return this.paused=!0,e=function(t){return function(){var e,r,s;for(t.paused=!1,clearTimeout(i),r=0,s=o.length;s>r;r++)e=o[r],e.destroy();return n(document,t.element)?t.selectionDidChange():void 0}}(this),i=setTimeout(e,200),o=function(){var n,o,i,s;for(i=["mousemove","keydown"],s=[],n=0,o=i.length;o>n;n++)t=i[n],s.push(r(t,{onElement:document,withCallback:e}));return s}()},s.prototype.selectionDidChange=function(){return this.paused||a(this.element)?void 0:this.updateCurrentLocationRange()},s.prototype.updateCurrentLocationRange=function(t){var e;return(null!=t?t:t=this.createLocationRangeFromDOMRange(o()))&&!h(t,this.currentLocationRange)?(this.currentLocationRange=t,null!=(e=this.delegate)&&"function"==typeof e.locationRangeDidChange?e.locationRangeDidChange(this.currentLocationRange.slice(0)):void 0):void 0},s.prototype.createDOMRangeFromLocationRange=function(t){var e,n,o,i;return o=this.findContainerAndOffsetFromLocation(t[0]),n=l(t)?o:null!=(i=this.findContainerAndOffsetFromLocation(t[1]))?i:o,null!=o&&null!=n?(e=document.createRange(),e.setStart.apply(e,o),e.setEnd.apply(e,n),e):void 0},s.prototype.createLocationRangeFromDOMRange=function(t,e){var n,o;if(null!=t&&this.domRangeWithinElement(t)&&(o=this.findLocationFromContainerAndOffset(t.startContainer,t.startOffset,e)))return t.collapsed||(n=this.findLocationFromContainerAndOffset(t.endContainer,t.endOffset,e)),c([o,n])},s.prototype.getLocationAtPoint=function(t){var e,n;return(e=this.createDOMRangeFromPoint(t))&&null!=(n=this.createLocationRangeFromDOMRange(e))?n[0]:void 0},s.prototype.domRangeWithinElement=function(t){return t.collapsed?n(this.element,t.startContainer):n(this.element,t.startContainer)&&n(this.element,t.endContainer)},s}(t.BasicObject)}.call(this),function(){var e,n,o,i=function(t,e){function n(){this.constructor=t}for(var o in e)r.call(e,o)&&(t[o]=e[o]);return n.prototype=e.prototype,t.prototype=new n,t.__super__=e.prototype,t},r={}.hasOwnProperty,s=[].slice;n=t.rangeIsCollapsed,o=t.rangesAreEqual,e=t.objectsAreEqual,t.EditorController=function(r){function a(e){var n,o;this.editorElement=e.editorElement,n=e.document,o=e.html,this.selectionManager=new t.SelectionManager(this.editorElement),this.selectionManager.delegate=this,this.composition=new t.Composition,this.composition.delegate=this,this.attachmentManager=new t.AttachmentManager(this.composition.getAttachments()),this.attachmentManager.delegate=this,this.inputController=new t.InputController(this.editorElement),this.inputController.delegate=this,this.inputController.responder=this.composition,this.compositionController=new t.CompositionController(this.editorElement,this.composition),this.compositionController.delegate=this,this.toolbarController=new t.ToolbarController(this.editorElement.toolbarElement),this.toolbarController.delegate=this,this.editor=new t.Editor(this.composition,this.selectionManager,this.editorElement),null!=n?this.editor.loadDocument(n):this.editor.loadHTML(o)}return i(a,r),a.prototype.registerSelectionManager=function(){return t.selectionChangeObserver.registerSelectionManager(this.selectionManager)},a.prototype.unregisterSelectionManager=function(){return t.selectionChangeObserver.unregisterSelectionManager(this.selectionManager)},a.prototype.compositionDidChangeDocument=function(){return this.editorElement.notify("document-change"),this.handlingInput?void 0:this.render()},a.prototype.compositionDidChangeCurrentAttributes=function(t){return this.currentAttributes=t,this.toolbarController.updateAttributes(this.currentAttributes),this.updateCurrentActions(),this.editorElement.notify("attributes-change",{attributes:this.currentAttributes})},a.prototype.compositionDidPerformInsertionAtRange=function(t){return this.pasting?this.pastedRange=t:void 0},a.prototype.compositionShouldAcceptFile=function(t){return this.editorElement.notify("file-accept",{file:t})},a.prototype.compositionDidAddAttachment=function(t){var e;return e=this.attachmentManager.manageAttachment(t),this.editorElement.notify("attachment-add",{attachment:e})},a.prototype.compositionDidEditAttachment=function(t){var e;return this.compositionController.rerenderViewForObject(t),e=this.attachmentManager.manageAttachment(t),this.editorElement.notify("attachment-edit",{attachment:e}),this.editorElement.notify("change")},a.prototype.compositionDidRemoveAttachment=function(t){var e;return e=this.attachmentManager.unmanageAttachment(t),this.editorElement.notify("attachment-remove",{attachment:e})},a.prototype.compositionDidStartEditingAttachment=function(t){var e,n;return n=this.composition.document,e=n.getRangeOfAttachment(t),this.attachmentLocationRange=n.locationRangeFromRange(e),this.compositionController.installAttachmentEditorForAttachment(t),this.selectionManager.setLocationRange(this.attachmentLocationRange)},a.prototype.compositionDidStopEditingAttachment=function(){return this.compositionController.uninstallAttachmentEditor(),this.attachmentLocationRange=null},a.prototype.compositionDidRequestChangingSelectionToLocationRange=function(t){return!this.loadingSnapshot||this.isFocused()?(this.requestedLocationRange=t,this.documentWhenLocationRangeRequested=this.composition.document,this.handlingInput?void 0:this.render()):void 0},a.prototype.compositionWillLoadSnapshot=function(){return this.loadingSnapshot=!0},a.prototype.compositionDidLoadSnapshot=function(){return this.compositionController.refreshViewCache(),this.render(),this.loadingSnapshot=!1},a.prototype.getSelectionManager=function(){return this.selectionManager
 },a.proxyMethod("getSelectionManager().setLocationRange"),a.proxyMethod("getSelectionManager().getLocationRange"),a.prototype.attachmentManagerDidRequestRemovalOfAttachment=function(t){return this.removeAttachment(t)},a.prototype.compositionControllerWillSyncDocumentView=function(){return this.inputController.editorWillSyncDocumentView(),this.selectionManager.lock(),this.selectionManager.clearSelection()},a.prototype.compositionControllerDidSyncDocumentView=function(){return this.inputController.editorDidSyncDocumentView(),this.selectionManager.unlock(),this.updateCurrentActions(),this.editorElement.notify("sync")},a.prototype.compositionControllerDidRender=function(){return null!=this.requestedLocationRange&&(this.documentWhenLocationRangeRequested.isEqualTo(this.composition.document)&&this.selectionManager.setLocationRange(this.requestedLocationRange),this.composition.updateCurrentAttributes(),this.requestedLocationRange=null,this.documentWhenLocationRangeRequested=null),this.editorElement.notify("render")},a.prototype.compositionControllerDidFocus=function(){return this.toolbarController.hideDialog(),this.editorElement.notify("focus")},a.prototype.compositionControllerDidBlur=function(){return this.editorElement.notify("blur")},a.prototype.compositionControllerDidSelectAttachment=function(t){return this.composition.editAttachment(t)},a.prototype.compositionControllerDidRequestDeselectingAttachment=function(){return this.attachmentLocationRange?this.selectionManager.setLocationRange(this.attachmentLocationRange[1]):void 0},a.prototype.compositionControllerWillUpdateAttachment=function(t){return this.editor.recordUndoEntry("Edit Attachment",{context:t.id,consolidatable:!0})},a.prototype.compositionControllerDidRequestRemovalOfAttachment=function(t){return this.removeAttachment(t)},a.prototype.inputControllerWillHandleInput=function(){return this.handlingInput=!0,this.requestedRender=!1},a.prototype.inputControllerDidRequestRender=function(){return this.requestedRender=!0},a.prototype.inputControllerDidHandleInput=function(){return this.handlingInput=!1,this.requestedRender?(this.requestedRender=!1,this.render()):void 0},a.prototype.inputControllerDidRequestReparse=function(){return this.reparse()},a.prototype.inputControllerWillPerformTyping=function(){return this.recordTypingUndoEntry()},a.prototype.inputControllerWillCutText=function(){return this.editor.recordUndoEntry("Cut")},a.prototype.inputControllerWillPasteText=function(){return this.editor.recordUndoEntry("Paste"),this.pasting=!0},a.prototype.inputControllerDidPaste=function(t){var e;return e=this.pastedRange,this.pastedRange=null,this.pasting=null,this.editorElement.notify("paste",{pasteData:t,range:e}),this.render()},a.prototype.inputControllerWillMoveText=function(){return this.editor.recordUndoEntry("Move")},a.prototype.inputControllerWillAttachFiles=function(){return this.editor.recordUndoEntry("Drop Files")},a.prototype.inputControllerDidReceiveKeyboardCommand=function(t){return this.toolbarController.applyKeyboardCommand(t)},a.prototype.inputControllerDidStartDrag=function(){return this.locationRangeBeforeDrag=this.selectionManager.getLocationRange()},a.prototype.inputControllerDidReceiveDragOverPoint=function(t){return this.selectionManager.setLocationRangeFromPointRange(t)},a.prototype.inputControllerDidCancelDrag=function(){return this.selectionManager.setLocationRange(this.locationRangeBeforeDrag),this.locationRangeBeforeDrag=null},a.prototype.locationRangeDidChange=function(t){return this.composition.updateCurrentAttributes(),this.updateCurrentActions(),this.attachmentLocationRange&&!o(this.attachmentLocationRange,t)&&this.composition.stopEditingAttachment(),this.editorElement.notify("selection-change")},a.prototype.toolbarDidClickButton=function(){return this.getLocationRange()?void 0:this.setLocationRange({index:0,offset:0})},a.prototype.toolbarDidInvokeAction=function(t){return this.invokeAction(t)},a.prototype.toolbarDidToggleAttribute=function(t){return this.recordFormattingUndoEntry(),this.composition.toggleCurrentAttribute(t),this.render(),this.selectionFrozen?void 0:this.editorElement.focus()},a.prototype.toolbarDidUpdateAttribute=function(t,e){return this.recordFormattingUndoEntry(),this.composition.setCurrentAttribute(t,e),this.render(),this.selectionFrozen?void 0:this.editorElement.focus()},a.prototype.toolbarDidRemoveAttribute=function(t){return this.recordFormattingUndoEntry(),this.composition.removeCurrentAttribute(t),this.render(),this.selectionFrozen?void 0:this.editorElement.focus()},a.prototype.toolbarWillShowDialog=function(){return this.composition.expandSelectionForEditing(),this.freezeSelection()},a.prototype.toolbarDidShowDialog=function(t){return this.editorElement.notify("toolbar-dialog-show",{dialogName:t})},a.prototype.toolbarDidHideDialog=function(t){return this.thawSelection(),this.editorElement.focus(),this.editorElement.notify("toolbar-dialog-hide",{dialogName:t})},a.prototype.freezeSelection=function(){return this.selectionFrozen?void 0:(this.selectionManager.lock(),this.composition.freezeSelection(),this.selectionFrozen=!0,this.render())},a.prototype.thawSelection=function(){return this.selectionFrozen?(this.composition.thawSelection(),this.selectionManager.unlock(),this.selectionFrozen=!1,this.render()):void 0},a.prototype.actions={undo:{test:function(){return this.editor.canUndo()},perform:function(){return this.editor.undo()}},redo:{test:function(){return this.editor.canRedo()},perform:function(){return this.editor.redo()}},link:{test:function(){return this.editor.canActivateAttribute("href")}},increaseNestingLevel:{test:function(){return this.editor.canIncreaseNestingLevel()},perform:function(){return this.editor.increaseNestingLevel()&&this.render()}},decreaseNestingLevel:{test:function(){return this.editor.canDecreaseNestingLevel()},perform:function(){return this.editor.decreaseNestingLevel()&&this.render()}},increaseBlockLevel:{test:function(){return this.editor.canIncreaseNestingLevel()},perform:function(){return this.editor.increaseNestingLevel()&&this.render()}},decreaseBlockLevel:{test:function(){return this.editor.canDecreaseNestingLevel()},perform:function(){return this.editor.decreaseNestingLevel()&&this.render()}}},a.prototype.canInvokeAction=function(t){var e,n;return this.actionIsExternal(t)?!0:!!(null!=(e=this.actions[t])&&null!=(n=e.test)?n.call(this):void 0)},a.prototype.invokeAction=function(t){var e,n;return this.actionIsExternal(t)?this.editorElement.notify("action-invoke",{actionName:t}):null!=(e=this.actions[t])&&null!=(n=e.perform)?n.call(this):void 0},a.prototype.actionIsExternal=function(t){return/^x-./.test(t)},a.prototype.getCurrentActions=function(){var t,e;e={};for(t in this.actions)e[t]=this.canInvokeAction(t);return e},a.prototype.updateCurrentActions=function(){var t;return t=this.getCurrentActions(),e(t,this.currentActions)?void 0:(this.currentActions=t,this.toolbarController.updateActions(this.currentActions),this.editorElement.notify("actions-change",{actions:this.currentActions}))},a.prototype.reparse=function(){return this.composition.replaceHTML(this.editorElement.innerHTML)},a.prototype.render=function(){return this.compositionController.render()},a.prototype.removeAttachment=function(t){return this.editor.recordUndoEntry("Delete Attachment"),this.composition.removeAttachment(t),this.render()},a.prototype.recordFormattingUndoEntry=function(){var t;return t=this.selectionManager.getLocationRange(),n(t)?void 0:this.editor.recordUndoEntry("Formatting",{context:this.getUndoContext(),consolidatable:!0})},a.prototype.recordTypingUndoEntry=function(){return this.editor.recordUndoEntry("Typing",{context:this.getUndoContext(this.currentAttributes),consolidatable:!0})},a.prototype.getUndoContext=function(){var t;return t=1<=arguments.length?s.call(arguments,0):[],[this.getLocationContext(),this.getTimeContext()].concat(s.call(t))},a.prototype.getLocationContext=function(){var t;return t=this.selectionManager.getLocationRange(),n(t)?t[0].index:t},a.prototype.getTimeContext=function(){return t.config.undoInterval>0?Math.floor((new Date).getTime()/t.config.undoInterval):0},a.prototype.isFocused=function(){var t;return this.editorElement===(null!=(t=this.editorElement.ownerDocument)?t.activeElement:void 0)},a}(t.Controller)}.call(this),function(){var e,n,o,i,r,s,a;r=t.makeElement,s=t.selectionElements,a=t.triggerEvent,o=t.handleEvent,i=t.handleEventOnce,n=t.defer,e=t.AttachmentView.attachmentSelector,t.registerElement("trix-editor",function(){var n,u,c,l,h,p;return l=0,n=function(t){return!document.querySelector(":focus")&&t.hasAttribute("autofocus")&&document.querySelector("[autofocus]")===t?t.focus():void 0},h=function(t){return t.hasAttribute("contenteditable")?void 0:(t.setAttribute("contenteditable",""),i("focus",{onElement:t,withCallback:function(){return u(t)}}))},u=function(t){return c(t),p(t)},c=function(t){return("function"==typeof document.queryCommandSupported?document.queryCommandSupported("enableObjectResizing"):void 0)?(document.execCommand("enableObjectResizing",!1,!1),o("mscontrolselect",{onElement:t,preventDefault:!0})):void 0},p=function(){var e;return("function"==typeof document.queryCommandSupported?document.queryCommandSupported("DefaultParagraphSeparator"):void 0)&&(e=t.config.blockAttributes["default"].tagName,"div"===e||"p"===e)?document.execCommand("DefaultParagraphSeparator",!1,e):void 0},{defaultCSS:"%t:empty:not(:focus)::before {\n  content: attr(placeholder);\n  color: graytext;\n}\n\n%t a[contenteditable=false] {\n  cursor: text;\n}\n\n%t img {\n  max-width: 100%;\n  height: auto;\n}\n\n%t "+e+" figcaption textarea {\n  resize: none;\n}\n\n%t "+e+" figcaption textarea.trix-autoresize-clone {\n  position: absolute;\n  left: -9999px;\n  max-height: 0px;\n}\n\n%t "+e+'[data-trix-mutable] figcaption:empty::before {\n  content: "'+t.config.lang.captionPrompt+'";\n  color: graytext;\n}\n\n%t '+s.selector+" { "+s.cssText+" }",trixId:{get:function(){return this.hasAttribute("trix-id")?this.getAttribute("trix-id"):(this.setAttribute("trix-id",++l),this.trixId)}},toolbarElement:{get:function(){var t,e,n;return this.hasAttribute("toolbar")?null!=(e=this.ownerDocument)?e.getElementById(this.getAttribute("toolbar")):void 0:this.parentElement?(n="trix-toolbar-"+this.trixId,this.setAttribute("toolbar",n),t=r("trix-toolbar",{id:n}),this.parentElement.insertBefore(t,this),t):void 0}},inputElement:{get:function(){var t,e,n;return this.hasAttribute("input")?null!=(n=this.ownerDocument)?n.getElementById(this.getAttribute("input")):void 0:this.parentElement?(e="trix-input-"+this.trixId,this.setAttribute("input",e),t=r("input",{type:"hidden",id:e}),this.parentElement.insertBefore(t,this.nextElementSibling),t):void 0}},editor:{get:function(){var t;return null!=(t=this.editorController)?t.editor:void 0}},name:{get:function(){var t;return null!=(t=this.inputElement)?t.name:void 0}},value:{get:function(){var t;return null!=(t=this.inputElement)?t.value:void 0},set:function(t){var e;return this.defaultValue=t,null!=(e=this.editor)?e.loadHTML(this.defaultValue):void 0}},notify:function(e,n){var o;switch(e){case"document-change":this.documentChangedSinceLastRender=!0;break;case"render":this.documentChangedSinceLastRender&&(this.documentChangedSinceLastRender=!1,this.notify("change"));break;case"change":case"attachment-add":case"attachment-edit":case"attachment-remove":null!=(o=this.inputElement)&&(o.value=t.serializeToContentType(this,"text/html"))}return this.editorController?a("trix-"+e,{onElement:this,attributes:n}):void 0},createdCallback:function(){return h(this)},attachedCallback:function(){return this.hasAttribute("data-trix-internal")?void 0:(null==this.editorController&&(this.editorController=new t.EditorController({editorElement:this,html:this.defaultValue=this.value})),this.editorController.registerSelectionManager(),this.registerResetListener(),n(this),requestAnimationFrame(function(t){return function(){return t.notify("initialize")}}(this)))},detachedCallback:function(){var t;return null!=(t=this.editorController)&&t.unregisterSelectionManager(),this.unregisterResetListener()},registerResetListener:function(){return this.resetListener=this.resetBubbled.bind(this),window.addEventListener("reset",this.resetListener,!1)},unregisterResetListener:function(){return window.removeEventListener("reset",this.resetListener,!1)},resetBubbled:function(t){var e;return t.target!==(null!=(e=this.inputElement)?e.form:void 0)||t.defaultPrevented?void 0:this.reset()},reset:function(){return this.value=this.defaultValue}}}())}.call(this),function(){}.call(this)}).call(this),"object"==typeof module&&module.exports?module.exports=t:"function"==typeof define&&define.amd&&define(t)}.call(this);
 //# sourceMappingURL=trix.js.map
+
 //# sourceMappingURL=vendors.js.map

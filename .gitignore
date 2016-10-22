@@ -4,6 +4,7 @@
 /vendor
 /node_modules
 /bower_components
+/public/storage
 /resources/assets/bower
 Homestead.yaml
 Homestead.json
