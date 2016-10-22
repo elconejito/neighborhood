@@ -11,6 +11,13 @@
 |
 */
 
-Route::get('/', function () {
-    return view('welcome');
+Route::get('/', ['as' => 'home', function () {
+    return view('index');
+}]);
+
+Route::resource('locations', 'LocationController');
+Route::resource('locations.prices', 'PriceController');
+
+Route::group(['prefix' => 'api'], function () {
+    Route::get('stats/{method}', 'PriceController@stats');
 });
