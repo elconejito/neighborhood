@@ -1,5 +1,6 @@
-process.env.DISABLE_NOTIFIER = true;
-var elixir = require('laravel-elixir');
+const elixir = require('laravel-elixir');
+
+require('laravel-elixir-vue-2');
 
 /*
  |--------------------------------------------------------------------------
@@ -12,7 +13,10 @@ var elixir = require('laravel-elixir');
  |
  */
 
-elixir(function(mix) {
+elixir(mix => {
+    mix.sass('app.scss')
+       .webpack('app.js');
+       
     /**
      * Mix Vendor JS files
      */
