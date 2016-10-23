@@ -12,8 +12,8 @@
     <!-- Fonts -->
     <link href="//fonts.googleapis.com/css?family=Lato:100" rel="stylesheet" type="text/css">
     <!-- Vendor CSS -->
-    <link href="{{ asset('/assets/css/vendors.css') }}" rel="stylesheet">
+    <link href="{{ secure_asset('/assets/css/vendors.css') }}" rel="stylesheet">
     <!-- App CSS -->
-    <link href="{{ asset('/assets/css/app.css') }}" rel="stylesheet">
+    <link href="{{ secure_asset('/assets/css/app.css') }}" rel="stylesheet">
 
 </head>
