@@ -15,8 +15,8 @@ elixir(mix => {
     /**
      * New Hotness
      **/
-    mix.sass('app.scss')
-       .webpack('app.js');
+    mix.sass('app.scss', 'public/assets/css')
+       .webpack('app.js', 'public/assets/js');
     
     /**
      * Mix Vendor JS files

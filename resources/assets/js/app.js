@@ -5,6 +5,8 @@
  */
 
 require('./bootstrap');
+import React from 'react';
+import ReactDOM from 'react-dom';
 
 /* global $ */
 /* global d3 */
@@ -83,14 +85,25 @@ var buildChart = function(selector, stat) {
 $( document ).ready(function() {
     console.log("ready!");
     
-    $(".data-chart").each(function() {
-        buildChart(this, $(this).data('method'));
-    });
+    if ( $(".data-chart").length ) {
+        $(".data-chart").each(function() {
+            buildChart(this, $(this).data('method'));
+        });
+    }
     
-    $(".data-list").each(function() {
-        $.get('api/stats/' + $(this).data('method'))
-            .done(function(data) {
-                console.log(data);
-            });
-    });
+    if ( $(".data-list").length ) {
+        $(".data-list").each(function() {
+            $.get('api/stats/' + $(this).data('method'))
+                .done(function(data) {
+                    console.log(data);
+                });
+        });
+    }
+    
+    console.log('react here');
+    ReactDOM.render(
+        <h1>Hello, world!</h1>,
+        document.getElementById('react-test')
+    );
+    console.log('reacted');
 });
