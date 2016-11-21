@@ -5,8 +5,7 @@
  */
 
 require('./bootstrap');
-import React from 'react';
-import ReactDOM from 'react-dom';
+require('./react.jsx');
 
 /* global $ */
 /* global d3 */
@@ -99,11 +98,4 @@ $( document ).ready(function() {
                 });
         });
     }
-    
-    console.log('react here');
-    ReactDOM.render(
-        <h1>Hello, world!</h1>,
-        document.getElementById('react-test')
-    );
-    console.log('reacted');
 });
