@@ -5,9 +5,15 @@
 
 import React from 'react';
 import ReactDOM from 'react-dom';
+import LocationsTable from './components/LocationsTable';
 
 $( document ).ready(function() {
-    // ReactDOM.render(<UserBio/>, document.getElementById('user-bio'));
+    if ( $("#react-locations").length ) {
+       ReactDOM.render(
+           <LocationsTable />,
+           document.getElementById('react-locations')
+       ); 
+    }
 
     console.log( "reacted!" );
 });

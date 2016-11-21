@@ -23,6 +23,20 @@ class LocationController extends Controller
     }
 
     /**
+     * Display a listing of the resource.
+     *
+     * @return Response
+     */
+    public function search(Request $request)
+    {
+        $locations = Location::orderBy('address')->orderBy('number')->get();
+        return response()->json([
+                "status" => "OK",
+                "data" => $locations
+            ]);
+    }
+    
+    /**
      * Show the form for creating a new resource.
      *
      * @return Response
