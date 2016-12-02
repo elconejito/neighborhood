@@ -8,15 +8,26 @@ class LocationsTable extends React.Component {
         this.state = {
             locations: []
         };
+        this.search = this.search.bind(this);
     }
     componentDidMount() {
         // After the component was initially rendered, load up the data
         this.getLocations();
     }
-    getLocations() {
+    search() {
+        let term = $("#address-filter").val();
+        console.log('Searched');
+        console.log( term );
+        this.getLocations(term);
+    }
+    getLocations(term) {
         let filterData, url;
         
         url = 'api/locations';
+        
+        if ( undefined !== term ) {
+            filterData = { term };
+        }
         
         // Make the asynchronous ajax call
         $.ajax({
@@ -47,23 +58,31 @@ class LocationsTable extends React.Component {
             content = <tr><td colSpan="8">There are no locations yet.</td></tr>;
         }
         return (
-            <table className="table">
-                <thead>
-                    <tr>
-                        <th></th>
-                        <th>Address</th>
-                        <th>Type</th>
-                        <th>BR</th>
-                        <th>BA</th>
-                        <th>Latest Price</th>
-                        <th>Sale Price</th>
-                        <th>Sale Date</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {content}
-                </tbody>
-            </table>
+            <div>
+                <div className="form-group row">
+                    <label htmlFor="address-filter" className="col-form-label sr-only">Address Filter</label>
+                    <div className="col-xs-12">
+                        <input type="text" id="address-filter" className="form-control" placeholder="Filter by Street Name" onChange={this.search} />
+                    </div>
+                </div>
+                <table className="table">
+                    <thead>
+                        <tr>
+                            <th></th>
+                            <th>Address</th>
+                            <th>Type</th>
+                            <th>BR</th>
+                            <th>BA</th>
+                            <th>Latest Price</th>
+                            <th>Sale Price</th>
+                            <th>Sale Date</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {content}
+                    </tbody>
+                </table>
+            </div>
         );
     }
 }
