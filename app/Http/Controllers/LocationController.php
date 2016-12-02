@@ -23,6 +23,35 @@ class LocationController extends Controller
     }
 
     /**
+     * Display a listing of the resource.
+     *
+     * @return Response
+     */
+    public function search(Request $request)
+    {
+        if ( $request->input('term') ) {
+            $locations = Location::with('latestPrice')
+                ->where('address', 'like', $request->input('term').'%')
+                ->orderBy('address')
+                ->orderBy('number')
+                ->get();
+            $search = true;
+        } else {
+            $locations = Location::with('latestPrice')
+                ->orderBy('address')
+                ->orderBy('number')
+                ->get();
+            $search = false;
+        }
+        
+        return response()->json([
+                "status" => "OK",
+                "search" => $search,
+                "data" => $locations
+            ]);
+    }
+    
+    /**
      * Show the form for creating a new resource.
      *
      * @return Response

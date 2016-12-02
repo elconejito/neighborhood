@@ -1,3 +1,12 @@
+/**
+ * First we will load all of this project's JavaScript dependencies which
+ * include Vue and Vue Resource. This gives a great starting point for
+ * building robust, powerful web applications using Vue and Laravel.
+ */
+
+require('./bootstrap');
+require('./react.jsx');
+
 /* global $ */
 /* global d3 */
 /**
@@ -75,14 +84,18 @@ var buildChart = function(selector, stat) {
 $( document ).ready(function() {
     console.log("ready!");
     
-    $(".data-chart").each(function() {
-        buildChart(this, $(this).data('method'));
-    });
+    if ( $(".data-chart").length ) {
+        $(".data-chart").each(function() {
+            buildChart(this, $(this).data('method'));
+        });
+    }
     
-    $(".data-list").each(function() {
-        $.get('api/stats/' + $(this).data('method'))
-            .done(function(data) {
-                console.log(data);
-            });
-    });
+    if ( $(".data-list").length ) {
+        $(".data-list").each(function() {
+            $.get('api/stats/' + $(this).data('method'))
+                .done(function(data) {
+                    console.log(data);
+                });
+        });
+    }
 });

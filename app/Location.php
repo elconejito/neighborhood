@@ -11,10 +11,12 @@ class Location extends Model
     }
 
     public function latestPrice() {
-        return $this->prices()->first();
+        // return $this->prices()->first();
+        return $this->hasOne('App\Price')->orderBy('price_date', 'desc')->latest();
     }
 
     public function latestSalePrice() {
-        return $this->prices()->where('type', 2)->orderBy('price_date', 'desc')->first();
+        // return $this->prices()->where('type', 2)->first();
+        return $this->hasOne('App\Price')->where('type', 2)->orderBy('price_date', 'desc')->latest();
     }
 }
