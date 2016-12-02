@@ -29,9 +29,21 @@ class LocationController extends Controller
      */
     public function search(Request $request)
     {
-        $locations = Location::orderBy('address')->orderBy('number')->get();
+        if ( $request->input('term') ) {
+            $locations = Location::with('latestPrice')
+                ->where('address', 'like', $request->input('term').'%')
+                ->orderBy('address')
+                ->orderBy('number')
+                ->get();
+            $search = true;
+        } else {
+            $locations = Location::orderBy('address')->orderBy('number')->get();
+            $search = false;
+        }
+        
         return response()->json([
                 "status" => "OK",
+                "search" => $search,
                 "data" => $locations
             ]);
     }
