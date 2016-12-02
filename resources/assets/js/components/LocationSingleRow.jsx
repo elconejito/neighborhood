@@ -4,7 +4,17 @@ class LocationSingleRow extends React.Component {
     render() {
         let loc = this.props.location;
         let urlRoot = 'locations/';
+        let latest_price = '-';
+        let sale_date = '-';
         
+        if ( null !== loc.latest_price ) {
+            latest_price = '$'+loc.latest_price.price;
+            if ( 2 === loc.latest_price.type ) {
+                let date = new Date(loc.latest_price.price_date);
+                let options = { year: 'numeric', month: 'short', day: 'numeric' };
+                sale_date = date.toLocaleDateString('en-US', options);
+            }
+        }
         
         return (
             <tr>
@@ -24,9 +34,8 @@ class LocationSingleRow extends React.Component {
                 <td>{ ( loc.type === 1 ? 'Interior' : 'End Unit' ) }</td>
                 <td>{ loc.bedrooms }</td>
                 <td>{ loc.bathrooms }</td>
-                <td>latestPrice()</td>
-                <td>latestSalePrice()</td>
-                <td>price_date</td>
+                <td>{ latest_price }</td>
+                <td>{ sale_date }</td>
             </tr>
         );
     }

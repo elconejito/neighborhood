@@ -37,7 +37,10 @@ class LocationController extends Controller
                 ->get();
             $search = true;
         } else {
-            $locations = Location::orderBy('address')->orderBy('number')->get();
+            $locations = Location::with('latestPrice')
+                ->orderBy('address')
+                ->orderBy('number')
+                ->get();
             $search = false;
         }
         

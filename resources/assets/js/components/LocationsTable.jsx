@@ -16,8 +16,6 @@ class LocationsTable extends React.Component {
     }
     search() {
         let term = $("#address-filter").val();
-        console.log('Searched');
-        console.log( term );
         this.getLocations(term);
     }
     getLocations(term) {
@@ -35,7 +33,6 @@ class LocationsTable extends React.Component {
             data: filterData,
             dataType: 'json',
             success: function(response) {
-                console.log(response);
                 // on success, set the data
                 this.setState({
                     locations: response.data
@@ -74,7 +71,6 @@ class LocationsTable extends React.Component {
                             <th>BR</th>
                             <th>BA</th>
                             <th>Latest Price</th>
-                            <th>Sale Price</th>
                             <th>Sale Date</th>
                         </tr>
                     </thead>
