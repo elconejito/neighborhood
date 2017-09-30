@@ -1,6 +1,6 @@
 .data-chart {
   .bar {
-    fill: $brand-primary;
+    fill: theme-color("primary");
   }
   .label {
     text-anchor: middle;

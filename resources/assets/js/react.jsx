@@ -12,7 +12,7 @@ $( document ).ready(function() {
        ReactDOM.render(
            <LocationsTable />,
            document.getElementById('react-locations')
-       ); 
+       );
     }
 
     console.log( "reacted!" );

@@ -5,7 +5,6 @@
  */
 
 require('./bootstrap');
-require('./react.jsx');
 
 /* global $ */
 /* global d3 */
