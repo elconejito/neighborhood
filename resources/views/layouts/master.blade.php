@@ -1,13 +1,13 @@
 <!DOCTYPE html>
 <html lang="en">
 
-@include('partials.head')
+@include('layouts.partials.head')
 
 <body>
 
-@include('partials.nav')
+@include('layouts.partials.nav')
 
-@include('partials.errors')
+@include('layouts.partials.errors')
 
 <div class="container main-content">
 @section('content')
@@ -15,7 +15,7 @@
 @show
 </div><!-- /.container.main-content -->
 
-@include('partials.footer')
+@include('layouts.partials.footer')
 
 <!-- Bootstrap core JavaScript
 ================================================== -->
