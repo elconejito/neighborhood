@@ -178,6 +178,7 @@ return [
         App\Providers\RouteServiceProvider::class,
 
         Barryvdh\LaravelIdeHelper\IdeHelperServiceProvider::class,
+        Watson\Active\ActiveServiceProvider::class
 
     ],
 
@@ -229,6 +230,7 @@ return [
         'View' => Illuminate\Support\Facades\View::class,
 
         'Debugbar' => Barryvdh\Debugbar\Facade::class,
+        'Active' => Watson\Active\Facades\Active::class
 
     ],
 
