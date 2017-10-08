@@ -122,29 +122,33 @@ class PriceController extends Controller
     public function stats($method)
     {
         switch ($method) {
+            case 'average-sales':
+                $return = Price::where('type', 2)
+                               ->select(DB::raw('AVG(price) AS amount, MONTH(`price_date`) AS month'))
+                               ->groupBy(DB::raw('MONTH(`price_date`)'))
+                               ->get();
+                break;
             case 'count-sales':
                 $return = Price::where('type', 2)
-                    ->where('price_date', '>=', DB::raw('DATE_SUB(NOW(),INTERVAL 1 YEAR)'))
-                    ->select(DB::raw('COUNT(*) AS count, YEAR(`price_date`) AS year, Month(`price_date`) AS month'))
-                    ->groupBy(DB::raw('YEAR(`price_date`), Month(`price_date`)'))
-                    ->get();
+                               ->select(DB::raw('COUNT(*) AS count, MONTH(`price_date`) AS month'))
+                               ->groupBy(DB::raw('MONTH(`price_date`)'))
+                               ->get();
                 break;
             case 'count-listing':
                 $return = Price::where('type', 1)
-                    ->where('price_date', '>=', DB::raw('DATE_SUB(NOW(),INTERVAL 1 YEAR)'))
-                    ->select(DB::raw('COUNT(*) AS count, YEAR(`price_date`) AS year, Month(`price_date`) AS month'))
-                    ->groupBy(DB::raw('YEAR(`price_date`), Month(`price_date`)'))
+                    ->select(DB::raw('COUNT(*) AS count, MONTH(`price_date`) AS month'))
+                    ->groupBy(DB::raw('MONTH(`price_date`)'))
                     ->get();
                 break;
             case 'list-sales':
                 $return = Price::where('prices.type', 2)
-                    ->join('locations', 'prices.location_id', '=', 'locations.id')
-                    ->select('prices.price', 'prices.price_date', 'locations.number', 'locations.address')
+                    ->with('location')
                     ->orderBy('price_date', 'desc')
                     ->limit(10)
                     ->get();
                 break;
             default:
+                $return = [];
                 break;
         }
         

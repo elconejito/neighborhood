@@ -20,5 +20,6 @@ mix.react('resources/assets/js/app.js', 'js')
 .autoload({
   'jquery': ['$', 'window.jQuery', 'jQuery'],
   'popper.js': ['Popper'],
-  'd3': ['d3']
+  'd3': ['d3'],
+  'moment': ['moment']
 });

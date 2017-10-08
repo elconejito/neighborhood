@@ -10,6 +10,9 @@ try {
   window.$ = window.jQuery = require('jquery');
 
   require('bootstrap');
+
+  require('moment');
+
 } catch (e) {}
 
 require('./react.jsx');
