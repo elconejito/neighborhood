@@ -89,7 +89,6 @@ let buildChartAmount = function(selector, stat) {
   // Make the chart square
   let chartWidth = $(selector).parent().width();
   let chartHeight = (chartWidth * .5) - 20;  // 20 px bottom margin
-  console.log('Chart dimensions', chartWidth, chartHeight);
 
   // Scales
   let x = d3.scaleBand()
@@ -112,11 +111,9 @@ let buildChartAmount = function(selector, stat) {
     x.domain(data.map(function(d) { return monthNames[d.month - 1]; }));
     y.domain([
       d3.min(data, function (d) {
-        console.log('y.domain min', d.amount.toFixed(0));
         return d.amount.toFixed(0);
       }) - 10000,
       d3.max(data, function (d) {
-        console.log('y.domain max', d.amount.toFixed(0));
         return d.amount.toFixed(0);
       })
     ]);
@@ -133,11 +130,9 @@ let buildChartAmount = function(selector, stat) {
         .attr("class", "bar")
         .attr("x", function(d) { return x(monthNames[d.month - 1]); })
         .attr("y", function(d) {
-          console.log('.bar y', d.amount.toFixed(0), y(d.amount.toFixed(0)));
           return y(d.amount.toFixed(0));
         })
         .attr("height", function(d) {
-          console.log('.bar height', y(d.amount.toFixed(0)));
           return chartHeight - y(d.amount.toFixed(0));
         })
         .attr("width", x.bandwidth());
@@ -154,7 +149,6 @@ let buildChartAmount = function(selector, stat) {
     })
     .attr("x", function(d) { return x(monthNames[d.month - 1]) + (x.bandwidth() / 2); })
     .attr("y", function(d) {
-      console.log('.label y', y(d.amount.toFixed(0)));
       if (y(d.amount.toFixed(0)) < 30) {
         return y(d.amount.toFixed(0)) + 15;
       } else {
@@ -197,7 +191,7 @@ $( document ).ready(function() {
                         }).text(sale.location.number + ' ' + sale.location.address);
 
                         tableRow
-                            .append($('<td>').text(moment(sale.price_date).format('MMM DD')).addClass('text-right'))
+                            .append($('<td>').text(moment(sale.price_date).format('MMM DD')))
                             .append($('<td>').append(address))
                             .append($('<td>').text(Utility.formatCurrency(sale.price)).addClass('text-right'));
 

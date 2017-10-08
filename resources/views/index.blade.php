@@ -17,7 +17,16 @@
         <div class="col-sm-6">
             <h3>Last 10 Sales</h3>
             <div class="data-list" data-method="list-sales">
-                <table class="table"></table>
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>Date</th>
+                            <th>Address</th>
+                            <th class="text-right">Sale Price</th>
+                        </tr>
+                    </thead>
+                    <tbody></tbody>
+                </table>
             </div>
         </div>
     </div>
