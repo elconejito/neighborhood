@@ -1,8 +1,10 @@
-.data-chart {
+.data-chart,
+.data-chart-amount {
   .bar {
-    fill: $brand-primary;
+    fill: theme-color("primary");
   }
   .label {
+    font-size: 12px;
     text-anchor: middle;
     fill: $body-color;
   }
@@ -10,7 +12,7 @@
     fill: #ffffff;
   }
   .axis text {
-    font-size: 14px;
+    font-size: 12px;
     fill: $body-color;
   }
 

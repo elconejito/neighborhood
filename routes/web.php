@@ -17,7 +17,3 @@ Route::get('/', ['as' => 'home', function () {
 
 Route::resource('locations', 'LocationController');
 Route::resource('locations.prices', 'PriceController');
-
-Route::group(['prefix' => 'api'], function () {
-    Route::get('stats/{method}', 'PriceController@stats');
-});
