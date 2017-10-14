@@ -16,18 +16,18 @@
     "axios": "^0.16.2",
     "babel-preset-react": "^6.24.1",
     "cross-env": "^5.0.1",
-    "laravel-mix": "^1.0",
+    "laravel-mix": "^1.5.0",
     "lodash": "^4.17.4"
   },
   "dependencies": {
     "bootstrap": "^4.0.0-beta",
-    "d3": "^4.10.2",
+    "d3": "^4.11.0",
     "font-awesome": "^4.7.0",
     "jquery": "^3.2.1",
-    "moment": "^2.18.1",
+    "moment": "^2.19.1",
     "popper.js": "^1.12.5",
     "react": "^16.0.0",
     "react-dom": "^16.0.0",
-    "trix": "^0.11.0"
+    "trix": "^0.11.1"
   }
 }
