@@ -1,13 +1,13 @@
 <!DOCTYPE html>
 <html lang="en">
 
-@include('partials.head')
+@include('layouts.partials.head')
 
 <body>
 
-@include('partials.nav')
+@include('layouts.partials.nav')
 
-@include('partials.errors')
+@include('layouts.partials.errors')
 
 <div class="container main-content">
 @section('content')
@@ -15,13 +15,13 @@
 @show
 </div><!-- /.container.main-content -->
 
-@include('partials.footer')
+@include('layouts.partials.footer')
 
 <!-- Bootstrap core JavaScript
 ================================================== -->
 <!-- Placed at the end of the document so the pages load faster -->
-<script src="//ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js"></script>
-<script src="{{ asset('/assets/js/vendors.js') }}"></script>
+<script src="{{ asset('/assets/js/manifest.js') }}"></script>
+<script src="{{ asset('/assets/js/vendor.js') }}"></script>
 <script src="{{ asset('/assets/js/app.js') }}"></script>
 </body>
 </html>

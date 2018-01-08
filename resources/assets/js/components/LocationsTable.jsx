@@ -56,11 +56,9 @@ class LocationsTable extends React.Component {
         }
         return (
             <div>
-                <div className="form-group row">
+                <div className="form-group">
                     <label htmlFor="address-filter" className="col-form-label sr-only">Address Filter</label>
-                    <div className="col-xs-12">
-                        <input type="text" id="address-filter" className="form-control" placeholder="Filter by Street Name" onChange={this.search} />
-                    </div>
+                    <input type="text" id="address-filter" className="form-control" placeholder="Filter by Street Name" onChange={this.search} />
                 </div>
                 <table className="table">
                     <thead>

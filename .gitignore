@@ -1,34 +1,14 @@
-#################
-## Laravel
-#################
-/vendor
 /node_modules
-/bower_components
+/public/hot
 /public/storage
-/resources/assets/bower
-Homestead.yaml
+/public/assets
+/storage/*.key
+/vendor
+/.idea
+/.vagrant
 Homestead.json
+Homestead.yaml
+npm-debug.log
+yarn-error.log
 .env
 *.sql
-
-#################
-## PHPStorm
-#################
-.idea
-
-#############
-## Windows detritus
-#############
-
-# Windows image file caches
-Thumbs.db
-ehthumbs.db
-
-# Folder config file
-Desktop.ini
-
-# Recycle Bin used on file shares
-$RECYCLE.BIN/
-
-# Mac crap
-.DS_Store
