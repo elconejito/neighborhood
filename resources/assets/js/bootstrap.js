@@ -13,8 +13,6 @@ try {
 
   require('moment');
 
-  require('trix');
-
 } catch (e) {}
 
 require('./react.jsx');
