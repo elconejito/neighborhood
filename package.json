@@ -1,33 +1,38 @@
 {
-  "name": "rabbithome",
-  "version": "0.2.0",
-  "homepage": "https://github.com/elconejito/RabbitHome",
+  "name": "neighborhood",
+  "version": "0.3.0",
+  "homepage": "https://github.com/elconejito/neighborhood",
   "private": true,
   "scripts": {
     "dev": "npm run development",
     "development": "cross-env NODE_ENV=development node_modules/webpack/bin/webpack.js --progress --hide-modules --config=node_modules/laravel-mix/setup/webpack.config.js",
-    "watch": "cross-env NODE_ENV=development node_modules/webpack/bin/webpack.js --watch --progress --hide-modules --config=node_modules/laravel-mix/setup/webpack.config.js",
+    "watch": "npm run development -- --watch",
     "watch-poll": "npm run watch -- --watch-poll",
     "hot": "cross-env NODE_ENV=development node_modules/webpack-dev-server/bin/webpack-dev-server.js --inline --hot --config=node_modules/laravel-mix/setup/webpack.config.js",
     "prod": "npm run production",
-    "production": "cross-env NODE_ENV=production node_modules/webpack/bin/webpack.js --progress --hide-modules --config=node_modules/laravel-mix/setup/webpack.config.js"
+    "production": "cross-env NODE_ENV=production node_modules/webpack/bin/webpack.js --no-progress --hide-modules --config=node_modules/laravel-mix/setup/webpack.config.js"
   },
   "devDependencies": {
-    "axios": "^0.16.2",
-    "babel-preset-react": "^6.24.1",
-    "cross-env": "^5.0.1",
-    "laravel-mix": "^1.5.0",
-    "lodash": "^4.17.4"
+    "@babel/preset-react": "^7.8.3",
+    "axios": "^0.19",
+    "cross-env": "^7.0",
+    "laravel-mix": "^5.0.1",
+    "lodash": "^4.17.13",
+    "resolve-url-loader": "^3.1.0",
+    "sass": "^1.26.2",
+    "sass-loader": "^8.0.2"
   },
   "dependencies": {
-    "bootstrap": "^4.0.0-beta",
-    "d3": "^4.11.0",
-    "font-awesome": "^4.7.0",
-    "jquery": "^3.2.1",
-    "moment": "^2.20.1",
-    "popper.js": "^1.13.0",
-    "react": "^16.2.0",
-    "react-dom": "^16.2.0",
-    "trix": "^0.11.1"
+    "@fortawesome/fontawesome-free": "^5.12.1",
+    "@fortawesome/free-brands-svg-icons": "^5.12.1",
+    "@fortawesome/free-regular-svg-icons": "^5.12.1",
+    "@fortawesome/free-solid-svg-icons": "^5.12.1",
+    "bootstrap": "^4.4.1",
+    "d3": "^5.15.0",
+    "jquery": "^3.3.1",
+    "moment": "^2.24.0",
+    "popper.js": "^1.16.1",
+    "react": "^16.13.0",
+    "react-dom": "^16.13.0"
   }
 }
