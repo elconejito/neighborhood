@@ -7,6 +7,7 @@ import {
   faAngleDoubleUp,
   faArrowCircleLeft,
   faArrowCircleRight,
+  faBars,
   faBed,
   faCircleNotch,
   faFrown,
@@ -21,6 +22,7 @@ library.add(faAngleUp);
 library.add(faAngleDoubleUp);
 library.add(faArrowCircleLeft);
 library.add(faArrowCircleRight);
+library.add(faBars);
 library.add(faBed);
 library.add(faCircleNotch);
 library.add(faFrown);

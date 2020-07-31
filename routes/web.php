@@ -11,9 +11,7 @@
 |
 */
 
-Route::get('/', ['as' => 'home', function () {
-    return view('index');
-}]);
+Route::get('/', 'HomeController@home')->name('home');
 
 Route::resource('locations', 'LocationController');
 Route::resource('locations.prices', 'PriceController');
