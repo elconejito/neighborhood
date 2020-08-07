@@ -8,6 +8,10 @@ class Price extends Model
 {
     protected $dates = ['price_date', 'created_at', 'updated_at', 'deleted_at'];
 
+    protected $guarded = [
+        'id'
+    ];
+
     public function location() {
         return $this->belongsTo('App\Location');
     }
