@@ -2,7 +2,9 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\LocationRequest;
 use App\Location;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 
 use App\Http\Requests;
@@ -43,14 +45,14 @@ class LocationController extends Controller
                 ->get();
             $search = false;
         }
-        
+
         return response()->json([
                 "status" => "OK",
                 "search" => $search,
                 "data" => $locations
             ]);
     }
-    
+
     /**
      * Show the form for creating a new resource.
      *
@@ -64,24 +66,15 @@ class LocationController extends Controller
     /**
      * Store a newly created resource in storage.
      *
-     * @param  Request  $request
-     * @return Response
+     * @param LocationRequest $request
+     *
+     * @return RedirectResponse
      */
-    public function store(Request $request)
+    public function store(LocationRequest $request)
     {
-        // create the new Location
-		$location = new Location();
-        $location->number = $request->number;
-        $location->address = $request->address;
-        $location->type = $request->type;
-        $location->bedrooms = $request->bedrooms;
-        $location->bathrooms = $request->bathrooms;
-        $location->sqft = $request->sqft;
-        $location->built = $request->built;
-        $location->mlsid = $request->mlsid;
-        $location->details = $request->details;
+        $validated = $request->validated();
 
-        $location->save();
+        $location = Location::create($validated);
 
         return redirect()->action('LocationController@show', $location->id);
     }
