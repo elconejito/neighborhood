@@ -8,6 +8,10 @@ class Location extends Model
 {
     protected $appends = ['urls'];
 
+    protected $guarded = [
+        'id'
+    ];
+
     public function prices() {
         return $this->hasMany('App\Price')->orderBy('price_date', 'desc');
     }
