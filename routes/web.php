@@ -1,17 +1,8 @@
 <?php
 
-/*
-|--------------------------------------------------------------------------
-| Web Routes
-|--------------------------------------------------------------------------
-|
-| This file is where you may define all of the routes that are handled
-| by your application. Just tell Laravel the URIs it should respond
-| to using a Closure or controller method. Build something great!
-|
-*/
+use Illuminate\Support\Facades\Route;
 
-Route::get('/', 'HomeController@home')->name('home');
-
-Route::resource('locations', 'LocationController');
-Route::resource('locations.prices', 'PriceController');
+// Serve the SPA for all routes (Vue Router will handle client-side routing)
+Route::get('/{any?}', function () {
+    return view('app');
+})->where('any', '.*');

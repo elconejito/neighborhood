@@ -1,0 +1,247 @@
+<template>
+    <div class="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
+        <div class="px-4 sm:px-0">
+            <!-- Loading -->
+            <div v-if="loading" class="text-center py-12">
+                <div class="inline-block animate-spin rounded-full h-8 w-8 border-4 border-emerald-500 border-t-transparent"></div>
+            </div>
+
+            <template v-else-if="property">
+                <!-- Header -->
+                <div class="mb-6">
+                    <router-link to="/properties" class="text-sm text-gray-500 hover:text-gray-700">
+                        ← Back to properties
+                    </router-link>
+                    <div class="mt-2 flex items-center justify-between">
+                        <h1 class="text-2xl font-bold text-gray-900">{{ property.address }}</h1>
+                        <div class="flex space-x-3">
+                            <button
+                                @click="runAnalysis"
+                                :disabled="analyzing"
+                                class="inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 disabled:opacity-50"
+                            >
+                                <svg v-if="analyzing" class="animate-spin -ml-1 mr-2 h-4 w-4" fill="none" viewBox="0 0 24 24">
+                                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                                    <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                                </svg>
+                                {{ analyzing ? 'Analyzing...' : 'Run Analysis' }}
+                            </button>
+                            <button
+                                @click="deleteProperty"
+                                class="inline-flex items-center px-4 py-2 border border-red-300 shadow-sm text-sm font-medium rounded-md text-red-700 bg-white hover:bg-red-50"
+                            >
+                                Delete
+                            </button>
+                        </div>
+                    </div>
+                    <p class="mt-1 text-sm text-gray-500">
+                        {{ property.city }}, {{ property.state }} {{ property.zip_code }}
+                    </p>
+                </div>
+
+                <!-- Property Details -->
+                <div class="bg-white shadow overflow-hidden sm:rounded-lg mb-6">
+                    <div class="px-4 py-5 sm:px-6">
+                        <h3 class="text-lg leading-6 font-medium text-gray-900">Property Details</h3>
+                    </div>
+                    <div class="border-t border-gray-200">
+                        <dl>
+                            <div class="bg-gray-50 px-4 py-4 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
+                                <dt class="text-sm font-medium text-gray-500">Price</dt>
+                                <dd class="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">
+                                    {{ property.price ? `$${formatPrice(property.price)}` : 'Not specified' }}
+                                </dd>
+                            </div>
+                            <div class="bg-white px-4 py-4 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
+                                <dt class="text-sm font-medium text-gray-500">Acreage</dt>
+                                <dd class="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">
+                                    {{ property.acreage ? `${property.acreage} acres` : 'Not specified' }}
+                                </dd>
+                            </div>
+                            <div class="bg-gray-50 px-4 py-4 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
+                                <dt class="text-sm font-medium text-gray-500">Bedrooms / Bathrooms</dt>
+                                <dd class="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">
+                                    {{ property.bedrooms ?? '-' }} bed / {{ property.bathrooms ?? '-' }} bath
+                                </dd>
+                            </div>
+                            <div v-if="property.listing_url" class="bg-white px-4 py-4 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
+                                <dt class="text-sm font-medium text-gray-500">Listing URL</dt>
+                                <dd class="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">
+                                    <a :href="property.listing_url" target="_blank" class="text-emerald-600 hover:text-emerald-500">
+                                        {{ property.listing_url }}
+                                    </a>
+                                </dd>
+                            </div>
+                            <div v-if="property.notes" class="bg-gray-50 px-4 py-4 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
+                                <dt class="text-sm font-medium text-gray-500">Notes</dt>
+                                <dd class="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2 whitespace-pre-wrap">{{ property.notes }}</dd>
+                            </div>
+                        </dl>
+                    </div>
+                </div>
+
+                <!-- Analysis Sections -->
+                <div v-if="property.analyzed_at" class="space-y-6">
+                    <p class="text-sm text-gray-500">
+                        Last analyzed: {{ formatDate(property.analyzed_at) }}
+                    </p>
+
+                    <!-- Neighbor Distance Analysis -->
+                    <div class="bg-white shadow overflow-hidden sm:rounded-lg">
+                        <div class="px-4 py-5 sm:px-6 flex items-center">
+                            <svg class="h-5 w-5 text-emerald-500 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
+                            </svg>
+                            <h3 class="text-lg leading-6 font-medium text-gray-900">Neighbor Distance</h3>
+                        </div>
+                        <div class="border-t border-gray-200 px-4 py-5 sm:px-6">
+                            <div v-if="property.analysis?.neighbor_distance" class="grid grid-cols-2 gap-4">
+                                <div>
+                                    <p class="text-2xl font-bold text-gray-900">
+                                        {{ property.analysis.neighbor_distance.nearest_distance_ft ?? 'N/A' }}
+                                        <span class="text-sm font-normal text-gray-500">ft</span>
+                                    </p>
+                                    <p class="text-sm text-gray-500">to nearest neighbor</p>
+                                </div>
+                                <div>
+                                    <p class="text-sm text-gray-600">
+                                        Structures within 300ft: {{ property.analysis.neighbor_distance.structures_within_300ft ?? 0 }}
+                                    </p>
+                                    <p class="text-sm text-gray-600">
+                                        Structures within 500ft: {{ property.analysis.neighbor_distance.structures_within_500ft ?? 0 }}
+                                    </p>
+                                </div>
+                            </div>
+                            <p v-else class="text-sm text-gray-500">No neighbor distance data available.</p>
+                        </div>
+                    </div>
+
+                    <!-- POI Analysis -->
+                    <div class="bg-white shadow overflow-hidden sm:rounded-lg">
+                        <div class="px-4 py-5 sm:px-6 flex items-center">
+                            <svg class="h-5 w-5 text-blue-500 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+                            </svg>
+                            <h3 class="text-lg leading-6 font-medium text-gray-900">Nearby Amenities</h3>
+                        </div>
+                        <div class="border-t border-gray-200">
+                            <div v-if="property.analysis?.pois" class="divide-y divide-gray-200">
+                                <div v-for="(pois, category) in property.analysis.pois" :key="category" class="px-4 py-4 sm:px-6">
+                                    <h4 class="text-sm font-medium text-gray-700 capitalize mb-2">{{ formatCategory(category) }}</h4>
+                                    <ul class="space-y-2">
+                                        <li v-for="poi in pois" :key="poi.name" class="flex justify-between text-sm">
+                                            <span class="text-gray-900">{{ poi.name }}</span>
+                                            <span class="text-gray-500">{{ poi.distance_miles }} mi · {{ poi.drive_time_minutes }} min</span>
+                                        </li>
+                                    </ul>
+                                </div>
+                            </div>
+                            <p v-else class="px-4 py-5 sm:px-6 text-sm text-gray-500">No POI data available.</p>
+                        </div>
+                    </div>
+
+                    <!-- Road Accessibility -->
+                    <div class="bg-white shadow overflow-hidden sm:rounded-lg">
+                        <div class="px-4 py-5 sm:px-6 flex items-center">
+                            <svg class="h-5 w-5 text-amber-500 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7" />
+                            </svg>
+                            <h3 class="text-lg leading-6 font-medium text-gray-900">Road Accessibility</h3>
+                        </div>
+                        <div class="border-t border-gray-200 px-4 py-5 sm:px-6">
+                            <div v-if="property.analysis?.road_accessibility">
+                                <div class="flex items-center mb-4">
+                                    <span
+                                        :class="[
+                                            'inline-flex items-center px-3 py-1 rounded-full text-sm font-medium',
+                                            property.analysis.road_accessibility.accessibility_score === 'good' ? 'bg-green-100 text-green-800' :
+                                            property.analysis.road_accessibility.accessibility_score === 'moderate' ? 'bg-yellow-100 text-yellow-800' :
+                                            'bg-red-100 text-red-800'
+                                        ]"
+                                    >
+                                        {{ property.analysis.road_accessibility.accessibility_score }}
+                                    </span>
+                                </div>
+                                <p class="text-sm text-gray-600 mb-2">{{ property.analysis.road_accessibility.accessibility_note }}</p>
+                                <div class="grid grid-cols-2 gap-4 text-sm">
+                                    <div>
+                                        <span class="text-gray-500">Distance from major road:</span>
+                                        <span class="ml-2 text-gray-900">{{ property.analysis.road_accessibility.total_distance_miles }} mi</span>
+                                    </div>
+                                    <div>
+                                        <span class="text-gray-500">Turns per mile:</span>
+                                        <span class="ml-2 text-gray-900">{{ property.analysis.road_accessibility.turns_per_mile }}</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <p v-else class="text-sm text-gray-500">No road accessibility data available.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div v-else class="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
+                    <p class="text-sm text-yellow-800">
+                        This property hasn't been analyzed yet. Click "Run Analysis" to get neighbor distance, POI, and road accessibility data.
+                    </p>
+                </div>
+            </template>
+        </div>
+    </div>
+</template>
+
+<script setup>
+import { ref, onMounted } from 'vue';
+import { useRouter, useRoute } from 'vue-router';
+import api from '@/api';
+
+const router = useRouter();
+const route = useRoute();
+
+const property = ref(null);
+const loading = ref(true);
+const analyzing = ref(false);
+
+const formatPrice = (price) => new Intl.NumberFormat('en-US').format(price);
+const formatDate = (date) => new Date(date).toLocaleDateString('en-US', { dateStyle: 'medium' });
+const formatCategory = (category) => category.replace(/_/g, ' ');
+
+const loadProperty = async () => {
+    try {
+        const response = await api.get(`/properties/${route.params.id}`);
+        property.value = response.data.data;
+    } catch (error) {
+        console.error('Failed to load property', error);
+        router.push('/properties');
+    } finally {
+        loading.value = false;
+    }
+};
+
+const runAnalysis = async () => {
+    analyzing.value = true;
+    try {
+        const response = await api.post(`/properties/${route.params.id}/analyze`);
+        property.value = response.data.data;
+    } catch (error) {
+        console.error('Analysis failed', error);
+        alert('Analysis failed. Please try again.');
+    } finally {
+        analyzing.value = false;
+    }
+};
+
+const deleteProperty = async () => {
+    if (!confirm('Are you sure you want to delete this property?')) return;
+
+    try {
+        await api.delete(`/properties/${route.params.id}`);
+        router.push('/properties');
+    } catch (error) {
+        console.error('Failed to delete property', error);
+        alert('Failed to delete property.');
+    }
+};
+
+onMounted(loadProperty);
+</script>

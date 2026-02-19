@@ -1,0 +1,292 @@
+<?php
+
+namespace App\Services;
+
+use App\Models\Property;
+use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Log;
+
+class PropertyAnalysisService
+{
+    protected string $overpassUrl = 'https://overpass-api.de/api/interpreter';
+
+    public function analyzeProperty(Property $property): array
+    {
+        $lat = $property->latitude;
+        $lng = $property->longitude;
+
+        return [
+            'neighbor_distance' => $this->analyzeNeighborDistance($lat, $lng),
+            'points_of_interest' => $this->analyzePointsOfInterest($lat, $lng),
+            'road_accessibility' => $this->analyzeRoadAccessibility($lat, $lng),
+        ];
+    }
+
+    public function geocodeAddress(string $address): ?array
+    {
+        try {
+            $response = Http::get('https://nominatim.openstreetmap.org/search', [
+                'q' => $address,
+                'format' => 'json',
+                'limit' => 1,
+            ]);
+
+            if ($response->successful() && count($response->json()) > 0) {
+                $result = $response->json()[0];
+                return [
+                    'lat' => (float) $result['lat'],
+                    'lng' => (float) $result['lon'],
+                ];
+            }
+        } catch (\Exception $e) {
+            Log::error('Geocoding failed: ' . $e->getMessage());
+        }
+
+        return null;
+    }
+
+    protected function analyzeNeighborDistance(float $lat, float $lng): array
+    {
+        $radiusMeters = 2000; // 2km search radius
+        
+        $query = <<<QUERY
+[out:json][timeout:25];
+(
+  way["building"="yes"](around:{$radiusMeters},{$lat},{$lng});
+  way["building"="house"](around:{$radiusMeters},{$lat},{$lng});
+  way["building"="residential"](around:{$radiusMeters},{$lat},{$lng});
+);
+out center;
+QUERY;
+
+        try {
+            $response = Http::timeout(30)->post($this->overpassUrl, [
+                'data' => $query,
+            ]);
+
+            if ($response->successful()) {
+                $data = $response->json();
+                $buildings = $data['elements'] ?? [];
+                
+                $distances = [];
+                foreach ($buildings as $building) {
+                    if (isset($building['center'])) {
+                        $distance = $this->haversineDistance(
+                            $lat, $lng,
+                            $building['center']['lat'],
+                            $building['center']['lon']
+                        );
+                        $distances[] = $distance;
+                    }
+                }
+
+                sort($distances);
+                $nearestDistances = array_slice($distances, 0, 10);
+
+                return [
+                    'total_buildings_nearby' => count($buildings),
+                    'nearest_neighbor_meters' => $nearestDistances[0] ?? null,
+                    'average_distance_meters' => count($nearestDistances) > 0 
+                        ? round(array_sum($nearestDistances) / count($nearestDistances), 1) 
+                        : null,
+                    'nearest_10_distances' => $nearestDistances,
+                    'isolation_score' => $this->calculateIsolationScore($nearestDistances),
+                ];
+            }
+        } catch (\Exception $e) {
+            Log::error('Neighbor distance analysis failed: ' . $e->getMessage());
+        }
+
+        return ['error' => 'Analysis failed'];
+    }
+
+    protected function analyzePointsOfInterest(float $lat, float $lng): array
+    {
+        $radiusMeters = 8000; // 8km search radius
+        
+        $poiTypes = [
+            'grocery' => '["shop"~"supermarket|grocery|convenience"]',
+            'hospital' => '["amenity"="hospital"]',
+            'school' => '["amenity"~"school|college|university"]',
+            'restaurant' => '["amenity"~"restaurant|cafe|fast_food"]',
+            'gas_station' => '["amenity"="fuel"]',
+            'pharmacy' => '["amenity"="pharmacy"]',
+            'bank' => '["amenity"="bank"]',
+            'post_office' => '["amenity"="post_office"]',
+        ];
+
+        $results = [];
+
+        foreach ($poiTypes as $type => $osmTag) {
+            $query = <<<QUERY
+[out:json][timeout:25];
+(
+  node{$osmTag}(around:{$radiusMeters},{$lat},{$lng});
+  way{$osmTag}(around:{$radiusMeters},{$lat},{$lng});
+);
+out center;
+QUERY;
+
+            try {
+                $response = Http::timeout(30)->post($this->overpassUrl, [
+                    'data' => $query,
+                ]);
+
+                if ($response->successful()) {
+                    $data = $response->json();
+                    $pois = $data['elements'] ?? [];
+                    
+                    $distances = [];
+                    foreach ($pois as $poi) {
+                        $poiLat = $poi['lat'] ?? ($poi['center']['lat'] ?? null);
+                        $poiLng = $poi['lon'] ?? ($poi['center']['lon'] ?? null);
+                        
+                        if ($poiLat && $poiLng) {
+                            $distances[] = [
+                                'name' => $poi['tags']['name'] ?? 'Unknown',
+                                'distance_meters' => $this->haversineDistance($lat, $lng, $poiLat, $poiLng),
+                            ];
+                        }
+                    }
+
+                    usort($distances, fn($a, $b) => $a['distance_meters'] <=> $b['distance_meters']);
+
+                    $results[$type] = [
+                        'count' => count($pois),
+                        'nearest' => $distances[0] ?? null,
+                        'top_3' => array_slice($distances, 0, 3),
+                    ];
+                }
+            } catch (\Exception $e) {
+                Log::error("POI analysis failed for {$type}: " . $e->getMessage());
+                $results[$type] = ['error' => 'Analysis failed'];
+            }
+
+            // Rate limiting - be nice to Overpass API
+            usleep(500000); // 0.5 second delay
+        }
+
+        return $results;
+    }
+
+    protected function analyzeRoadAccessibility(float $lat, float $lng): array
+    {
+        $radiusMeters = 5000; // 5km search radius
+        
+        $roadTypes = [
+            'highway' => '["highway"~"motorway|trunk|primary"]',
+            'main_road' => '["highway"~"secondary|tertiary"]',
+            'local_road' => '["highway"~"residential|unclassified"]',
+            'path' => '["highway"~"path|track|footway"]',
+        ];
+
+        $results = [];
+
+        foreach ($roadTypes as $type => $osmTag) {
+            $query = <<<QUERY
+[out:json][timeout:25];
+(
+  way{$osmTag}(around:{$radiusMeters},{$lat},{$lng});
+);
+out geom;
+QUERY;
+
+            try {
+                $response = Http::timeout(30)->post($this->overpassUrl, [
+                    'data' => $query,
+                ]);
+
+                if ($response->successful()) {
+                    $data = $response->json();
+                    $roads = $data['elements'] ?? [];
+                    
+                    $minDistance = PHP_FLOAT_MAX;
+                    $nearestRoad = null;
+
+                    foreach ($roads as $road) {
+                        if (isset($road['geometry'])) {
+                            foreach ($road['geometry'] as $point) {
+                                $distance = $this->haversineDistance(
+                                    $lat, $lng, 
+                                    $point['lat'], 
+                                    $point['lon']
+                                );
+                                if ($distance < $minDistance) {
+                                    $minDistance = $distance;
+                                    $nearestRoad = [
+                                        'name' => $road['tags']['name'] ?? 'Unnamed',
+                                        'ref' => $road['tags']['ref'] ?? null,
+                                        'surface' => $road['tags']['surface'] ?? 'unknown',
+                                    ];
+                                }
+                            }
+                        }
+                    }
+
+                    $results[$type] = [
+                        'count' => count($roads),
+                        'nearest_distance_meters' => $minDistance < PHP_FLOAT_MAX ? round($minDistance, 1) : null,
+                        'nearest_road' => $nearestRoad,
+                    ];
+                }
+            } catch (\Exception $e) {
+                Log::error("Road analysis failed for {$type}: " . $e->getMessage());
+                $results[$type] = ['error' => 'Analysis failed'];
+            }
+
+            usleep(500000); // Rate limiting
+        }
+
+        // Calculate overall accessibility score
+        $results['accessibility_score'] = $this->calculateAccessibilityScore($results);
+
+        return $results;
+    }
+
+    protected function haversineDistance(float $lat1, float $lon1, float $lat2, float $lon2): float
+    {
+        $earthRadius = 6371000; // meters
+
+        $lat1Rad = deg2rad($lat1);
+        $lat2Rad = deg2rad($lat2);
+        $deltaLat = deg2rad($lat2 - $lat1);
+        $deltaLon = deg2rad($lon2 - $lon1);
+
+        $a = sin($deltaLat / 2) ** 2 +
+             cos($lat1Rad) * cos($lat2Rad) * sin($deltaLon / 2) ** 2;
+        $c = 2 * atan2(sqrt($a), sqrt(1 - $a));
+
+        return round($earthRadius * $c, 1);
+    }
+
+    protected function calculateIsolationScore(array $distances): string
+    {
+        if (empty($distances)) {
+            return 'unknown';
+        }
+
+        $avgDistance = array_sum($distances) / count($distances);
+
+        if ($avgDistance > 1000) return 'very_isolated';
+        if ($avgDistance > 500) return 'isolated';
+        if ($avgDistance > 200) return 'moderate';
+        if ($avgDistance > 100) return 'suburban';
+        return 'dense';
+    }
+
+    protected function calculateAccessibilityScore(array $roadData): string
+    {
+        $highwayDist = $roadData['highway']['nearest_distance_meters'] ?? PHP_FLOAT_MAX;
+        $mainRoadDist = $roadData['main_road']['nearest_distance_meters'] ?? PHP_FLOAT_MAX;
+        $localRoadDist = $roadData['local_road']['nearest_distance_meters'] ?? PHP_FLOAT_MAX;
+
+        // Score based on distance to nearest paved road
+        $minPavedRoad = min($highwayDist, $mainRoadDist, $localRoadDist);
+
+        if ($minPavedRoad <= 100) return 'excellent';
+        if ($minPavedRoad <= 500) return 'good';
+        if ($minPavedRoad <= 1000) return 'moderate';
+        if ($minPavedRoad <= 2000) return 'limited';
+        return 'poor';
+    }
+}
