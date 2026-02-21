@@ -3,6 +3,7 @@
 use App\Http\Controllers\Api\V1\AuthController;
 use App\Http\Controllers\Api\V1\DashboardController;
 use App\Http\Controllers\Api\V1\PropertyController;
+use App\Http\Controllers\Api\V1\NeighborhoodController;
 use Illuminate\Support\Facades\Route;
 
 Route::prefix('v1')->group(function () {
@@ -25,5 +26,8 @@ Route::prefix('v1')->group(function () {
         // Properties
         Route::apiResource('properties', PropertyController::class);
         Route::post('properties/{property}/analyze', [PropertyController::class, 'analyze']);
+
+        // Neighborhoods
+        Route::apiResource('neighborhoods', NeighborhoodController::class);
     });
 });

@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Api\V1;
 
 use App\Http\Controllers\Controller;
 use App\Models\User;
+use App\Transformers\Api\V1\UserTransformer;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
@@ -32,7 +33,7 @@ class AuthController extends Controller
         return response()->json([
             'data' => [
                 'message' => 'User registered successfully',
-                'user' => $user,
+                'user' => fractal($user, new UserTransformer())->toArray()['data'],
                 'access_token' => $token,
                 'token_type' => 'bearer',
                 'expires_in' => auth('api')->factory()->getTTL() * 60,
@@ -76,9 +77,7 @@ class AuthController extends Controller
 
     public function me(): JsonResponse
     {
-        return response()->json([
-            'data' => auth('api')->user()
-        ]);
+        return fractal(auth('api')->user(), new UserTransformer())->respond();
     }
 
     public function forgotPassword(Request $request): JsonResponse
@@ -142,7 +141,7 @@ class AuthController extends Controller
                 'access_token' => $token,
                 'token_type' => 'bearer',
                 'expires_in' => auth('api')->factory()->getTTL() * 60,
-                'user' => auth('api')->user(),
+                'user' => fractal(auth('api')->user(), new UserTransformer())->toArray()['data'],
             ]
         ]);
     }

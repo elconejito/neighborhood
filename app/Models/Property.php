@@ -5,11 +5,13 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\MorphMany;
 
 class Property extends Model
 {
     protected $fillable = [
         'user_id',
+        'neighborhood_id',
         'address',
         'city',
         'state',
@@ -22,7 +24,6 @@ class Property extends Model
         'bathrooms',
         'square_feet',
         'listing_url',
-        'notes',
         'analysis',
         'analyzed_at',
     ];
@@ -42,9 +43,19 @@ class Property extends Model
         return $this->belongsTo(User::class);
     }
 
+    public function neighborhood(): BelongsTo
+    {
+        return $this->belongsTo(Neighborhood::class);
+    }
+
     public function priceHistories(): HasMany
     {
         return $this->hasMany(PriceHistory::class)->orderByDesc('price_date');
+    }
+
+    public function notes(): MorphMany
+    {
+        return $this->morphMany(Note::class, 'notable');
     }
 
     public function getFullAddressAttribute(): string

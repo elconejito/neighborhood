@@ -16,7 +16,7 @@
                             <div class="ml-5 w-0 flex-1">
                                 <dl>
                                     <dt class="text-sm font-medium text-gray-500 truncate">Total Properties</dt>
-                                    <dd class="text-lg font-semibold text-gray-900">{{ stats.totalProperties }}</dd>
+                                    <dd class="text-lg font-semibold text-gray-900">{{ stats.total_properties }}</dd>
                                 </dl>
                             </div>
                         </div>
@@ -40,7 +40,7 @@
                             <div class="ml-5 w-0 flex-1">
                                 <dl>
                                     <dt class="text-sm font-medium text-gray-500 truncate">Analyzed</dt>
-                                    <dd class="text-lg font-semibold text-gray-900">{{ stats.analyzedProperties }}</dd>
+                                    <dd class="text-lg font-semibold text-gray-900">{{ stats.analyzed_properties }}</dd>
                                 </dl>
                             </div>
                         </div>
@@ -48,19 +48,57 @@
                 </div>
             </div>
 
-            <!-- Quick Actions -->
-            <div class="mt-8">
-                <h2 class="text-lg font-medium text-gray-900 mb-4">Quick Actions</h2>
-                <div class="flex space-x-4">
-                    <router-link
-                        to="/properties/create"
-                        class="inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-emerald-600 hover:bg-emerald-700"
-                    >
-                        <svg class="-ml-1 mr-2 h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
-                        </svg>
-                        Add Property
-                    </router-link>
+            <div class="grid grid-cols-1 gap-6 lg:grid-cols-2">
+                <!-- Recently Listed -->
+                <div class="bg-white shadow rounded-lg overflow-hidden">
+                    <div class="px-4 py-5 sm:px-6 border-b border-gray-200 bg-gray-50">
+                        <h3 class="text-lg leading-6 font-medium text-gray-900">Recently Listed (30 days)</h3>
+                    </div>
+                    <ul class="divide-y divide-gray-200">
+                        <li v-for="property in stats.recently_listed" :key="property.id" class="px-4 py-4 sm:px-6 hover:bg-gray-50">
+                            <router-link :to="`/properties/${property.id}`" class="block">
+                                <div class="flex items-center justify-between">
+                                    <div class="truncate">
+                                        <p class="text-sm font-medium text-emerald-600 truncate">{{ property.address }}</p>
+                                        <p class="text-sm text-gray-500">{{ property.city }}, {{ property.state }}</p>
+                                    </div>
+                                    <div class="ml-2 flex-shrink-0">
+                                        <p class="text-sm font-semibold text-gray-900">${{ formatPrice(property.price) }}</p>
+                                        <p class="text-xs text-gray-400">{{ formatDate(property.created_at) }}</p>
+                                    </div>
+                                </div>
+                            </router-link>
+                        </li>
+                        <li v-if="!stats.recently_listed?.length" class="px-4 py-8 text-center text-gray-500 italic">
+                            No recent listings found
+                        </li>
+                    </ul>
+                </div>
+
+                <!-- Recently Sold -->
+                <div class="bg-white shadow rounded-lg overflow-hidden">
+                    <div class="px-4 py-5 sm:px-6 border-b border-gray-200 bg-gray-50">
+                        <h3 class="text-lg leading-6 font-medium text-gray-900">Recently Sold (30 days)</h3>
+                    </div>
+                    <ul class="divide-y divide-gray-200">
+                        <li v-for="history in stats.recently_sold" :key="history.id" class="px-4 py-4 sm:px-6 hover:bg-gray-50">
+                            <router-link :to="`/properties/${history.property.id}`" class="block">
+                                <div class="flex items-center justify-between">
+                                    <div class="truncate">
+                                        <p class="text-sm font-medium text-emerald-600 truncate">{{ history.property.address }}</p>
+                                        <p class="text-sm text-gray-500">{{ history.property.city }}, {{ history.property.state }}</p>
+                                    </div>
+                                    <div class="ml-2 flex-shrink-0">
+                                        <p class="text-sm font-semibold text-gray-900">${{ formatPrice(history.price) }}</p>
+                                        <p class="text-xs text-gray-400">{{ formatDate(history.price_date) }}</p>
+                                    </div>
+                                </div>
+                            </router-link>
+                        </li>
+                        <li v-if="!stats.recently_sold?.length" class="px-4 py-8 text-center text-gray-500 italic">
+                            No recent sales found
+                        </li>
+                    </ul>
                 </div>
             </div>
         </div>
@@ -72,9 +110,19 @@ import { ref, onMounted } from 'vue';
 import api from '@/api';
 
 const stats = ref({
-    totalProperties: 0,
-    analyzedProperties: 0,
+    total_properties: 0,
+    analyzed_properties: 0,
+    recently_listed: [],
+    recently_sold: [],
 });
+
+const formatPrice = (price) => {
+    return new Intl.NumberFormat('en-US').format(price);
+};
+
+const formatDate = (date) => {
+    return new Date(date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+};
 
 onMounted(async () => {
     try {

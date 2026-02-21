@@ -11,8 +11,24 @@ class UpdatePropertyRequest extends FormRequest
      */
     public function authorize(): bool
     {
+        $user = $this->user();
         $property = $this->route('property');
-        return $property && $property->user_id === $this->user()->id;
+
+        if (!$property) {
+            return false;
+        }
+
+        if ($property->user_id === $user->id) {
+            return true;
+        }
+
+        if ($user->team_id && $property->neighborhood_id) {
+            return $user->team->neighborhoods()
+                ->where('id', $property->neighborhood_id)
+                ->exists();
+        }
+
+        return false;
     }
 
     /**
@@ -23,6 +39,7 @@ class UpdatePropertyRequest extends FormRequest
     public function rules(): array
     {
         return [
+            'neighborhood_id' => ['sometimes', 'nullable', 'exists:neighborhoods,id'],
             'address' => ['sometimes', 'required', 'string', 'max:255'],
             'city' => ['sometimes', 'required', 'string', 'max:255'],
             'state' => ['sometimes', 'required', 'string', 'size:2'],

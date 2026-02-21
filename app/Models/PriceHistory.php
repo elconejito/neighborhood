@@ -4,6 +4,8 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\MorphMany;
 
 class PriceHistory extends Model
 {
@@ -12,7 +14,6 @@ class PriceHistory extends Model
         'price',
         'price_date',
         'type',
-        'notes',
     ];
 
     protected $casts = [
@@ -23,5 +24,10 @@ class PriceHistory extends Model
     public function property(): BelongsTo
     {
         return $this->belongsTo(Property::class);
+    }
+
+    public function notes(): MorphMany
+    {
+        return $this->morphMany(Note::class, 'notable');
     }
 }

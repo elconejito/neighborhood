@@ -11,6 +11,7 @@ use App\Http\Requests\Api\V1\Property\StorePropertyRequest;
 use App\Http\Requests\Api\V1\Property\UpdatePropertyRequest;
 use App\Models\Property;
 use App\Services\PropertyAnalysisService;
+use App\Transformers\Api\V1\PropertyTransformer;
 use Illuminate\Http\JsonResponse;
 
 class PropertyController extends Controller
@@ -19,7 +20,13 @@ class PropertyController extends Controller
 
     public function index(IndexPropertyRequest $request): JsonResponse
     {
-        $query = $request->user()->properties()->with('priceHistories');
+        $user = $request->user();
+
+        if ($user->team_id) {
+            $query = Property::whereIn('neighborhood_id', $user->team->neighborhoods()->pluck('id'));
+        } else {
+            $query = $user->properties();
+        }
 
         if ($request->has('search')) {
             $search = $request->input('search');
@@ -32,16 +39,25 @@ class PropertyController extends Controller
 
         $properties = $query->orderByDesc('created_at')->paginate(15);
 
-        return response()->json([
-            'data' => $properties
-        ]);
+        return fractal($properties, new PropertyTransformer())
+            ->parseIncludes(['neighborhood', 'price_histories'])
+            ->respond();
     }
 
     public function store(StorePropertyRequest $request): JsonResponse
     {
         $validated = $request->validated();
+        $notesContent = $validated['notes'] ?? null;
+        unset($validated['notes']);
 
         $property = $request->user()->properties()->create($validated);
+
+        if ($notesContent) {
+            $property->notes()->create([
+                'user_id' => $request->user()->id,
+                'content' => $notesContent,
+            ]);
+        }
 
         // Create initial price history if price provided
         if ($validated['price'] ?? null) {
@@ -52,21 +68,23 @@ class PropertyController extends Controller
             ]);
         }
 
-        return response()->json([
-            'data' => $property->load('priceHistories')
-        ], 201);
+        return fractal($property, new PropertyTransformer())
+            ->parseIncludes(['price_histories'])
+            ->respond(201);
     }
 
     public function show(ShowPropertyRequest $request, Property $property): JsonResponse
     {
-        return response()->json([
-            'data' => $property->load('priceHistories')
-        ]);
+        return fractal($property, new PropertyTransformer())
+            ->parseIncludes(['price_histories', 'neighborhood', 'notes'])
+            ->respond();
     }
 
     public function update(UpdatePropertyRequest $request, Property $property): JsonResponse
     {
         $validated = $request->validated();
+        $notesContent = $validated['notes'] ?? null;
+        unset($validated['notes']);
 
         // Track price changes
         if (isset($validated['price']) && $validated['price'] != $property->price) {
@@ -80,11 +98,18 @@ class PropertyController extends Controller
             ]);
         }
 
+        if ($notesContent) {
+            $property->notes()->create([
+                'user_id' => $request->user()->id,
+                'content' => $notesContent,
+            ]);
+        }
+
         $property->update($validated);
 
-        return response()->json([
-            'data' => $property->load('priceHistories')
-        ]);
+        return fractal($property, new PropertyTransformer())
+            ->parseIncludes(['price_histories', 'neighborhood', 'notes'])
+            ->respond();
     }
 
     public function destroy(DestroyPropertyRequest $request, Property $property): JsonResponse
@@ -121,11 +146,7 @@ class PropertyController extends Controller
             'analyzed_at' => now(),
         ]);
 
-        return response()->json([
-            'data' => [
-                'message' => 'Analysis completed',
-                'property' => $property->fresh(),
-            ]
-        ]);
+        return fractal($property->fresh(), new PropertyTransformer())
+            ->respond();
     }
 }

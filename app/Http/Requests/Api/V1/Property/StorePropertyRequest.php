@@ -22,6 +22,7 @@ class StorePropertyRequest extends FormRequest
     public function rules(): array
     {
         return [
+            'neighborhood_id' => ['nullable', 'exists:neighborhoods,id'],
             'address' => ['required', 'string', 'max:255'],
             'city' => ['required', 'string', 'max:255'],
             'state' => ['required', 'string', 'size:2'],

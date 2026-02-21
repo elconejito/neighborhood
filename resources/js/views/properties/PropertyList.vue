@@ -38,6 +38,9 @@
                                         </p>
                                         <p class="mt-1 text-sm text-gray-500">
                                             {{ property.city }}, {{ property.state }} {{ property.zip_code }}
+                                            <span v-if="property.neighborhood" class="ml-2 px-2 py-0.5 bg-gray-100 rounded text-gray-600">
+                                                {{ property.neighborhood.name }}
+                                            </span>
                                         </p>
                                     </div>
                                     <div class="ml-4 flex-shrink-0 flex items-center space-x-4">

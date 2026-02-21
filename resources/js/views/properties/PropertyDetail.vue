@@ -46,6 +46,12 @@
                     </div>
                     <div class="border-t border-gray-200">
                         <dl>
+                            <div v-if="property.neighborhood" class="bg-white px-4 py-4 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
+                                <dt class="text-sm font-medium text-gray-500">Neighborhood</dt>
+                                <dd class="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">
+                                    {{ property.neighborhood.name }}
+                                </dd>
+                            </div>
                             <div class="bg-gray-50 px-4 py-4 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
                                 <dt class="text-sm font-medium text-gray-500">Price</dt>
                                 <dd class="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">
@@ -72,11 +78,23 @@
                                     </a>
                                 </dd>
                             </div>
-                            <div v-if="property.notes" class="bg-gray-50 px-4 py-4 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
-                                <dt class="text-sm font-medium text-gray-500">Notes</dt>
-                                <dd class="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2 whitespace-pre-wrap">{{ property.notes }}</dd>
-                            </div>
                         </dl>
+                    </div>
+                </div>
+
+                <!-- Notes -->
+                <div class="bg-white shadow overflow-hidden sm:rounded-lg mb-6">
+                    <div class="px-4 py-5 sm:px-6 flex justify-between items-center">
+                        <h3 class="text-lg leading-6 font-medium text-gray-900">Notes</h3>
+                    </div>
+                    <div class="border-t border-gray-200">
+                        <ul v-if="property.notes?.length" class="divide-y divide-gray-200">
+                            <li v-for="note in property.notes" :key="note.id" class="px-4 py-4 sm:px-6">
+                                <p class="text-sm text-gray-900 whitespace-pre-wrap">{{ note.content }}</p>
+                                <p class="mt-1 text-xs text-gray-500">{{ formatDate(note.created_at) }}</p>
+                            </li>
+                        </ul>
+                        <p v-else class="px-4 py-5 text-sm text-gray-500 italic">No notes added yet.</p>
                     </div>
                 </div>
 

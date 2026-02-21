@@ -14,6 +14,21 @@
                         {{ error }}
                     </div>
 
+                    <!-- Neighborhood -->
+                    <div v-if="neighborhoods.length > 0">
+                        <label for="neighborhood_id" class="block text-sm font-medium text-gray-700">Neighborhood</label>
+                        <select
+                            id="neighborhood_id"
+                            v-model="form.neighborhood_id"
+                            class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-emerald-500 focus:border-emerald-500"
+                        >
+                            <option :value="null">None</option>
+                            <option v-for="neighborhood in neighborhoods" :key="neighborhood.id" :value="neighborhood.id">
+                                {{ neighborhood.name }}
+                            </option>
+                        </select>
+                    </div>
+
                     <!-- Address -->
                     <div>
                         <label for="address" class="block text-sm font-medium text-gray-700">Street Address *</label>
@@ -161,13 +176,17 @@
 </template>
 
 <script setup>
-import { ref, reactive } from 'vue';
+import { ref, reactive, onMounted } from 'vue';
 import { useRouter } from 'vue-router';
 import api from '@/api';
 
 const router = useRouter();
 
+const neighborhoods = ref([]);
+const loadingNeighborhoods = ref(false);
+
 const form = reactive({
+    neighborhood_id: null,
     address: '',
     city: '',
     state: '',
@@ -196,4 +215,16 @@ const handleSubmit = async () => {
         loading.value = false;
     }
 };
+
+onMounted(async () => {
+    loadingNeighborhoods.value = true;
+    try {
+        const response = await api.get('/neighborhoods');
+        neighborhoods.value = response.data.data;
+    } catch (e) {
+        console.error('Failed to load neighborhoods', e);
+    } finally {
+        loadingNeighborhoods.value = false;
+    }
+});
 </script>
