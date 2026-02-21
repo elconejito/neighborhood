@@ -107,7 +107,7 @@ const handleSubmit = async () => {
         await authStore.register(form);
         router.push('/');
     } catch (e) {
-        error.value = e.response?.data?.message || 'Registration failed';
+        error.value = e.response?.data?.data?.message || e.response?.data?.message || 'Registration failed';
     } finally {
         loading.value = false;
     }

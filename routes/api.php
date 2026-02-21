@@ -25,6 +25,5 @@ Route::prefix('v1')->group(function () {
         // Properties
         Route::apiResource('properties', PropertyController::class);
         Route::post('properties/{property}/analyze', [PropertyController::class, 'analyze']);
-        Route::post('properties/{property}/toggle-favorite', [PropertyController::class, 'toggleFavorite']);
     });
 });

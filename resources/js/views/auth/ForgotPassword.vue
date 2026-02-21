@@ -74,7 +74,7 @@ const handleSubmit = async () => {
         await authStore.forgotPassword(email.value);
         sent.value = true;
     } catch (e) {
-        error.value = e.response?.data?.message || 'Failed to send reset link';
+        error.value = e.response?.data?.data?.message || e.response?.data?.message || 'Failed to send reset link';
     } finally {
         loading.value = false;
     }

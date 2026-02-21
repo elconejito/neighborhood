@@ -30,11 +30,13 @@ class AuthController extends Controller
         $token = auth('api')->login($user);
 
         return response()->json([
-            'message' => 'User registered successfully',
-            'user' => $user,
-            'access_token' => $token,
-            'token_type' => 'bearer',
-            'expires_in' => auth('api')->factory()->getTTL() * 60,
+            'data' => [
+                'message' => 'User registered successfully',
+                'user' => $user,
+                'access_token' => $token,
+                'token_type' => 'bearer',
+                'expires_in' => auth('api')->factory()->getTTL() * 60,
+            ]
         ], 201);
     }
 
@@ -61,7 +63,9 @@ class AuthController extends Controller
         auth('api')->logout();
 
         return response()->json([
-            'message' => 'Successfully logged out',
+            'data' => [
+                'message' => 'Successfully logged out',
+            ]
         ]);
     }
 
@@ -72,7 +76,9 @@ class AuthController extends Controller
 
     public function me(): JsonResponse
     {
-        return response()->json(auth('api')->user());
+        return response()->json([
+            'data' => auth('api')->user()
+        ]);
     }
 
     public function forgotPassword(Request $request): JsonResponse
@@ -85,7 +91,9 @@ class AuthController extends Controller
 
         if ($status === Password::RESET_LINK_SENT) {
             return response()->json([
-                'message' => 'Password reset link sent to your email',
+                'data' => [
+                    'message' => 'Password reset link sent to your email',
+                ]
             ]);
         }
 
@@ -115,7 +123,9 @@ class AuthController extends Controller
 
         if ($status === Password::PASSWORD_RESET) {
             return response()->json([
-                'message' => 'Password has been reset successfully',
+                'data' => [
+                    'message' => 'Password has been reset successfully',
+                ]
             ]);
         }
 
@@ -128,10 +138,12 @@ class AuthController extends Controller
     protected function respondWithToken(string $token): JsonResponse
     {
         return response()->json([
-            'access_token' => $token,
-            'token_type' => 'bearer',
-            'expires_in' => auth('api')->factory()->getTTL() * 60,
-            'user' => auth('api')->user(),
+            'data' => [
+                'access_token' => $token,
+                'token_type' => 'bearer',
+                'expires_in' => auth('api')->factory()->getTTL() * 60,
+                'user' => auth('api')->user(),
+            ]
         ]);
     }
 }

@@ -3,24 +3,23 @@
 namespace App\Http\Controllers\Api\V1;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Api\V1\Property\AnalyzePropertyRequest;
+use App\Http\Requests\Api\V1\Property\DestroyPropertyRequest;
+use App\Http\Requests\Api\V1\Property\IndexPropertyRequest;
+use App\Http\Requests\Api\V1\Property\ShowPropertyRequest;
+use App\Http\Requests\Api\V1\Property\StorePropertyRequest;
+use App\Http\Requests\Api\V1\Property\UpdatePropertyRequest;
 use App\Models\Property;
 use App\Services\PropertyAnalysisService;
 use Illuminate\Http\JsonResponse;
-use Illuminate\Http\Request;
 
 class PropertyController extends Controller
 {
-    public function __construct(
-        protected PropertyAnalysisService $analysisService
-    ) {}
+    public function __construct(protected PropertyAnalysisService $analysisService) {}
 
-    public function index(Request $request): JsonResponse
+    public function index(IndexPropertyRequest $request): JsonResponse
     {
         $query = $request->user()->properties()->with('priceHistories');
-
-        if ($request->has('favorite')) {
-            $query->where('is_favorite', $request->boolean('favorite'));
-        }
 
         if ($request->has('search')) {
             $search = $request->input('search');
@@ -33,26 +32,14 @@ class PropertyController extends Controller
 
         $properties = $query->orderByDesc('created_at')->paginate(15);
 
-        return response()->json($properties);
+        return response()->json([
+            'data' => $properties
+        ]);
     }
 
-    public function store(Request $request): JsonResponse
+    public function store(StorePropertyRequest $request): JsonResponse
     {
-        $validated = $request->validate([
-            'address' => ['required', 'string', 'max:255'],
-            'city' => ['required', 'string', 'max:255'],
-            'state' => ['required', 'string', 'size:2'],
-            'zip_code' => ['required', 'string', 'max:10'],
-            'latitude' => ['nullable', 'numeric', 'between:-90,90'],
-            'longitude' => ['nullable', 'numeric', 'between:-180,180'],
-            'price' => ['nullable', 'numeric', 'min:0'],
-            'acreage' => ['nullable', 'numeric', 'min:0'],
-            'bedrooms' => ['nullable', 'integer', 'min:0'],
-            'bathrooms' => ['nullable', 'numeric', 'min:0'],
-            'square_feet' => ['nullable', 'integer', 'min:0'],
-            'listing_url' => ['nullable', 'url', 'max:255'],
-            'notes' => ['nullable', 'string'],
-        ]);
+        $validated = $request->validated();
 
         $property = $request->user()->properties()->create($validated);
 
@@ -65,42 +52,27 @@ class PropertyController extends Controller
             ]);
         }
 
-        return response()->json($property->load('priceHistories'), 201);
+        return response()->json([
+            'data' => $property->load('priceHistories')
+        ], 201);
     }
 
-    public function show(Request $request, Property $property): JsonResponse
+    public function show(ShowPropertyRequest $request, Property $property): JsonResponse
     {
-        $this->authorizeProperty($request, $property);
-
-        return response()->json($property->load('priceHistories'));
-    }
-
-    public function update(Request $request, Property $property): JsonResponse
-    {
-        $this->authorizeProperty($request, $property);
-
-        $validated = $request->validate([
-            'address' => ['sometimes', 'required', 'string', 'max:255'],
-            'city' => ['sometimes', 'required', 'string', 'max:255'],
-            'state' => ['sometimes', 'required', 'string', 'size:2'],
-            'zip_code' => ['sometimes', 'required', 'string', 'max:10'],
-            'latitude' => ['nullable', 'numeric', 'between:-90,90'],
-            'longitude' => ['nullable', 'numeric', 'between:-180,180'],
-            'price' => ['nullable', 'numeric', 'min:0'],
-            'acreage' => ['nullable', 'numeric', 'min:0'],
-            'bedrooms' => ['nullable', 'integer', 'min:0'],
-            'bathrooms' => ['nullable', 'numeric', 'min:0'],
-            'square_feet' => ['nullable', 'integer', 'min:0'],
-            'listing_url' => ['nullable', 'url', 'max:255'],
-            'notes' => ['nullable', 'string'],
-            'is_favorite' => ['sometimes', 'boolean'],
+        return response()->json([
+            'data' => $property->load('priceHistories')
         ]);
+    }
+
+    public function update(UpdatePropertyRequest $request, Property $property): JsonResponse
+    {
+        $validated = $request->validated();
 
         // Track price changes
         if (isset($validated['price']) && $validated['price'] != $property->price) {
-            $type = $property->price === null ? 'listing' 
+            $type = $property->price === null ? 'listing'
                 : ($validated['price'] > $property->price ? 'increase' : 'reduction');
-            
+
             $property->priceHistories()->create([
                 'price' => $validated['price'],
                 'price_date' => now(),
@@ -110,26 +82,26 @@ class PropertyController extends Controller
 
         $property->update($validated);
 
-        return response()->json($property->load('priceHistories'));
+        return response()->json([
+            'data' => $property->load('priceHistories')
+        ]);
     }
 
-    public function destroy(Request $request, Property $property): JsonResponse
+    public function destroy(DestroyPropertyRequest $request, Property $property): JsonResponse
     {
-        $this->authorizeProperty($request, $property);
-
         $property->delete();
 
-        return response()->json(['message' => 'Property deleted successfully']);
+        return response()->json([
+            'data' => ['message' => 'Property deleted successfully']
+        ]);
     }
 
-    public function analyze(Request $request, Property $property): JsonResponse
+    public function analyze(AnalyzePropertyRequest $request, Property $property): JsonResponse
     {
-        $this->authorizeProperty($request, $property);
-
         if (!$property->latitude || !$property->longitude) {
             // Try to geocode the address
             $coordinates = $this->analysisService->geocodeAddress($property->full_address);
-            
+
             if ($coordinates) {
                 $property->update([
                     'latitude' => $coordinates['lat'],
@@ -150,27 +122,10 @@ class PropertyController extends Controller
         ]);
 
         return response()->json([
-            'message' => 'Analysis completed',
-            'property' => $property->fresh(),
+            'data' => [
+                'message' => 'Analysis completed',
+                'property' => $property->fresh(),
+            ]
         ]);
-    }
-
-    public function toggleFavorite(Request $request, Property $property): JsonResponse
-    {
-        $this->authorizeProperty($request, $property);
-
-        $property->update(['is_favorite' => !$property->is_favorite]);
-
-        return response()->json([
-            'message' => $property->is_favorite ? 'Added to favorites' : 'Removed from favorites',
-            'is_favorite' => $property->is_favorite,
-        ]);
-    }
-
-    protected function authorizeProperty(Request $request, Property $property): void
-    {
-        if ($property->user_id !== $request->user()->id) {
-            abort(403, 'Unauthorized');
-        }
     }
 }

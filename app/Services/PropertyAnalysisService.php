@@ -30,6 +30,7 @@ class PropertyAnalysisService
                 'format' => 'json',
                 'limit' => 1,
             ]);
+            Log::debug(__CLASS__.':'.__LINE__, ['response' => $response]);
 
             if ($response->successful() && count($response->json()) > 0) {
                 $result = $response->json()[0];
@@ -48,7 +49,7 @@ class PropertyAnalysisService
     protected function analyzeNeighborDistance(float $lat, float $lng): array
     {
         $radiusMeters = 2000; // 2km search radius
-        
+
         $query = <<<QUERY
 [out:json][timeout:25];
 (
@@ -67,7 +68,7 @@ QUERY;
             if ($response->successful()) {
                 $data = $response->json();
                 $buildings = $data['elements'] ?? [];
-                
+
                 $distances = [];
                 foreach ($buildings as $building) {
                     if (isset($building['center'])) {
@@ -86,8 +87,8 @@ QUERY;
                 return [
                     'total_buildings_nearby' => count($buildings),
                     'nearest_neighbor_meters' => $nearestDistances[0] ?? null,
-                    'average_distance_meters' => count($nearestDistances) > 0 
-                        ? round(array_sum($nearestDistances) / count($nearestDistances), 1) 
+                    'average_distance_meters' => count($nearestDistances) > 0
+                        ? round(array_sum($nearestDistances) / count($nearestDistances), 1)
                         : null,
                     'nearest_10_distances' => $nearestDistances,
                     'isolation_score' => $this->calculateIsolationScore($nearestDistances),
@@ -103,7 +104,7 @@ QUERY;
     protected function analyzePointsOfInterest(float $lat, float $lng): array
     {
         $radiusMeters = 8000; // 8km search radius
-        
+
         $poiTypes = [
             'grocery' => '["shop"~"supermarket|grocery|convenience"]',
             'hospital' => '["amenity"="hospital"]',
@@ -135,12 +136,12 @@ QUERY;
                 if ($response->successful()) {
                     $data = $response->json();
                     $pois = $data['elements'] ?? [];
-                    
+
                     $distances = [];
                     foreach ($pois as $poi) {
                         $poiLat = $poi['lat'] ?? ($poi['center']['lat'] ?? null);
                         $poiLng = $poi['lon'] ?? ($poi['center']['lon'] ?? null);
-                        
+
                         if ($poiLat && $poiLng) {
                             $distances[] = [
                                 'name' => $poi['tags']['name'] ?? 'Unknown',
@@ -172,7 +173,7 @@ QUERY;
     protected function analyzeRoadAccessibility(float $lat, float $lng): array
     {
         $radiusMeters = 5000; // 5km search radius
-        
+
         $roadTypes = [
             'highway' => '["highway"~"motorway|trunk|primary"]',
             'main_road' => '["highway"~"secondary|tertiary"]',
@@ -199,7 +200,7 @@ QUERY;
                 if ($response->successful()) {
                     $data = $response->json();
                     $roads = $data['elements'] ?? [];
-                    
+
                     $minDistance = PHP_FLOAT_MAX;
                     $nearestRoad = null;
 
@@ -207,8 +208,8 @@ QUERY;
                         if (isset($road['geometry'])) {
                             foreach ($road['geometry'] as $point) {
                                 $distance = $this->haversineDistance(
-                                    $lat, $lng, 
-                                    $point['lat'], 
+                                    $lat, $lng,
+                                    $point['lat'],
                                     $point['lon']
                                 );
                                 if ($distance < $minDistance) {

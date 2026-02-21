@@ -3,7 +3,7 @@
         <div class="px-4 py-6 sm:px-0">
             <h1 class="text-2xl font-bold text-gray-900 mb-6">Dashboard</h1>
 
-            <div class="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
+            <div class="grid grid-cols-1 gap-6 sm:grid-cols-2">
                 <!-- Properties Card -->
                 <div class="bg-white overflow-hidden shadow rounded-lg">
                     <div class="p-5">
@@ -46,25 +46,6 @@
                         </div>
                     </div>
                 </div>
-
-                <!-- Favorites Card -->
-                <div class="bg-white overflow-hidden shadow rounded-lg">
-                    <div class="p-5">
-                        <div class="flex items-center">
-                            <div class="flex-shrink-0">
-                                <svg class="h-6 w-6 text-red-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
-                                </svg>
-                            </div>
-                            <div class="ml-5 w-0 flex-1">
-                                <dl>
-                                    <dt class="text-sm font-medium text-gray-500 truncate">Favorites</dt>
-                                    <dd class="text-lg font-semibold text-gray-900">{{ stats.favoriteProperties }}</dd>
-                                </dl>
-                            </div>
-                        </div>
-                    </div>
-                </div>
             </div>
 
             <!-- Quick Actions -->
@@ -93,7 +74,6 @@ import api from '@/api';
 const stats = ref({
     totalProperties: 0,
     analyzedProperties: 0,
-    favoriteProperties: 0,
 });
 
 onMounted(async () => {

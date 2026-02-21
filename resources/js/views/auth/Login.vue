@@ -91,7 +91,7 @@ const handleSubmit = async () => {
         const redirect = route.query.redirect || '/';
         router.push(redirect);
     } catch (e) {
-        error.value = e.response?.data?.message || 'Invalid credentials';
+        error.value = e.response?.data?.data?.message || e.response?.data?.message || 'Invalid credentials';
     } finally {
         loading.value = false;
     }

@@ -25,7 +25,6 @@ class Property extends Model
         'notes',
         'analysis',
         'analyzed_at',
-        'is_favorite',
     ];
 
     protected $casts = [
@@ -36,7 +35,6 @@ class Property extends Model
         'bathrooms' => 'decimal:1',
         'analysis' => 'array',
         'analyzed_at' => 'datetime',
-        'is_favorite' => 'boolean',
     ];
 
     public function user(): BelongsTo

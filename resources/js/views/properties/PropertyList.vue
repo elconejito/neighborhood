@@ -81,7 +81,7 @@ const formatPrice = (price) => {
 onMounted(async () => {
     try {
         const response = await api.get('/properties');
-        properties.value = response.data.data;
+        properties.value = response.data.data.data;
     } catch (error) {
         console.error('Failed to load properties', error);
     } finally {

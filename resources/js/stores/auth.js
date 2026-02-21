@@ -32,7 +32,7 @@ export const useAuthStore = defineStore('auth', () => {
         user.value = userData;
         localStorage.setItem('token', access_token);
 
-        return response.data;
+        return response.data.data;
     }
 
     // Register
@@ -44,7 +44,7 @@ export const useAuthStore = defineStore('auth', () => {
         user.value = userData;
         localStorage.setItem('token', access_token);
 
-        return response.data;
+        return response.data.data;
     }
 
     // Logout
@@ -65,13 +65,13 @@ export const useAuthStore = defineStore('auth', () => {
     // Forgot password
     async function forgotPassword(email) {
         const response = await api.post('/auth/forgot-password', { email });
-        return response.data;
+        return response.data.data;
     }
 
     // Reset password
     async function resetPassword(data) {
         const response = await api.post('/auth/reset-password', data);
-        return response.data;
+        return response.data.data;
     }
 
     return {
