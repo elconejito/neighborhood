@@ -11,15 +11,20 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('teams', function (Blueprint $table) {
+        Schema::create('notes', function (Blueprint $table) {
             $table->id();
-            $table->string('name');
+            $table->unsignedBigInteger('user_id');
+            $table->morphs('notable');
+            $table->text('content');
             $table->timestamps();
         });
     }
 
+    /**
+     * Reverse the migrations.
+     */
     public function down(): void
     {
-        Schema::dropIfExists('teams');
+        Schema::dropIfExists('notes');
     }
 };

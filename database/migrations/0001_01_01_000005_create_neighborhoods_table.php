@@ -11,17 +11,19 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('notes', function (Blueprint $table) {
+        Schema::create('neighborhoods', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('user_id')->constrained()->onDelete('cascade');
-            $table->morphs('notable');
-            $table->text('content');
+            $table->unsignedBigInteger('team_id');
+            $table->string('name');
             $table->timestamps();
         });
     }
 
+    /**
+     * Reverse the migrations.
+     */
     public function down(): void
     {
-        Schema::dropIfExists('notes');
+        Schema::dropIfExists('neighborhoods');
     }
 };
