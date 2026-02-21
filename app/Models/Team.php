@@ -2,12 +2,16 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasManyThrough;
 
 class Team extends Model
 {
-    protected $fillable = ['name'];
+    use HasFactory;
+
+    protected $fillable = ['user_id', 'name', 'personal_team'];
 
     public function users(): HasMany
     {

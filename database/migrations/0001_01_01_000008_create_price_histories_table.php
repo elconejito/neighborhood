@@ -14,9 +14,10 @@ return new class extends Migration
         Schema::create('price_histories', function (Blueprint $table) {
             $table->id();
             $table->unsignedBigInteger('property_id');
+            $table->unsignedBigInteger('listing_cycle_id')->nullable();
             $table->decimal('price', 12, 2);
             $table->date('price_date');
-            $table->enum('type', ['listing', 'reduction', 'increase', 'sold'])->default('listing');
+            $table->enum('type', ['listing', 'reduction', 'increase', 'sold', 'off_market'])->default('listing');
             $table->timestamps();
         });
     }

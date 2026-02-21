@@ -67,6 +67,12 @@ return new class extends Migration
         Schema::table('price_histories', function (Blueprint $table) {
             $table->index(['property_id', 'price_date']);
             $table->foreign('property_id')->references('id')->on('properties')->onDelete('cascade');
+            $table->foreign('listing_cycle_id')->references('id')->on('listing_cycles')->onDelete('cascade');
+        });
+
+        // Listing Cycles
+        Schema::table('listing_cycles', function (Blueprint $table) {
+            $table->foreign('property_id')->references('id')->on('properties')->onDelete('cascade');
         });
 
         // Notes
@@ -87,8 +93,14 @@ return new class extends Migration
 
         // Price Histories
         Schema::table('price_histories', function (Blueprint $table) {
+            $table->dropForeign(['listing_cycle_id']);
             $table->dropForeign(['property_id']);
             $table->dropIndex(['property_id', 'price_date']);
+        });
+
+        // Listing Cycles
+        Schema::table('listing_cycles', function (Blueprint $table) {
+            $table->dropForeign(['property_id']);
         });
 
         // Properties
