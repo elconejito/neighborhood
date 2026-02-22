@@ -12,6 +12,8 @@ import Dashboard from '@/views/Dashboard.vue';
 import PropertyList from '@/views/properties/PropertyList.vue';
 import PropertyDetail from '@/views/properties/PropertyDetail.vue';
 import PropertyCreate from '@/views/properties/PropertyCreate.vue';
+import TeamManagement from '@/views/team/TeamManagement.vue';
+import NeighborhoodManagement from '@/views/neighborhoods/NeighborhoodManagement.vue';
 
 const routes = [
     // Auth routes (guest only)
@@ -63,6 +65,18 @@ const routes = [
         path: '/properties/:id',
         name: 'property-detail',
         component: PropertyDetail,
+        meta: { requiresAuth: true },
+    },
+    {
+        path: '/team',
+        name: 'team',
+        component: TeamManagement,
+        meta: { requiresAuth: true },
+    },
+    {
+        path: '/neighborhoods',
+        name: 'neighborhoods',
+        component: NeighborhoodManagement,
         meta: { requiresAuth: true },
     },
 ];

@@ -10,6 +10,8 @@ class PropertyAnalysisService
 {
     protected string $overpassUrl = 'https://overpass-api.de/api/interpreter';
 
+    protected string $userAgent = 'NeighborhoodApp/1.0 (contact@neighborhood.app)';
+
     public function analyzeProperty(Property $property): array
     {
         $lat = $property->latitude;
@@ -25,7 +27,9 @@ class PropertyAnalysisService
     public function geocodeAddress(string $address): ?array
     {
         try {
-            $response = Http::get('https://nominatim.openstreetmap.org/search', [
+            $response = Http::withHeaders([
+                'User-Agent' => $this->userAgent,
+            ])->get('https://nominatim.openstreetmap.org/search', [
                 'q' => $address,
                 'format' => 'json',
                 'limit' => 1,
@@ -34,13 +38,14 @@ class PropertyAnalysisService
 
             if ($response->successful() && count($response->json()) > 0) {
                 $result = $response->json()[0];
+
                 return [
                     'lat' => (float) $result['lat'],
                     'lng' => (float) $result['lon'],
                 ];
             }
         } catch (\Exception $e) {
-            Log::error('Geocoding failed: ' . $e->getMessage());
+            Log::error('Geocoding failed: '.$e->getMessage());
         }
 
         return null;
@@ -61,7 +66,9 @@ out center;
 QUERY;
 
         try {
-            $response = Http::timeout(30)->post($this->overpassUrl, [
+            $response = Http::withHeaders([
+                'User-Agent' => $this->userAgent,
+            ])->timeout(30)->post($this->overpassUrl, [
                 'data' => $query,
             ]);
 
@@ -95,7 +102,7 @@ QUERY;
                 ];
             }
         } catch (\Exception $e) {
-            Log::error('Neighbor distance analysis failed: ' . $e->getMessage());
+            Log::error('Neighbor distance analysis failed: '.$e->getMessage());
         }
 
         return ['error' => 'Analysis failed'];
@@ -129,7 +136,9 @@ out center;
 QUERY;
 
             try {
-                $response = Http::timeout(30)->post($this->overpassUrl, [
+                $response = Http::withHeaders([
+                    'User-Agent' => $this->userAgent,
+                ])->timeout(30)->post($this->overpassUrl, [
                     'data' => $query,
                 ]);
 
@@ -150,7 +159,7 @@ QUERY;
                         }
                     }
 
-                    usort($distances, fn($a, $b) => $a['distance_meters'] <=> $b['distance_meters']);
+                    usort($distances, fn ($a, $b) => $a['distance_meters'] <=> $b['distance_meters']);
 
                     $results[$type] = [
                         'count' => count($pois),
@@ -159,7 +168,7 @@ QUERY;
                     ];
                 }
             } catch (\Exception $e) {
-                Log::error("POI analysis failed for {$type}: " . $e->getMessage());
+                Log::error("POI analysis failed for {$type}: ".$e->getMessage());
                 $results[$type] = ['error' => 'Analysis failed'];
             }
 
@@ -193,7 +202,9 @@ out geom;
 QUERY;
 
             try {
-                $response = Http::timeout(30)->post($this->overpassUrl, [
+                $response = Http::withHeaders([
+                    'User-Agent' => $this->userAgent,
+                ])->timeout(30)->post($this->overpassUrl, [
                     'data' => $query,
                 ]);
 
@@ -231,7 +242,7 @@ QUERY;
                     ];
                 }
             } catch (\Exception $e) {
-                Log::error("Road analysis failed for {$type}: " . $e->getMessage());
+                Log::error("Road analysis failed for {$type}: ".$e->getMessage());
                 $results[$type] = ['error' => 'Analysis failed'];
             }
 
@@ -268,10 +279,19 @@ QUERY;
 
         $avgDistance = array_sum($distances) / count($distances);
 
-        if ($avgDistance > 1000) return 'very_isolated';
-        if ($avgDistance > 500) return 'isolated';
-        if ($avgDistance > 200) return 'moderate';
-        if ($avgDistance > 100) return 'suburban';
+        if ($avgDistance > 1000) {
+            return 'very_isolated';
+        }
+        if ($avgDistance > 500) {
+            return 'isolated';
+        }
+        if ($avgDistance > 200) {
+            return 'moderate';
+        }
+        if ($avgDistance > 100) {
+            return 'suburban';
+        }
+
         return 'dense';
     }
 
@@ -284,10 +304,19 @@ QUERY;
         // Score based on distance to nearest paved road
         $minPavedRoad = min($highwayDist, $mainRoadDist, $localRoadDist);
 
-        if ($minPavedRoad <= 100) return 'excellent';
-        if ($minPavedRoad <= 500) return 'good';
-        if ($minPavedRoad <= 1000) return 'moderate';
-        if ($minPavedRoad <= 2000) return 'limited';
+        if ($minPavedRoad <= 100) {
+            return 'excellent';
+        }
+        if ($minPavedRoad <= 500) {
+            return 'good';
+        }
+        if ($minPavedRoad <= 1000) {
+            return 'moderate';
+        }
+        if ($minPavedRoad <= 2000) {
+            return 'limited';
+        }
+
         return 'poor';
     }
 }

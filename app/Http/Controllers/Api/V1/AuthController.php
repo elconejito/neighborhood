@@ -3,10 +3,12 @@
 namespace App\Http\Controllers\Api\V1;
 
 use App\Http\Controllers\Controller;
+use App\Models\Team;
 use App\Models\User;
 use App\Transformers\Api\V1\UserTransformer;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Password;
 use Illuminate\Support\Str;
@@ -22,22 +24,36 @@ class AuthController extends Controller
             'password' => ['required', 'confirmed', PasswordRule::defaults()],
         ]);
 
-        $user = User::create([
-            'name' => $request->name,
-            'email' => $request->email,
-            'password' => Hash::make($request->password),
-        ]);
+        $user = DB::transaction(function () use ($request) {
+            $user = User::create([
+                'name' => $request->name,
+                'email' => $request->email,
+                'password' => Hash::make($request->password),
+            ]);
+
+            // Create initial "Private" team
+            $team = $user->teams()->create([
+                'user_id' => $user->id,
+                'name' => 'Private',
+                'personal_team' => true,
+            ]);
+
+            // Set as active team
+            $user->update(['team_id' => $team->id]);
+
+            return $user;
+        });
 
         $token = auth('api')->login($user);
 
         return response()->json([
             'data' => [
                 'message' => 'User registered successfully',
-                'user' => fractal($user, new UserTransformer())->toArray()['data'],
+                'user' => fractal($user, new UserTransformer)->toArray()['data'],
                 'access_token' => $token,
                 'token_type' => 'bearer',
                 'expires_in' => auth('api')->factory()->getTTL() * 60,
-            ]
+            ],
         ], 201);
     }
 
@@ -50,7 +66,7 @@ class AuthController extends Controller
 
         $credentials = $request->only('email', 'password');
 
-        if (!$token = auth('api')->attempt($credentials)) {
+        if (! $token = auth('api')->attempt($credentials)) {
             return response()->json([
                 'message' => 'Invalid credentials',
             ], 401);
@@ -66,7 +82,7 @@ class AuthController extends Controller
         return response()->json([
             'data' => [
                 'message' => 'Successfully logged out',
-            ]
+            ],
         ]);
     }
 
@@ -77,7 +93,7 @@ class AuthController extends Controller
 
     public function me(): JsonResponse
     {
-        return fractal(auth('api')->user(), new UserTransformer())->respond();
+        return fractal(auth('api')->user(), new UserTransformer)->respond();
     }
 
     public function forgotPassword(Request $request): JsonResponse
@@ -92,7 +108,7 @@ class AuthController extends Controller
             return response()->json([
                 'data' => [
                     'message' => 'Password reset link sent to your email',
-                ]
+                ],
             ]);
         }
 
@@ -124,7 +140,7 @@ class AuthController extends Controller
             return response()->json([
                 'data' => [
                     'message' => 'Password has been reset successfully',
-                ]
+                ],
             ]);
         }
 
@@ -141,8 +157,8 @@ class AuthController extends Controller
                 'access_token' => $token,
                 'token_type' => 'bearer',
                 'expires_in' => auth('api')->factory()->getTTL() * 60,
-                'user' => fractal(auth('api')->user(), new UserTransformer())->toArray()['data'],
-            ]
+                'user' => fractal(auth('api')->user(), new UserTransformer)->toArray()['data'],
+            ],
         ]);
     }
 }

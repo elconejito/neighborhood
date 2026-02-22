@@ -5,6 +5,7 @@ import api from '@/api';
 export const useAuthStore = defineStore('auth', () => {
     const user = ref(null);
     const token = ref(localStorage.getItem('token') || null);
+    const teams = ref([]);
     const initialized = ref(false);
 
     const isAuthenticated = computed(() => !!token.value && !!user.value);
@@ -15,12 +16,24 @@ export const useAuthStore = defineStore('auth', () => {
             try {
                 const response = await api.get('/auth/me');
                 user.value = response.data.data;
+                await loadTeams();
             } catch (error) {
                 // Token is invalid, clear it
                 logout();
             }
         }
         initialized.value = true;
+    }
+
+    // Load user's teams
+    async function loadTeams() {
+        if (!token.value) return;
+        try {
+            const response = await api.get('/teams');
+            teams.value = response.data.data;
+        } catch (error) {
+            console.error('Failed to load teams', error);
+        }
     }
 
     // Login
@@ -77,9 +90,11 @@ export const useAuthStore = defineStore('auth', () => {
     return {
         user,
         token,
+        teams,
         initialized,
         isAuthenticated,
         initAuth,
+        loadTeams,
         login,
         register,
         logout,

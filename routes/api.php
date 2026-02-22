@@ -2,8 +2,9 @@
 
 use App\Http\Controllers\Api\V1\AuthController;
 use App\Http\Controllers\Api\V1\DashboardController;
-use App\Http\Controllers\Api\V1\PropertyController;
 use App\Http\Controllers\Api\V1\NeighborhoodController;
+use App\Http\Controllers\Api\V1\PropertyController;
+use App\Http\Controllers\Api\V1\TeamController;
 use Illuminate\Support\Facades\Route;
 
 Route::prefix('v1')->group(function () {
@@ -29,5 +30,14 @@ Route::prefix('v1')->group(function () {
 
         // Neighborhoods
         Route::apiResource('neighborhoods', NeighborhoodController::class);
+
+        // Team
+        Route::get('teams', [TeamController::class, 'teams']);
+        Route::post('teams', [TeamController::class, 'store']);
+        Route::put('teams/{team}', [TeamController::class, 'update']);
+        Route::post('teams/{team}/switch', [TeamController::class, 'switch']);
+        Route::get('team/members', [TeamController::class, 'index']);
+        Route::post('team/invite', [TeamController::class, 'invite']);
+        Route::delete('team/members/{member}', [TeamController::class, 'remove']);
     });
 });
