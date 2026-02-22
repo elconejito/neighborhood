@@ -24,7 +24,6 @@ return new class extends Migration
             $table->decimal('latitude', 10, 7)->nullable();
             $table->decimal('longitude', 10, 7)->nullable();
             // Property details
-            $table->decimal('price', 12, 2)->nullable();
             $table->decimal('acreage', 8, 2)->nullable();
             $table->integer('bedrooms')->nullable();
             $table->decimal('bathrooms', 3, 1)->nullable();

@@ -81,23 +81,7 @@
                     </div>
 
                     <div class="grid grid-cols-6 gap-6">
-                        <div class="col-span-6 sm:col-span-2">
-                            <label for="price" class="block text-sm font-medium text-gray-700">Price</label>
-                            <div class="mt-1 relative rounded-md shadow-sm">
-                                <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                                    <span class="text-gray-500 sm:text-sm">$</span>
-                                </div>
-                                <input
-                                    id="price"
-                                    v-model="form.price"
-                                    type="number"
-                                    min="0"
-                                    class="block w-full pl-7 pr-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-emerald-500 focus:border-emerald-500"
-                                />
-                            </div>
-                        </div>
-
-                        <div class="col-span-6 sm:col-span-2">
+                        <div class="col-span-3 sm:col-span-1">
                             <label for="acreage" class="block text-sm font-medium text-gray-700">Acreage</label>
                             <input
                                 id="acreage"
@@ -139,19 +123,9 @@
                             id="listing_url"
                             v-model="form.listing_url"
                             type="url"
-                            placeholder="https://zillow.com/..."
+                            placeholder="https://redfin.com/..."
                             class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-emerald-500 focus:border-emerald-500"
                         />
-                    </div>
-
-                    <div>
-                        <label for="notes" class="block text-sm font-medium text-gray-700">Notes</label>
-                        <textarea
-                            id="notes"
-                            v-model="form.notes"
-                            rows="3"
-                            class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-emerald-500 focus:border-emerald-500"
-                        ></textarea>
                     </div>
                 </div>
 
