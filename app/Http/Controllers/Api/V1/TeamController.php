@@ -16,18 +16,6 @@ class TeamController extends Controller
 {
     public function index(Request $request): JsonResponse
     {
-        $user = $request->user();
-        if (! $user->team_id) {
-            return response()->json(['data' => []]);
-        }
-
-        $members = $user->team->users()->orderBy('name')->get();
-
-        return fractal($members, new UserTransformer)->respond();
-    }
-
-    public function teams(Request $request): JsonResponse
-    {
         $teams = $request->user()->teams()->orderBy('name')->get();
 
         return fractal($teams, new TeamTransformer)->respond();
@@ -99,6 +87,18 @@ class TeamController extends Controller
         $invitedUser->teams()->attach($user->team_id);
 
         return fractal($invitedUser, new UserTransformer)->respond();
+    }
+
+    public function members(Request $request): JsonResponse
+    {
+        $user = $request->user();
+        if (! $user->team_id) {
+            return response()->json(['data' => []]);
+        }
+
+        $members = $user->team->users()->orderBy('name')->get();
+
+        return fractal($members, new UserTransformer)->respond();
     }
 
     public function remove(RemoveMemberRequest $request, User $member): JsonResponse

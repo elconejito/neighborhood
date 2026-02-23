@@ -115,6 +115,202 @@
                                 class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-emerald-500 focus:border-emerald-500"
                             />
                         </div>
+
+                        <div class="col-span-3 sm:col-span-1">
+                            <label for="square_feet" class="block text-sm font-medium text-gray-700">Sq Ft</label>
+                            <input
+                                id="square_feet"
+                                v-model="form.square_feet"
+                                type="number"
+                                min="0"
+                                class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-emerald-500 focus:border-emerald-500"
+                            />
+                        </div>
+
+                        <div class="col-span-3 sm:col-span-1">
+                            <label for="year_built" class="block text-sm font-medium text-gray-700">Year Built</label>
+                            <input
+                                id="year_built"
+                                v-model="form.year_built"
+                                type="number"
+                                min="1700"
+                                :max="new Date().getFullYear() + 5"
+                                class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-emerald-500 focus:border-emerald-500"
+                            />
+                        </div>
+
+                        <div class="col-span-3 sm:col-span-1">
+                            <label for="garage" class="block text-sm font-medium text-gray-700">Garage</label>
+                            <input
+                                id="garage"
+                                v-model="form.garage"
+                                type="number"
+                                min="0"
+                                class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-emerald-500 focus:border-emerald-500"
+                            />
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-6 gap-6">
+                        <div class="col-span-6 sm:col-span-2">
+                            <label for="basement" class="block text-sm font-medium text-gray-700">Basement</label>
+                            <select
+                                id="basement"
+                                v-model="form.basement"
+                                class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-emerald-500 focus:border-emerald-500"
+                            >
+                                <option :value="null">None/Unknown</option>
+                                <option value="Unfinished">Unfinished</option>
+                                <option value="Finished">Finished</option>
+                                <option value="Partial">Partial</option>
+                            </select>
+                        </div>
+
+                        <div class="col-span-6 sm:col-span-2">
+                            <label for="fence" class="block text-sm font-medium text-gray-700">Fence</label>
+                            <select
+                                id="fence"
+                                v-model="form.fence"
+                                class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-emerald-500 focus:border-emerald-500"
+                            >
+                                <option :value="null">Unknown</option>
+                                <option value="Yes">Yes</option>
+                                <option value="No but allowed">No but allowed</option>
+                                <option value="No">No</option>
+                            </select>
+                        </div>
+
+                        <div class="col-span-6 sm:col-span-2">
+                            <label for="deck" class="block text-sm font-medium text-gray-700">Deck/Patio</label>
+                            <select
+                                id="deck"
+                                v-model="form.deck"
+                                class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-emerald-500 focus:border-emerald-500"
+                            >
+                                <option :value="null">Unknown</option>
+                                <option value="Screened/Covered Porch">Screened/Covered Porch</option>
+                                <option value="Deck">Deck</option>
+                                <option value="Patio">Patio</option>
+                                <option value="None">None</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-6 gap-6">
+                        <div class="col-span-6 sm:col-span-2">
+                            <label for="water" class="block text-sm font-medium text-gray-700">Water</label>
+                            <select
+                                id="water"
+                                v-model="form.water"
+                                class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-emerald-500 focus:border-emerald-500"
+                            >
+                                <option :value="null">Unknown</option>
+                                <option value="Well">Well</option>
+                                <option value="Public">Public</option>
+                                <option value="Other">Other</option>
+                            </select>
+                        </div>
+
+                        <div class="col-span-6 sm:col-span-2">
+                            <label for="sewer" class="block text-sm font-medium text-gray-700">Sewer</label>
+                            <select
+                                id="sewer"
+                                v-model="form.sewer"
+                                class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-emerald-500 focus:border-emerald-500"
+                            >
+                                <option :value="null">Unknown</option>
+                                <option value="Septic">Septic</option>
+                                <option value="Public">Public</option>
+                                <option value="Other">Other</option>
+                            </select>
+                        </div>
+
+                        <div class="col-span-6 sm:col-span-2">
+                            <label for="hoa" class="block text-sm font-medium text-gray-700">HOA</label>
+                            <select
+                                id="hoa"
+                                v-model="form.hoa"
+                                class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-emerald-500 focus:border-emerald-500"
+                            >
+                                <option :value="null">Unknown</option>
+                                <option value="None">None</option>
+                                <option value="HOA">HOA</option>
+                                <option value="Condo">Condo</option>
+                                <option value="Coop">Coop</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div>
+                        <label for="reference_hvac_type_id" class="block text-sm font-medium text-gray-700">HVAC Type</label>
+                        <select
+                            id="reference_hvac_type_id"
+                            v-model="form.reference_hvac_type_id"
+                            class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-emerald-500 focus:border-emerald-500"
+                        >
+                            <option :value="null">Unknown</option>
+                            <option v-for="type in hvacTypes" :key="type.id" :value="type.id">
+                                {{ type.label }}
+                            </option>
+                        </select>
+                    </div>
+
+                    <div class="grid grid-cols-2 gap-4">
+                        <div class="flex items-start">
+                            <div class="flex items-center h-5">
+                                <input
+                                    id="basement_walkout"
+                                    v-model="form.basement_walkout"
+                                    type="checkbox"
+                                    class="focus:ring-emerald-500 h-4 w-4 text-emerald-600 border-gray-300 rounded"
+                                />
+                            </div>
+                            <div class="ml-3 text-sm">
+                                <label for="basement_walkout" class="font-medium text-gray-700">Basement Walkout</label>
+                            </div>
+                        </div>
+
+                        <div class="flex items-start">
+                            <div class="flex items-center h-5">
+                                <input
+                                    id="fireplace"
+                                    v-model="form.fireplace"
+                                    type="checkbox"
+                                    class="focus:ring-emerald-500 h-4 w-4 text-emerald-600 border-gray-300 rounded"
+                                />
+                            </div>
+                            <div class="ml-3 text-sm">
+                                <label for="fireplace" class="font-medium text-gray-700">Fireplace</label>
+                            </div>
+                        </div>
+
+                        <div class="flex items-start">
+                            <div class="flex items-center h-5">
+                                <input
+                                    id="main_level_primary_bedroom"
+                                    v-model="form.main_level_primary_bedroom"
+                                    type="checkbox"
+                                    class="focus:ring-emerald-500 h-4 w-4 text-emerald-600 border-gray-300 rounded"
+                                />
+                            </div>
+                            <div class="ml-3 text-sm">
+                                <label for="main_level_primary_bedroom" class="font-medium text-gray-700">Main Level Primary Bed</label>
+                            </div>
+                        </div>
+
+                        <div class="flex items-start">
+                            <div class="flex items-center h-5">
+                                <input
+                                    id="pool"
+                                    v-model="form.pool"
+                                    type="checkbox"
+                                    class="focus:ring-emerald-500 h-4 w-4 text-emerald-600 border-gray-300 rounded"
+                                />
+                            </div>
+                            <div class="ml-3 text-sm">
+                                <label for="pool" class="font-medium text-gray-700">Pool</label>
+                            </div>
+                        </div>
                     </div>
 
                     <div>
@@ -157,7 +353,9 @@ import api from '@/api';
 const router = useRouter();
 
 const neighborhoods = ref([]);
+const hvacTypes = ref([]);
 const loadingNeighborhoods = ref(false);
+const loadingHvacTypes = ref(false);
 
 const form = reactive({
     neighborhood_id: null,
@@ -165,12 +363,24 @@ const form = reactive({
     city: '',
     state: '',
     zip_code: '',
-    price: null,
     acreage: null,
     bedrooms: null,
     bathrooms: null,
+    square_feet: null,
+    year_built: null,
+    garage: 0,
+    basement: null,
+    basement_walkout: false,
+    fireplace: false,
+    main_level_primary_bedroom: false,
+    pool: false,
+    fence: null,
+    deck: null,
+    water: null,
+    sewer: null,
+    reference_hvac_type_id: null,
+    hoa: null,
     listing_url: '',
-    notes: '',
 });
 
 const loading = ref(false);
@@ -192,13 +402,19 @@ const handleSubmit = async () => {
 
 onMounted(async () => {
     loadingNeighborhoods.value = true;
+    loadingHvacTypes.value = true;
     try {
-        const response = await api.get('/neighborhoods');
-        neighborhoods.value = response.data.data;
+        const [neighborhoodsRes, hvacTypesRes] = await Promise.all([
+            api.get('/neighborhoods'),
+            api.get('/reference/hvac-types')
+        ]);
+        neighborhoods.value = neighborhoodsRes.data.data;
+        hvacTypes.value = hvacTypesRes.data.data;
     } catch (e) {
-        console.error('Failed to load neighborhoods', e);
+        console.error('Failed to load initial data', e);
     } finally {
         loadingNeighborhoods.value = false;
+        loadingHvacTypes.value = false;
     }
 });
 </script>

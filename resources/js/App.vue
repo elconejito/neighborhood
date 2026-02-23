@@ -23,7 +23,7 @@
                                 Neighborhoods
                             </router-link>
                             <router-link
-                                to="/team"
+                                to="/teams"
                                 class="px-3 py-2 text-sm font-medium text-gray-700 hover:text-emerald-600 rounded-md"
                                 active-class="text-emerald-600 bg-emerald-50"
                             >

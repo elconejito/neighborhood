@@ -178,7 +178,7 @@ const updateTeamName = async (team) => {
 
 const loadMembers = async () => {
     try {
-        const response = await api.get('/team/members');
+        const response = await api.get('/teams/members');
         members.value = response.data.data;
     } catch (err) {
         console.error('Failed to load members', err);
@@ -190,7 +190,7 @@ const inviteMember = async () => {
     error.value = '';
     success.value = '';
     try {
-        await api.post('/team/invite', inviteForm.value);
+        await api.post('/teams/invite', inviteForm.value);
         success.value = 'Member invited successfully.';
         inviteForm.value.email = '';
         await loadMembers();
@@ -209,7 +209,7 @@ const confirmRemove = (member) => {
 const removeMember = async () => {
     if (!memberToRemove.value) return;
     try {
-        await api.delete(`/team/members/${memberToRemove.value.id}`);
+        await api.delete(`/teams/members/${memberToRemove.value.id}`);
         showConfirmModal.value = false;
         await loadMembers();
     } catch (err) {

@@ -123,4 +123,20 @@ return [
         'store' => env('APP_MAINTENANCE_STORE', 'database'),
     ],
 
+    /*
+    |--------------------------------------------------------------------------
+    | Seeder User Configuration
+    |--------------------------------------------------------------------------
+    |
+    | These configuration options determine the default user created during
+    | the database seeding process when not in production.
+    |
+    */
+
+    'seeder_user' => [
+        'name' => env('SEEDER_USER_NAME', 'H'),
+        'email' => env('SEEDER_USER_EMAIL', 'harvey@harvsworld.com'),
+        'password' => env('SEEDER_USER_PASSWORD', 'password'),
+    ],
+
 ];

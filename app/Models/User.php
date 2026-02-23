@@ -8,6 +8,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use Illuminate\Support\Facades\DB;
 use PHPOpenSourceSaver\JWTAuth\Contracts\JWTSubject;
 
 class User extends Authenticatable implements JWTSubject
@@ -56,6 +57,21 @@ class User extends Authenticatable implements JWTSubject
     public function properties(): HasMany
     {
         return $this->hasMany(Property::class);
+    }
+
+    public function createPersonalTeam(): Team
+    {
+        return DB::transaction(function () {
+            $team = $this->teams()->create([
+                'user_id' => $this->id,
+                'name' => 'Private',
+                'personal_team' => true,
+            ]);
+
+            $this->update(['team_id' => $team->id]);
+
+            return $team;
+        });
     }
 
     public function team(): BelongsTo

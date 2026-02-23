@@ -31,13 +31,18 @@ Route::prefix('v1')->group(function () {
         // Neighborhoods
         Route::apiResource('neighborhoods', NeighborhoodController::class);
 
+        // Reference Data
+        Route::get('reference/hvac-types', function () {
+            return response()->json(['data' => \App\Models\ReferenceHvacType::all(['id', 'label'])]);
+        });
+
         // Team
-        Route::get('teams', [TeamController::class, 'teams']);
-        Route::post('teams', [TeamController::class, 'store']);
-        Route::put('teams/{team}', [TeamController::class, 'update']);
-        Route::post('teams/{team}/switch', [TeamController::class, 'switch']);
-        Route::get('team/members', [TeamController::class, 'index']);
-        Route::post('team/invite', [TeamController::class, 'invite']);
-        Route::delete('team/members/{member}', [TeamController::class, 'remove']);
+        Route::apiResource('teams', TeamController::class)->only(['index', 'store', 'update']);
+        Route::prefix('teams')->group(function () {
+            Route::post('{team}/switch', [TeamController::class, 'switch']);
+            Route::get('members', [TeamController::class, 'members']);
+            Route::post('invite', [TeamController::class, 'invite']);
+            Route::delete('members/{member}', [TeamController::class, 'remove']);
+        });
     });
 });

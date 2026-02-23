@@ -28,6 +28,19 @@ return new class extends Migration
             $table->integer('bedrooms')->nullable();
             $table->decimal('bathrooms', 3, 1)->nullable();
             $table->integer('square_feet')->nullable();
+            $table->integer('year_built')->nullable();
+            $table->integer('garage')->default(0);
+            $table->enum('basement', ['Unfinished', 'Finished', 'Partial'])->nullable();
+            $table->boolean('basement_walkout')->default(false);
+            $table->boolean('fireplace')->default(false);
+            $table->boolean('main_level_primary_bedroom')->default(false);
+            $table->boolean('pool')->default(false);
+            $table->enum('fence', ['Yes', 'No but allowed', 'No'])->nullable();
+            $table->enum('deck', ['Screened/Covered Porch', 'Deck', 'Patio', 'None'])->nullable();
+            $table->enum('water', ['Well', 'Public', 'Other'])->nullable();
+            $table->enum('sewer', ['Septic', 'Public', 'Other'])->nullable();
+            $table->foreignId('reference_hvac_type_id')->nullable()->constrained('reference_hvac_types');
+            $table->enum('hoa', ['None', 'HOA', 'Condo', 'Coop'])->nullable();
             // External links
             $table->string('listing_url')->nullable();
             // Analysis data (stored as JSON)

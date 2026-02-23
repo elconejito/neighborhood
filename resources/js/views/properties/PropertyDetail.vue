@@ -52,12 +52,6 @@
                                     {{ property.neighborhood.name }}
                                 </dd>
                             </div>
-                            <div class="bg-gray-50 px-4 py-4 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
-                                <dt class="text-sm font-medium text-gray-500">Price</dt>
-                                <dd class="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">
-                                    {{ property.price ? `$${formatPrice(property.price)}` : 'Not specified' }}
-                                </dd>
-                            </div>
                             <div class="bg-white px-4 py-4 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
                                 <dt class="text-sm font-medium text-gray-500">Acreage</dt>
                                 <dd class="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">
@@ -68,6 +62,33 @@
                                 <dt class="text-sm font-medium text-gray-500">Bedrooms / Bathrooms</dt>
                                 <dd class="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">
                                     {{ property.bedrooms ?? '-' }} bed / {{ property.bathrooms ?? '-' }} bath
+                                </dd>
+                            </div>
+                            <div class="bg-white px-4 py-4 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
+                                <dt class="text-sm font-medium text-gray-500">Square Feet / Year Built</dt>
+                                <dd class="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">
+                                    {{ property.square_feet ? `${property.square_feet.toLocaleString()} sq ft` : '-' }} / {{ property.year_built ?? '-' }}
+                                </dd>
+                            </div>
+                            <div class="bg-gray-50 px-4 py-4 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
+                                <dt class="text-sm font-medium text-gray-500">Garage / Basement</dt>
+                                <dd class="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">
+                                    {{ property.garage }} car / {{ property.basement ?? 'None' }}
+                                    <span v-if="property.basement_walkout" class="ml-1 text-xs text-gray-500">(Walkout)</span>
+                                </dd>
+                            </div>
+                            <div class="bg-white px-4 py-4 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
+                                <dt class="text-sm font-medium text-gray-500">Features</dt>
+                                <dd class="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2 space-x-4">
+                                    <span v-if="property.fireplace">🔥 Fireplace</span>
+                                    <span v-if="property.pool">🏊 Pool</span>
+                                    <span v-if="property.main_level_primary_bedroom">🛌 Main Primary</span>
+                                </dd>
+                            </div>
+                            <div class="bg-gray-50 px-4 py-4 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
+                                <dt class="text-sm font-medium text-gray-500">Utilities / HOA</dt>
+                                <dd class="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">
+                                    Water: {{ property.water ?? 'Unknown' }} / Sewer: {{ property.sewer ?? 'Unknown' }} / HOA: {{ property.hoa ?? 'None' }}
                                 </dd>
                             </div>
                             <div v-if="property.listing_url" class="bg-white px-4 py-4 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">

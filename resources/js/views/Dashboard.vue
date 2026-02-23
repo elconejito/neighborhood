@@ -63,7 +63,6 @@
                                         <p class="text-sm text-gray-500">{{ property.city }}, {{ property.state }}</p>
                                     </div>
                                     <div class="ml-2 flex-shrink-0">
-                                        <p class="text-sm font-semibold text-gray-900">${{ formatPrice(property.price) }}</p>
                                         <p class="text-xs text-gray-400">{{ formatDate(property.created_at) }}</p>
                                     </div>
                                 </div>

@@ -20,7 +20,7 @@ class TeamManagementTest extends TestCase
         $otherUser = User::factory()->create(['team_id' => $team->id]);
         $otherUser->teams()->attach($team->id);
 
-        $response = $this->actingAs($user, 'api')->getJson('/api/v1/team/members');
+        $response = $this->actingAs($user, 'api')->getJson('/api/v1/teams/members');
 
         $response->assertStatus(200)
             ->assertJsonCount(2, 'data');
@@ -34,7 +34,7 @@ class TeamManagementTest extends TestCase
 
         $invitedUser = User::factory()->create(); // User without team
 
-        $response = $this->actingAs($user, 'api')->postJson('/api/v1/team/invite', [
+        $response = $this->actingAs($user, 'api')->postJson('/api/v1/teams/invite', [
             'email' => $invitedUser->email,
         ]);
 
@@ -51,7 +51,7 @@ class TeamManagementTest extends TestCase
         $otherUser = User::factory()->create();
         $otherUser->teams()->attach($team->id);
 
-        $response = $this->actingAs($user, 'api')->postJson('/api/v1/team/invite', [
+        $response = $this->actingAs($user, 'api')->postJson('/api/v1/teams/invite', [
             'email' => $otherUser->email,
         ]);
 
@@ -67,7 +67,7 @@ class TeamManagementTest extends TestCase
         $memberToRemove = User::factory()->create(['team_id' => $team->id]);
         $memberToRemove->teams()->attach($team->id);
 
-        $response = $this->actingAs($user, 'api')->deleteJson("/api/v1/team/members/{$memberToRemove->id}");
+        $response = $this->actingAs($user, 'api')->deleteJson("/api/v1/teams/members/{$memberToRemove->id}");
 
         $response->assertStatus(200);
         $this->assertFalse($memberToRemove->fresh()->teams()->where('teams.id', $team->id)->exists());
@@ -79,7 +79,7 @@ class TeamManagementTest extends TestCase
         $user = User::factory()->create(['team_id' => $team->id]);
         $user->teams()->attach($team->id);
 
-        $response = $this->actingAs($user, 'api')->deleteJson("/api/v1/team/members/{$user->id}");
+        $response = $this->actingAs($user, 'api')->deleteJson("/api/v1/teams/members/{$user->id}");
 
         $response->assertStatus(422);
     }

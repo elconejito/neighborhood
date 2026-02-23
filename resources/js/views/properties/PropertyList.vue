@@ -66,7 +66,6 @@
                                     </div>
                                 </div>
                                 <div class="mt-2 flex items-center text-sm text-gray-500 space-x-4">
-                                    <span v-if="property.price">${{ formatPrice(property.price) }}</span>
                                     <span v-if="property.acreage">{{ property.acreage }} acres</span>
                                     <span v-if="property.bedrooms">{{ property.bedrooms }} bed</span>
                                     <span v-if="property.bathrooms">{{ property.bathrooms }} bath</span>

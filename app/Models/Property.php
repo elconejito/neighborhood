@@ -21,25 +21,43 @@ class Property extends Model
         'zip_code',
         'latitude',
         'longitude',
-        'price',
         'acreage',
         'bedrooms',
         'bathrooms',
         'square_feet',
+        'year_built',
+        'garage',
+        'basement',
+        'basement_walkout',
+        'fireplace',
+        'main_level_primary_bedroom',
+        'pool',
+        'fence',
+        'deck',
+        'water',
+        'sewer',
+        'reference_hvac_type_id',
+        'hoa',
         'listing_url',
         'analysis',
         'analyzed_at',
     ];
 
-    protected $casts = [
-        'latitude' => 'decimal:7',
-        'longitude' => 'decimal:7',
-        'price' => 'decimal:2',
-        'acreage' => 'decimal:2',
-        'bathrooms' => 'decimal:1',
-        'analysis' => 'array',
-        'analyzed_at' => 'datetime',
-    ];
+    protected function casts(): array
+    {
+        return [
+            'latitude' => 'decimal:7',
+            'longitude' => 'decimal:7',
+            'acreage' => 'decimal:2',
+            'bathrooms' => 'decimal:1',
+            'analysis' => 'array',
+            'analyzed_at' => 'datetime',
+            'basement_walkout' => 'boolean',
+            'fireplace' => 'boolean',
+            'main_level_primary_bedroom' => 'boolean',
+            'pool' => 'boolean',
+        ];
+    }
 
     public function user(): BelongsTo
     {
@@ -49,6 +67,11 @@ class Property extends Model
     public function neighborhood(): BelongsTo
     {
         return $this->belongsTo(Neighborhood::class);
+    }
+
+    public function hvacType(): BelongsTo
+    {
+        return $this->belongsTo(ReferenceHvacType::class, 'reference_hvac_type_id');
     }
 
     public function priceHistories(): HasMany

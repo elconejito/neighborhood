@@ -3,7 +3,6 @@
 namespace App\Http\Controllers\Api\V1;
 
 use App\Http\Controllers\Controller;
-use App\Models\Team;
 use App\Models\User;
 use App\Transformers\Api\V1\UserTransformer;
 use Illuminate\Http\JsonResponse;
@@ -31,15 +30,7 @@ class AuthController extends Controller
                 'password' => Hash::make($request->password),
             ]);
 
-            // Create initial "Private" team
-            $team = $user->teams()->create([
-                'user_id' => $user->id,
-                'name' => 'Private',
-                'personal_team' => true,
-            ]);
-
-            // Set as active team
-            $user->update(['team_id' => $team->id]);
+            $user->createPersonalTeam();
 
             return $user;
         });

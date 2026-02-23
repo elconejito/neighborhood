@@ -32,14 +32,14 @@ class PropertyController extends Controller
             $search = $request->input('search');
             $query->where(function ($q) use ($search) {
                 $q->where('address', 'like', "%{$search}%")
-                  ->orWhere('city', 'like', "%{$search}%")
-                  ->orWhere('zip_code', 'like', "%{$search}%");
+                    ->orWhere('city', 'like', "%{$search}%")
+                    ->orWhere('zip_code', 'like', "%{$search}%");
             });
         }
 
         $properties = $query->orderByDesc('created_at')->paginate(15);
 
-        return fractal($properties, new PropertyTransformer())
+        return fractal($properties, new PropertyTransformer)
             ->parseIncludes(['neighborhood', 'price_histories'])
             ->respond();
     }
@@ -59,23 +59,14 @@ class PropertyController extends Controller
             ]);
         }
 
-        // Create initial price history if price provided
-        if ($validated['price'] ?? null) {
-            $property->priceHistories()->create([
-                'price' => $validated['price'],
-                'price_date' => now(),
-                'type' => 'listing',
-            ]);
-        }
-
-        return fractal($property, new PropertyTransformer())
+        return fractal($property, new PropertyTransformer)
             ->parseIncludes(['price_histories'])
             ->respond(201);
     }
 
     public function show(ShowPropertyRequest $request, Property $property): JsonResponse
     {
-        return fractal($property, new PropertyTransformer())
+        return fractal($property, new PropertyTransformer)
             ->parseIncludes(['price_histories', 'neighborhood', 'notes'])
             ->respond();
     }
@@ -86,18 +77,6 @@ class PropertyController extends Controller
         $notesContent = $validated['notes'] ?? null;
         unset($validated['notes']);
 
-        // Track price changes
-        if (isset($validated['price']) && $validated['price'] != $property->price) {
-            $type = $property->price === null ? 'listing'
-                : ($validated['price'] > $property->price ? 'increase' : 'reduction');
-
-            $property->priceHistories()->create([
-                'price' => $validated['price'],
-                'price_date' => now(),
-                'type' => $type,
-            ]);
-        }
-
         if ($notesContent) {
             $property->notes()->create([
                 'user_id' => $request->user()->id,
@@ -107,7 +86,7 @@ class PropertyController extends Controller
 
         $property->update($validated);
 
-        return fractal($property, new PropertyTransformer())
+        return fractal($property, new PropertyTransformer)
             ->parseIncludes(['price_histories', 'neighborhood', 'notes'])
             ->respond();
     }
@@ -117,13 +96,13 @@ class PropertyController extends Controller
         $property->delete();
 
         return response()->json([
-            'data' => ['message' => 'Property deleted successfully']
+            'data' => ['message' => 'Property deleted successfully'],
         ]);
     }
 
     public function analyze(AnalyzePropertyRequest $request, Property $property): JsonResponse
     {
-        if (!$property->latitude || !$property->longitude) {
+        if (! $property->latitude || ! $property->longitude) {
             // Try to geocode the address
             $coordinates = $this->analysisService->geocodeAddress($property->full_address);
 
@@ -146,7 +125,7 @@ class PropertyController extends Controller
             'analyzed_at' => now(),
         ]);
 
-        return fractal($property->fresh(), new PropertyTransformer())
+        return fractal($property->fresh(), new PropertyTransformer)
             ->respond();
     }
 }
