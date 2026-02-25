@@ -24,31 +24,73 @@ class PropertyAnalysisService
         ];
     }
 
-    public function geocodeAddress(string $address): ?array
+    public function geocodeAddress(string|array $address): ?array
     {
-        try {
-            $response = Http::withHeaders([
-                'User-Agent' => $this->userAgent,
-            ])->get('https://nominatim.openstreetmap.org/search', [
-                'q' => $address,
-                'format' => 'json',
-                'limit' => 1,
-            ]);
-            Log::debug(__CLASS__.':'.__LINE__, ['response' => $response]);
+        $attempts = $this->prepareGeocodeAttempts($address);
 
-            if ($response->successful() && count($response->json()) > 0) {
-                $result = $response->json()[0];
+        foreach ($attempts as $params) {
+            try {
+                $response = Http::withHeaders([
+                    'User-Agent' => $this->userAgent,
+                ])->get('https://nominatim.openstreetmap.org/search', $params);
 
-                return [
-                    'lat' => (float) $result['lat'],
-                    'lng' => (float) $result['lon'],
-                ];
+                Log::debug(__CLASS__.':'.__LINE__, [
+                    'params' => $params,
+                    'json' => $response->json(),
+                    'status_code' => $response->getStatusCode(),
+                ]);
+
+                if ($response->successful() && count($response->json()) > 0) {
+                    $result = $response->json()[0];
+
+                    return [
+                        'lat' => (float) $result['lat'],
+                        'lng' => (float) $result['lon'],
+                    ];
+                }
+            } catch (\Exception $e) {
+                Log::error('Geocoding attempt failed: '.$e->getMessage());
             }
-        } catch (\Exception $e) {
-            Log::error('Geocoding failed: '.$e->getMessage());
         }
 
         return null;
+    }
+
+    protected function prepareGeocodeAttempts(string|array $address): array
+    {
+        $baseParams = [
+            'format' => 'json',
+            'limit' => 1,
+        ];
+
+        if (is_string($address)) {
+            return [array_merge($baseParams, ['q' => $address])];
+        }
+
+        $attempts = [];
+
+        // Attempt 1: Full structured search (most precise)
+        $attempts[] = array_merge($baseParams, $address);
+
+        // Attempt 2: Full unstructured search string (sometimes handles city mismatches better)
+        $fullAddress = implode(', ', array_filter([
+            $address['street'] ?? null,
+            $address['city'] ?? null,
+            $address['state'] ?? null,
+            $address['postalcode'] ?? null,
+        ]));
+        if ($fullAddress) {
+            $attempts[] = array_merge($baseParams, ['q' => $fullAddress]);
+        }
+
+        // Attempt 3: Structured search without city (if ZIP/street are provided)
+        if (isset($address['street'], $address['postalcode'])) {
+            $noCity = $address;
+            unset($noCity['city']);
+            $attempts[] = array_merge($baseParams, $noCity);
+        }
+
+        return $attempts;
     }
 
     protected function analyzeNeighborDistance(float $lat, float $lng): array
@@ -66,7 +108,7 @@ out center;
 QUERY;
 
         try {
-            $response = Http::withHeaders([
+            $response = Http::asForm()->withHeaders([
                 'User-Agent' => $this->userAgent,
             ])->timeout(30)->post($this->overpassUrl, [
                 'data' => $query,
@@ -123,60 +165,104 @@ QUERY;
             'post_office' => '["amenity"="post_office"]',
         ];
 
-        $results = [];
-
+        $queryParts = [];
         foreach ($poiTypes as $type => $osmTag) {
-            $query = <<<QUERY
-[out:json][timeout:25];
-(
-  node{$osmTag}(around:{$radiusMeters},{$lat},{$lng});
-  way{$osmTag}(around:{$radiusMeters},{$lat},{$lng});
-);
-out center;
-QUERY;
+            $queryParts[] = "node{$osmTag}(around:{$radiusMeters},{$lat},{$lng});";
+            $queryParts[] = "way{$osmTag}(around:{$radiusMeters},{$lat},{$lng});";
+        }
 
-            try {
-                $response = Http::withHeaders([
-                    'User-Agent' => $this->userAgent,
-                ])->timeout(30)->post($this->overpassUrl, [
-                    'data' => $query,
-                ]);
+        $query = "[out:json][timeout:30];\n(\n".implode("\n", $queryParts)."\n);\nout center;";
 
-                if ($response->successful()) {
-                    $data = $response->json();
-                    $pois = $data['elements'] ?? [];
+        try {
+            $response = Http::asForm()->withHeaders([
+                'User-Agent' => $this->userAgent,
+            ])->timeout(45)->post($this->overpassUrl, [
+                'data' => $query,
+            ]);
 
-                    $distances = [];
-                    foreach ($pois as $poi) {
-                        $poiLat = $poi['lat'] ?? ($poi['center']['lat'] ?? null);
-                        $poiLng = $poi['lon'] ?? ($poi['center']['lon'] ?? null);
+            if ($response->successful()) {
+                $data = $response->json();
+                $elements = $data['elements'] ?? [];
 
-                        if ($poiLat && $poiLng) {
-                            $distances[] = [
-                                'name' => $poi['tags']['name'] ?? 'Unknown',
-                                'distance_meters' => $this->haversineDistance($lat, $lng, $poiLat, $poiLng),
-                            ];
-                        }
+                $results = [];
+                foreach ($poiTypes as $type => $osmTag) {
+                    $results[$type] = [
+                        'count' => 0,
+                        'nearest' => null,
+                        'top_3' => [],
+                    ];
+                }
+
+                $categorizedDistances = [];
+                foreach ($elements as $element) {
+                    $poiLat = $element['lat'] ?? ($element['center']['lat'] ?? null);
+                    $poiLng = $element['lon'] ?? ($element['center']['lon'] ?? null);
+
+                    if (! $poiLat || ! $poiLng) {
+                        continue;
                     }
 
+                    $distance = $this->haversineDistance($lat, $lng, $poiLat, $poiLng);
+                    $poiData = [
+                        'name' => $element['tags']['name'] ?? 'Unknown',
+                        'distance_meters' => $distance,
+                    ];
+
+                    // Determine which type this element belongs to
+                    foreach ($poiTypes as $type => $osmTag) {
+                        if ($this->elementMatchesTag($element, $osmTag)) {
+                            $categorizedDistances[$type][] = $poiData;
+                        }
+                    }
+                }
+
+                foreach ($poiTypes as $type => $osmTag) {
+                    $distances = $categorizedDistances[$type] ?? [];
                     usort($distances, fn ($a, $b) => $a['distance_meters'] <=> $b['distance_meters']);
 
                     $results[$type] = [
-                        'count' => count($pois),
+                        'count' => count($distances),
                         'nearest' => $distances[0] ?? null,
                         'top_3' => array_slice($distances, 0, 3),
                     ];
                 }
-            } catch (\Exception $e) {
-                Log::error("POI analysis failed for {$type}: ".$e->getMessage());
-                $results[$type] = ['error' => 'Analysis failed'];
-            }
 
-            // Rate limiting - be nice to Overpass API
-            usleep(500000); // 0.5 second delay
+                return $results;
+            }
+        } catch (\Exception $e) {
+            Log::error('POI analysis failed: '.$e->getMessage());
         }
 
-        return $results;
+        return ['error' => 'Analysis failed'];
+    }
+
+    protected function elementMatchesTag(array $element, string $osmTag): bool
+    {
+        // Simple parser for osmTag like '["amenity"="hospital"]' or '["shop"~"supermarket|grocery|convenience"]'
+        if (preg_match('/\["([^"]+)"="([^"]+)"\]/', $osmTag, $matches)) {
+            $key = $matches[1];
+            $value = $matches[2];
+
+            return isset($element['tags'][$key]) && $element['tags'][$key] === $value;
+        }
+
+        if (preg_match('/\["([^"]+)"~"([^"]+)"\]/', $osmTag, $matches)) {
+            $key = $matches[1];
+            $regex = $matches[2];
+
+            if (! isset($element['tags'][$key])) {
+                return false;
+            }
+
+            $values = explode('|', $regex);
+            foreach ($values as $value) {
+                if ($element['tags'][$key] === $value) {
+                    return true;
+                }
+            }
+        }
+
+        return false;
     }
 
     protected function analyzeRoadAccessibility(float $lat, float $lng): array
@@ -202,7 +288,7 @@ out geom;
 QUERY;
 
             try {
-                $response = Http::withHeaders([
+                $response = Http::asForm()->withHeaders([
                     'User-Agent' => $this->userAgent,
                 ])->timeout(30)->post($this->overpassUrl, [
                     'data' => $query,

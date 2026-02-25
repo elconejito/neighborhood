@@ -104,7 +104,12 @@ class PropertyController extends Controller
     {
         if (! $property->latitude || ! $property->longitude) {
             // Try to geocode the address
-            $coordinates = $this->analysisService->geocodeAddress($property->full_address);
+            $coordinates = $this->analysisService->geocodeAddress([
+                'street' => $property->address,
+                'city' => $property->city,
+                'state' => $property->state,
+                'postalcode' => $property->zip_code,
+            ]);
 
             if ($coordinates) {
                 $property->update([
