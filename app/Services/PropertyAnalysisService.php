@@ -203,8 +203,15 @@ QUERY;
                     }
 
                     $distance = $this->haversineDistance($lat, $lng, $poiLat, $poiLng);
+                    $name = $element['tags']['name']
+                        ?? $element['tags']['brand']
+                        ?? $element['tags']['operator']
+                        ?? $element['tags']['amenity']
+                        ?? $element['tags']['shop']
+                        ?? 'Unknown';
+
                     $poiData = [
-                        'name' => $element['tags']['name'] ?? 'Unknown',
+                        'name' => $name,
                         'distance_meters' => $distance,
                     ];
 
@@ -311,8 +318,12 @@ QUERY;
                                 );
                                 if ($distance < $minDistance) {
                                     $minDistance = $distance;
+                                    $name = $road['tags']['name']
+                                        ?? $road['tags']['ref']
+                                        ?? 'Unnamed Road';
+
                                     $nearestRoad = [
-                                        'name' => $road['tags']['name'] ?? 'Unnamed',
+                                        'name' => $name,
                                         'ref' => $road['tags']['ref'] ?? null,
                                         'surface' => $road['tags']['surface'] ?? 'unknown',
                                     ];

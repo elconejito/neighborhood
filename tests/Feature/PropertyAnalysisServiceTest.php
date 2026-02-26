@@ -179,4 +179,53 @@ class PropertyAnalysisServiceTest extends TestCase
                    str_contains($request['data'], '[out:json]');
         });
     }
+
+    public function test_analyze_property_handles_missing_names_with_fallbacks(): void
+    {
+        Http::fake([
+            'https://overpass-api.de/api/interpreter' => Http::response([
+                'elements' => [
+                    [
+                        'type' => 'node',
+                        'id' => 1,
+                        'lat' => 40.7129,
+                        'lon' => -74.0062,
+                        'tags' => ['amenity' => 'hospital', 'brand' => 'HealthCare Plus'],
+                    ],
+                    [
+                        'type' => 'node',
+                        'id' => 2,
+                        'lat' => 40.7130,
+                        'lon' => -74.0063,
+                        'tags' => ['shop' => 'supermarket', 'operator' => 'FoodCorp'],
+                    ],
+                    [
+                        'type' => 'way',
+                        'id' => 3,
+                        'geometry' => [
+                            ['lat' => 40.7127, 'lon' => -74.0059],
+                        ],
+                        'tags' => ['highway' => 'primary', 'ref' => 'US-1'],
+                    ],
+                ],
+            ], 200),
+        ]);
+
+        $property = new \App\Models\Property([
+            'latitude' => 40.7128,
+            'longitude' => -74.0060,
+        ]);
+
+        $service = new PropertyAnalysisService;
+        $result = $service->analyzeProperty($property);
+
+        // Hospital should fallback to brand
+        $this->assertEquals('HealthCare Plus', $result['points_of_interest']['hospital']['nearest']['name']);
+
+        // Grocery should fallback to operator
+        $this->assertEquals('FoodCorp', $result['points_of_interest']['grocery']['nearest']['name']);
+
+        // Road should fallback to ref
+        $this->assertEquals('US-1', $result['road_accessibility']['highway']['nearest_road']['name']);
+    }
 }

@@ -134,20 +134,23 @@
                             <h3 class="text-lg leading-6 font-medium text-gray-900">Neighbor Distance</h3>
                         </div>
                         <div class="border-t border-gray-200 px-4 py-5 sm:px-6">
-                            <div v-if="property.analysis?.neighbor_distance" class="grid grid-cols-2 gap-4">
+                            <div v-if="property.analysis?.neighbor_distance" class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                                 <div>
                                     <p class="text-2xl font-bold text-gray-900">
-                                        {{ property.analysis.neighbor_distance.nearest_distance_ft ?? 'N/A' }}
+                                        {{ property.analysis.neighbor_distance.nearest_neighbor_meters ? Math.round(property.analysis.neighbor_distance.nearest_neighbor_meters * 3.28084) : 'N/A' }}
                                         <span class="text-sm font-normal text-gray-500">ft</span>
                                     </p>
                                     <p class="text-sm text-gray-500">to nearest neighbor</p>
                                 </div>
-                                <div>
+                                <div class="space-y-1">
                                     <p class="text-sm text-gray-600">
-                                        Structures within 300ft: {{ property.analysis.neighbor_distance.structures_within_300ft ?? 0 }}
+                                        Nearby structures (2km): {{ property.analysis.neighbor_distance.total_buildings_nearby ?? 0 }}
+                                    </p>
+                                    <p class="text-sm text-gray-600 capitalize">
+                                        Isolation: {{ formatCategory(property.analysis.neighbor_distance.isolation_score) }}
                                     </p>
                                     <p class="text-sm text-gray-600">
-                                        Structures within 500ft: {{ property.analysis.neighbor_distance.structures_within_500ft ?? 0 }}
+                                        Avg. distance (top 10): {{ property.analysis.neighbor_distance.average_distance_meters ? Math.round(property.analysis.neighbor_distance.average_distance_meters * 3.28084) : 'N/A' }} ft
                                     </p>
                                 </div>
                             </div>
@@ -165,16 +168,17 @@
                             <h3 class="text-lg leading-6 font-medium text-gray-900">Nearby Amenities</h3>
                         </div>
                         <div class="border-t border-gray-200">
-                            <div v-if="property.analysis?.pois" class="divide-y divide-gray-200">
-                                <div v-for="(pois, category) in property.analysis.pois" :key="category" class="px-4 py-4 sm:px-6">
-                                    <h4 class="text-sm font-medium text-gray-700 capitalize mb-2">{{ formatCategory(category) }}</h4>
-                                    <ul class="space-y-2">
-                                        <li v-for="poi in pois" :key="poi.name" class="flex justify-between text-sm">
-                                            <span class="text-gray-900">{{ poi.name }}</span>
-                                            <span class="text-gray-500">{{ poi.distance_miles }} mi · {{ poi.drive_time_minutes }} min</span>
-                                        </li>
-                                    </ul>
-                                </div>
+                            <div v-if="property.analysis?.points_of_interest" class="divide-y divide-gray-200">
+                                <template v-for="(poiData, category) in property.analysis.points_of_interest" :key="category">
+                                    <div v-if="poiData.nearest" class="px-4 py-4 sm:px-6">
+                                        <h4 class="text-sm font-medium text-gray-700 capitalize mb-2">{{ formatCategory(category) }}</h4>
+                                        <div class="flex justify-between text-sm">
+                                            <span class="text-gray-900">{{ poiData.nearest.name }}</span>
+                                            <span class="text-gray-500">{{ (poiData.nearest.distance_meters / 1609.34).toFixed(2) }} mi</span>
+                                        </div>
+                                        <p v-if="poiData.count > 1" class="mt-1 text-xs text-gray-400">+ {{ poiData.count - 1 }} more in area</p>
+                                    </div>
+                                </template>
                             </div>
                             <p v-else class="px-4 py-5 sm:px-6 text-sm text-gray-500">No POI data available.</p>
                         </div>
@@ -193,24 +197,27 @@
                                 <div class="flex items-center mb-4">
                                     <span
                                         :class="[
-                                            'inline-flex items-center px-3 py-1 rounded-full text-sm font-medium',
-                                            property.analysis.road_accessibility.accessibility_score === 'good' ? 'bg-green-100 text-green-800' :
-                                            property.analysis.road_accessibility.accessibility_score === 'moderate' ? 'bg-yellow-100 text-yellow-800' :
+                                            'inline-flex items-center px-3 py-1 rounded-full text-sm font-medium capitalize',
+                                            ['excellent', 'good'].includes(property.analysis.road_accessibility.accessibility_score) ? 'bg-green-100 text-green-800' :
+                                            ['moderate', 'limited'].includes(property.analysis.road_accessibility.accessibility_score) ? 'bg-yellow-100 text-yellow-800' :
                                             'bg-red-100 text-red-800'
                                         ]"
                                     >
                                         {{ property.analysis.road_accessibility.accessibility_score }}
                                     </span>
                                 </div>
-                                <p class="text-sm text-gray-600 mb-2">{{ property.analysis.road_accessibility.accessibility_note }}</p>
-                                <div class="grid grid-cols-2 gap-4 text-sm">
-                                    <div>
-                                        <span class="text-gray-500">Distance from major road:</span>
-                                        <span class="ml-2 text-gray-900">{{ property.analysis.road_accessibility.total_distance_miles }} mi</span>
+                                <div class="grid grid-cols-1 sm:grid-cols-2 gap-y-4 gap-x-8 text-sm">
+                                    <div v-if="property.analysis.road_accessibility.highway?.nearest_road">
+                                        <p class="text-gray-500 font-medium">Nearest Major Highway</p>
+                                        <p class="text-gray-900">{{ property.analysis.road_accessibility.highway.nearest_road.name }} ({{ (property.analysis.road_accessibility.highway.nearest_distance_meters / 1609.34).toFixed(2) }} mi)</p>
                                     </div>
-                                    <div>
-                                        <span class="text-gray-500">Turns per mile:</span>
-                                        <span class="ml-2 text-gray-900">{{ property.analysis.road_accessibility.turns_per_mile }}</span>
+                                    <div v-if="property.analysis.road_accessibility.main_road?.nearest_road">
+                                        <p class="text-gray-500 font-medium">Nearest Main Road</p>
+                                        <p class="text-gray-900">{{ property.analysis.road_accessibility.main_road.nearest_road.name }} ({{ (property.analysis.road_accessibility.main_road.nearest_distance_meters / 1609.34).toFixed(2) }} mi)</p>
+                                    </div>
+                                    <div v-if="property.analysis.road_accessibility.local_road?.nearest_road">
+                                        <p class="text-gray-500 font-medium">Nearest Local Road</p>
+                                        <p class="text-gray-900">{{ property.analysis.road_accessibility.local_road.nearest_road.name }} ({{ (property.analysis.road_accessibility.local_road.nearest_distance_meters / 1609.34).toFixed(2) }} mi)</p>
                                     </div>
                                 </div>
                             </div>
@@ -261,7 +268,7 @@ const runAnalysis = async () => {
     analyzing.value = true;
     try {
         const response = await api.post(`/properties/${route.params.id}/analyze`);
-        property.value = response.data.data;
+        alert(response.data.data.message || 'Analysis has been queued.');
     } catch (error) {
         console.error('Analysis failed', error);
         alert('Analysis failed. Please try again.');
