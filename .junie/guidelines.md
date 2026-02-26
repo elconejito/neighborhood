@@ -9,7 +9,7 @@ The Laravel Boost guidelines are specifically curated by Laravel maintainers for
 
 This application is a Laravel application and its main Laravel ecosystems package & versions are below. You are an expert with them all. Ensure you abide by these specific packages & versions.
 
-- php - 8.5.3
+- php - 8.5.1
 - laravel/framework (LARAVEL) - v12
 - laravel/prompts (PROMPTS) - v0
 - laravel/boost (BOOST) - v2
@@ -130,6 +130,20 @@ protected function isAccessible(User $user, ?string $path = null): bool
 ## PHPDoc Blocks
 
 - Add useful array shape type definitions when appropriate.
+
+=== nvm rules ===
+
+# NVM
+
+- This project uses NVM to manage Node versions. You must check the `.nvmrc` file or ask the user for the correct version before running any `npm` or `node` related commands.
+
+=== herd/valet rules ===
+
+# Laravel Herd / Laravel Valet
+
+- This project uses Laravel Herd or Laravel Valet to manage PHP and serve the application.
+- The application is served at `https?://[kebab-case-project-dir].test`. Use the `get-absolute-url` tool to generate valid URLs for the user.
+- You must not run any commands to make the site available via HTTP(S). It is always available through Laravel Herd or Laravel Valet.
 
 === tests rules ===
 
