@@ -23,6 +23,7 @@ class PropertyController extends Controller
     {
         $user = $request->user();
 
+        // #TODO better filtering here for team > neighborhood
         if ($user->team_id) {
             $query = Property::whereIn('neighborhood_id', $user->team->neighborhoods()->pluck('id'));
         } else {
@@ -40,7 +41,7 @@ class PropertyController extends Controller
 
         $properties = $query->orderByDesc('created_at')->paginate(15);
 
-        return fractal($properties, new PropertyTransformer)
+        return fractal($properties, PropertyTransformer::class)
             ->parseIncludes(['neighborhood', 'price_histories'])
             ->respond();
     }
@@ -48,26 +49,19 @@ class PropertyController extends Controller
     public function store(StorePropertyRequest $request): JsonResponse
     {
         $validated = $request->validated();
-        $notesContent = $validated['notes'] ?? null;
-        unset($validated['notes']);
 
         $property = $request->user()->properties()->create($validated);
 
-        if ($notesContent) {
-            $property->notes()->create([
-                'user_id' => $request->user()->id,
-                'content' => $notesContent,
-            ]);
-        }
+        AnalyzePropertyJob::dispatch($property);
 
-        return fractal($property, new PropertyTransformer)
+        return fractal()->item($property, PropertyTransformer::class)
             ->parseIncludes(['price_histories'])
             ->respond(201);
     }
 
     public function show(ShowPropertyRequest $request, Property $property): JsonResponse
     {
-        return fractal($property, new PropertyTransformer)
+        return fractal()->item($property, PropertyTransformer::class)
             ->parseIncludes(['price_histories', 'neighborhood', 'notes'])
             ->respond();
     }
@@ -75,19 +69,13 @@ class PropertyController extends Controller
     public function update(UpdatePropertyRequest $request, Property $property): JsonResponse
     {
         $validated = $request->validated();
-        $notesContent = $validated['notes'] ?? null;
-        unset($validated['notes']);
-
-        if ($notesContent) {
-            $property->notes()->create([
-                'user_id' => $request->user()->id,
-                'content' => $notesContent,
-            ]);
-        }
 
         $property->update($validated);
+        $property->refresh();
 
-        return fractal($property, new PropertyTransformer)
+        AnalyzePropertyJob::dispatch($property);
+
+        return fractal()->item($property, PropertyTransformer::class)
             ->parseIncludes(['price_histories', 'neighborhood', 'notes'])
             ->respond();
     }
