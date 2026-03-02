@@ -22,3 +22,18 @@
 Homestead.json
 Homestead.yaml
 Thumbs.db
+
+# AI Agents & MCP Configs
+.agents/
+.ai/
+.claude/
+.cursor/
+!.cursor/mcp.json
+.gemini/
+.junie/
+!.junie/mcp/mcp.json
+.codex/
+.mcp.json
+CLAUDE.md
+GEMINI.md
+mcp.json
