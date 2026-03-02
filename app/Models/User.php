@@ -64,7 +64,7 @@ class User extends Authenticatable implements JWTSubject
         return DB::transaction(function () {
             $team = $this->teams()->create([
                 'user_id' => $this->id,
-                'name' => 'Private',
+                'name' => 'My Team',
                 'personal_team' => true,
             ]);
 
