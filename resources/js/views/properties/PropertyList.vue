@@ -37,52 +37,17 @@
             </EmptyState>
 
             <div v-else class="bg-white shadow overflow-hidden sm:rounded-md">
-                <ul class="divide-y divide-gray-200">
-                    <li v-for="property in properties" :key="property.id">
-                        <router-link :to="`/properties/${property.id}`" class="block hover:bg-gray-50">
-                            <div class="px-4 py-4 sm:px-6">
-                                <div class="flex items-center justify-between">
-                                    <div class="flex-1 min-w-0">
-                                        <p class="text-sm font-medium text-emerald-600 truncate">
-                                            {{ property.address }}
-                                        </p>
-                                        <p class="mt-1 text-sm text-gray-500">
-                                            {{ property.city }}, {{ property.state }} {{ property.zip_code }}
-                                            <span v-if="property.neighborhood" class="ml-2 px-2 py-0.5 bg-gray-100 rounded text-gray-600">
-                                                {{ property.neighborhood.name }}
-                                            </span>
-                                        </p>
-                                    </div>
-                                    <div class="ml-4 flex-shrink-0 flex items-center space-x-4">
-                                        <span v-if="property.analyzed_at" class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
-                                            Analyzed
-                                        </span>
-                                        <span v-else class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800">
-                                            Pending
-                                        </span>
-                                        <svg class="h-5 w-5 text-gray-400" fill="currentColor" viewBox="0 0 20 20">
-                                            <path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd" />
-                                        </svg>
-                                    </div>
-                                </div>
-                                <div class="mt-2 flex items-center text-sm text-gray-500 space-x-4">
-                                    <span v-if="property.acreage">{{ property.acreage }} acres</span>
-                                    <span v-if="property.bedrooms">{{ property.bedrooms }} bed</span>
-                                    <span v-if="property.bathrooms">{{ property.bathrooms }} bath</span>
-                                </div>
-                            </div>
-                        </router-link>
-                    </li>
-                </ul>
+              <PropertyListItem v-for="property in properties" :key="property.id" :property="property"/>
             </div>
         </div>
     </div>
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue';
+import { onMounted, ref } from 'vue';
 import api from '@/api';
 import EmptyState from '@/components/EmptyState.vue';
+import PropertyListItem from '@/components/properties/PropertyListItem.vue';
 
 const properties = ref([]);
 const loading = ref(true);

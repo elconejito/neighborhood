@@ -195,6 +195,7 @@ QUERY;
 
                 $categorizedDistances = [];
                 foreach ($elements as $element) {
+                    Log::debug(__METHOD__.':'.__LINE__, [$element]);
                     $poiLat = $element['lat'] ?? ($element['center']['lat'] ?? null);
                     $poiLng = $element['lon'] ?? ($element['center']['lon'] ?? null);
 
