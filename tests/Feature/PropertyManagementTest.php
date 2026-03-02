@@ -5,7 +5,9 @@ namespace Tests\Feature;
 use App\Models\Property;
 use App\Models\ReferenceHvacType;
 use App\Models\User;
+use App\Serializers\IncludeUnwrappedDataArraySerializer;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\Config;
 use Tests\TestCase;
 
 class PropertyManagementTest extends TestCase
@@ -79,5 +81,19 @@ class PropertyManagementTest extends TestCase
             'pool' => true,
             'hoa' => 'Condo',
         ]);
+    }
+
+    public function test_included_neighborhood_is_not_wrapped_in_data(): void
+    {
+        Config::set('fractal.default_serializer', IncludeUnwrappedDataArraySerializer::class);
+
+        $user = User::factory()->create();
+        $property = Property::factory()->create(['user_id' => $user->id]);
+
+        $response = $this->actingAs($user, 'api')->getJson('/api/v1/properties');
+
+        $response->assertStatus(200)
+            ->assertJsonPath('data.0.neighborhood.id', $property->neighborhood->id)
+            ->assertJsonMissingPath('data.0.neighborhood.data');
     }
 }
