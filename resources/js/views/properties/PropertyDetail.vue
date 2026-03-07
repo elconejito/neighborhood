@@ -126,37 +126,7 @@
                     </p>
 
                     <!-- Neighbor Distance Analysis -->
-                    <div class="bg-white shadow overflow-hidden sm:rounded-lg">
-                        <div class="px-4 py-5 sm:px-6 flex items-center">
-                            <svg class="h-5 w-5 text-emerald-500 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
-                            </svg>
-                            <h3 class="text-lg leading-6 font-medium text-gray-900">Neighbor Distance</h3>
-                        </div>
-                        <div class="border-t border-gray-200 px-4 py-5 sm:px-6">
-                            <div v-if="property.analysis?.neighbor_distance" class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                                <div>
-                                    <p class="text-2xl font-bold text-gray-900">
-                                        {{ property.analysis.neighbor_distance.nearest_neighbor_meters ? Math.round(property.analysis.neighbor_distance.nearest_neighbor_meters * 3.28084) : 'N/A' }}
-                                        <span class="text-sm font-normal text-gray-500">ft</span>
-                                    </p>
-                                    <p class="text-sm text-gray-500">to nearest neighbor</p>
-                                </div>
-                                <div class="space-y-1">
-                                    <p class="text-sm text-gray-600">
-                                        Nearby structures (2km): {{ property.analysis.neighbor_distance.total_buildings_nearby ?? 0 }}
-                                    </p>
-                                    <p class="text-sm text-gray-600 capitalize">
-                                        Isolation: {{ formatCategory(property.analysis.neighbor_distance.isolation_score) }}
-                                    </p>
-                                    <p class="text-sm text-gray-600">
-                                        Avg. distance (top 10): {{ property.analysis.neighbor_distance.average_distance_meters ? Math.round(property.analysis.neighbor_distance.average_distance_meters * 3.28084) : 'N/A' }} ft
-                                    </p>
-                                </div>
-                            </div>
-                            <p v-else class="text-sm text-gray-500">No neighbor distance data available.</p>
-                        </div>
-                    </div>
+                    <Neighborhood :analysis="property.analysis" />
 
                     <!-- POI Analysis -->
                     <div class="bg-white shadow overflow-hidden sm:rounded-lg">
@@ -240,6 +210,7 @@
 import { ref, onMounted } from 'vue';
 import { useRouter, useRoute } from 'vue-router';
 import api from '@/api';
+import Neighborhood from "@/components/properties/analyses/Neighborhood.vue";
 
 const router = useRouter();
 const route = useRoute();
@@ -256,9 +227,10 @@ const loadProperty = async () => {
     try {
         const response = await api.get(`/properties/${route.params.id}`);
         property.value = response.data.data;
+        console.log('property response', property.value);
     } catch (error) {
         console.error('Failed to load property', error);
-        router.push('/properties');
+        await router.push('/properties');
     } finally {
         loading.value = false;
     }

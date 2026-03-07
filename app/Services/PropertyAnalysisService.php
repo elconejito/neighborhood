@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use App\Models\Property;
+use Exception;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 
@@ -48,7 +49,7 @@ class PropertyAnalysisService
                         'lng' => (float) $result['lon'],
                     ];
                 }
-            } catch (\Exception $e) {
+            } catch (Exception $e) {
                 Log::error('Geocoding attempt failed: '.$e->getMessage());
             }
         }
@@ -93,9 +94,9 @@ class PropertyAnalysisService
         return $attempts;
     }
 
-    protected function analyzeNeighborDistance(float $lat, float $lng): array
+    public function analyzeNeighborDistance(float $lat, float $lng): array
     {
-        $radiusMeters = 2000; // 2km search radius
+        $radiusMeters = 1609; // 1m search radius
 
         $query = <<<QUERY
 [out:json][timeout:25];
@@ -133,6 +134,30 @@ QUERY;
                 sort($distances);
                 $nearestDistances = array_slice($distances, 0, 10);
 
+                $nearestHouses = [];
+                $houseCount = 0;
+                foreach ($buildings as $building) {
+                    if (isset($building['center'])) {
+                        $dist = $this->haversineDistance(
+                            $lat, $lng,
+                            $building['center']['lat'],
+                            $building['center']['lon']
+                        );
+                        $direction = $this->calculateDirection(
+                            $lat, $lng,
+                            $building['center']['lat'],
+                            $building['center']['lon']
+                        );
+                        $nearestHouses[] = [
+                            'distance_meters' => $dist,
+                            'direction' => $direction,
+                        ];
+                    }
+                }
+
+                usort($nearestHouses, fn ($a, $b) => $a['distance_meters'] <=> $b['distance_meters']);
+                $nearestHouses = array_slice($nearestHouses, 0, 10);
+
                 return [
                     'total_buildings_nearby' => count($buildings),
                     'nearest_neighbor_meters' => $nearestDistances[0] ?? null,
@@ -140,6 +165,7 @@ QUERY;
                         ? round(array_sum($nearestDistances) / count($nearestDistances), 1)
                         : null,
                     'nearest_10_distances' => $nearestDistances,
+                    'nearest_houses' => $nearestHouses,
                     'isolation_score' => $this->calculateIsolationScore($nearestDistances),
                 ];
             }
@@ -150,7 +176,7 @@ QUERY;
         return ['error' => 'Analysis failed'];
     }
 
-    protected function analyzePointsOfInterest(float $lat, float $lng): array
+    public function analyzePointsOfInterest(float $lat, float $lng): array
     {
         $radiusMeters = 8000; // 8km search radius
 
@@ -273,7 +299,7 @@ QUERY;
         return false;
     }
 
-    protected function analyzeRoadAccessibility(float $lat, float $lng): array
+    public function analyzeRoadAccessibility(float $lat, float $lng): array
     {
         $radiusMeters = 5000; // 5km search radius
 
@@ -351,6 +377,22 @@ QUERY;
         $results['accessibility_score'] = $this->calculateAccessibilityScore($results);
 
         return $results;
+    }
+
+    protected function calculateDirection(float $lat1, float $lon1, float $lat2, float $lon2): string
+    {
+        $dLon = deg2rad($lon2 - $lon1);
+        $y = sin($dLon) * cos(deg2rad($lat2));
+        $x = cos(deg2rad($lat1)) * sin(deg2rad($lat2)) -
+            sin(deg2rad($lat1)) * cos(deg2rad($lat2)) * cos($dLon);
+
+        $bearing = rad2deg(atan2($y, $x));
+        $bearing = ($bearing + 360) % 360;
+
+        $directions = ['N', 'NE', 'E', 'SE', 'S', 'SW', 'W', 'NW'];
+        $index = round($bearing / 45) % 8;
+
+        return $directions[$index];
     }
 
     protected function haversineDistance(float $lat1, float $lon1, float $lat2, float $lon2): float

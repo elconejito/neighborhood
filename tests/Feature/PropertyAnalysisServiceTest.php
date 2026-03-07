@@ -170,6 +170,10 @@ class PropertyAnalysisServiceTest extends TestCase
         $this->assertArrayHasKey('road_accessibility', $result);
 
         $this->assertEquals(3, $result['neighbor_distance']['total_buildings_nearby']);
+        $this->assertCount(1, $result['neighbor_distance']['nearest_houses']);
+        $this->assertEquals('W', $result['neighbor_distance']['nearest_houses'][0]['direction']);
+        $this->assertEquals(8.4, $result['neighbor_distance']['nearest_houses'][0]['distance_meters']);
+
         $this->assertEquals(1, $result['points_of_interest']['hospital']['count']);
         $this->assertEquals('General Hospital', $result['points_of_interest']['hospital']['nearest']['name']);
         $this->assertEquals('Main St', $result['road_accessibility']['highway']['nearest_road']['name']);
