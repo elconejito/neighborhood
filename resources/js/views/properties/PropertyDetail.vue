@@ -137,9 +137,11 @@
                             </svg>
                             <h3 class="text-lg leading-6 font-medium text-gray-900">Nearby Amenities</h3>
                         </div>
-                        <div class="border-t border-gray-200">
-                            <div v-if="property.analysis?.points_of_interest" class="divide-y divide-gray-200">
-                                <template v-for="(poiData, category) in property.analysis.points_of_interest" :key="category">
+                        <div class="border-t border-gray-200 divide-y divide-gray-200">
+                            <Medical :hospitals="pointsOfInterest.hospital" :pharmacies="pointsOfInterest.pharmacy" />
+
+                            <div class="grid grid-cols-1 lg:grid-cols-3 [&>*]:border-b [&>*]:border-gray-200 [&>*:last-child]:border-b-0 lg:[&>*:nth-last-child(-n+3)]:border-b-0 lg:[&>*:not(:nth-child(3n))]:border-r">
+                                <template v-for="(poiData, category) in otherAmenities" :key="category">
                                     <div v-if="poiData.nearest" class="px-4 py-4 sm:px-6">
                                         <h4 class="text-sm font-medium text-gray-700 capitalize mb-2">{{ formatCategory(category) }}</h4>
                                         <div class="flex justify-between text-sm">
@@ -150,7 +152,7 @@
                                     </div>
                                 </template>
                             </div>
-                            <p v-else class="px-4 py-5 sm:px-6 text-sm text-gray-500">No POI data available.</p>
+                            <p v-if="!Object.keys(otherAmenities).length" class="px-4 py-5 sm:px-6 text-sm text-gray-500">No other POI data available.</p>
                         </div>
                     </div>
 
@@ -207,10 +209,11 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue';
+import { ref, onMounted, computed } from 'vue';
 import { useRouter, useRoute } from 'vue-router';
 import api from '@/api';
 import Neighborhood from "@/components/properties/analyses/Neighborhood.vue";
+import Medical from '@/components/properties/analyses/Medical.vue';
 
 const router = useRouter();
 const route = useRoute();
@@ -218,6 +221,24 @@ const route = useRoute();
 const property = ref(null);
 const loading = ref(true);
 const analyzing = ref(false);
+
+const pointsOfInterest = computed(() => property.value?.analysis?.points_of_interest ?? {});
+const otherAmenities = computed(() => {
+    const excludedCategories = ['hospital', 'pharmacy'];
+    const pointsOfInterest = property.value?.analysis?.points_of_interest;
+
+    if (!pointsOfInterest || typeof pointsOfInterest !== 'object') {
+        return {};
+    }
+
+    if (Array.isArray(pointsOfInterest)) {
+        return pointsOfInterest.filter((poi) => !excludedCategories.includes(poi?.category));
+    }
+
+    return Object.fromEntries(
+        Object.entries(pointsOfInterest).filter(([category]) => !excludedCategories.includes(category)),
+    );
+});
 
 const formatPrice = (price) => new Intl.NumberFormat('en-US').format(price);
 const formatDate = (date) => new Date(date).toLocaleDateString('en-US', { dateStyle: 'medium' });
