@@ -7,7 +7,15 @@ const props = defineProps({
     type: Object,
     required: true,
   },
+  property: {
+    type: Object,
+    required: false,
+    default: () => ({}),
+  },
 });
+
+const centerLat = computed(() => props.property?.latitude);
+const centerLng = computed(() => props.property?.longitude);
 
 const neighborDistance = computed(() => {
     return props.analysis.neighbor_distance;
@@ -15,6 +23,37 @@ const neighborDistance = computed(() => {
 const nearestHouses = computed(() => {
   return props.analysis.neighbor_distance.nearest_houses ?? [];
 });
+
+const mapData = computed(() => {
+    if (!centerLat.value || !centerLng.value) return [];
+
+    // Simple Mercator-ish projection for small areas
+    const latScale = 111320; // meters per degree latitude
+    const lngScale = 40075000 * Math.cos(centerLat.value * Math.PI / 180) / 360; // meters per degree longitude
+
+    return nearestHouses.value.map(house => {
+        if (!house.lat || !house.lng) return null;
+
+        const dy = (house.lat - centerLat.value) * latScale;
+        const dx = (house.lng - centerLng.value) * lngScale;
+
+        return {
+            ...house,
+            x: dx,
+            y: -dy, // SVG y is down
+        };
+    }).filter(Boolean);
+});
+
+const viewBox = computed(() => {
+    if (!mapData.value.length) return "-100 -100 200 200";
+
+    const padding = 40;
+    const maxDist = Math.max(...mapData.value.map(h => Math.max(Math.abs(h.x), Math.abs(h.y)))) + padding;
+
+    return `${-maxDist} ${-maxDist} ${maxDist * 2} ${maxDist * 2}`;
+});
+
 const nearestHouse = computed(() => {
   return nearestHouses.value?.[0];
 });
@@ -85,33 +124,68 @@ const directionalNearest = computed(() => {
               </ul>
         </div>
           <div class="space-y-1">
-          <div class="grid grid-cols-3 border border-gray-200">
-            <template v-for="(row, rowIndex) in directionGrid" :key="rowIndex">
-              <template v-for="(direction, colIndex) in row" :key="`${rowIndex}-${colIndex}`">
-                <div
-                  class="min-h-20 border-gray-200 p-2"
-                  :class="[
-                    rowIndex < 2 ? 'border-b' : '',
-                    colIndex < 2 ? 'border-r' : '',
-                    direction ? '' : 'bg-gray-50'
-                  ]"
-                >
-                  <template v-if="direction">
-                    <p class="text-[11px] font-semibold text-gray-500">{{ direction }}</p>
-                    <p v-if="directionalNearest[direction].nearest !== null" class="text-sm font-medium text-gray-900">
-                      {{ formatRelativeDistance(directionalNearest[direction].nearest, 'ft') }}
-                    </p>
-                    <p v-else class="text-sm text-gray-400">N/A</p>
-                    <p v-if="directionalNearest[direction].count > 1" class="text-[11px] text-gray-400">
-                      + {{ directionalNearest[direction].count - 1 }} more
-                    </p>
-                  </template>
-                </div>
-              </template>
-            </template>
-          </div>
+              <div v-if="mapData.length" class="bg-gray-50 border border-gray-200 rounded-lg p-4 relative h-96 overflow-hidden">
+                  <svg :viewBox="viewBox" class="w-full h-full drop-shadow-sm">
+                      <!-- Center Point (Home) -->
+                      <circle cx="0" cy="0" r="5" class="fill-emerald-500 stroke-white stroke-2" />
+                      <text x="0" y="-10" text-anchor="middle" class="text-[12px] font-bold fill-emerald-700">Home</text>
 
-        </div>
+                      <!-- Neighbor Connections -->
+                      <g v-for="(house, index) in mapData" :key="index">
+                          <!-- Connection Line -->
+                          <line
+                              x1="0" y1="0"
+                              :x2="house.x" :y2="house.y"
+                              class="stroke-gray-300 stroke-1"
+                              stroke-dasharray="4"
+                          />
+
+                          <!-- Neighbor Point -->
+                          <circle :cx="house.x" :cy="house.y" r="4" class="fill-blue-500 stroke-white stroke-1" />
+
+                          <!-- Distance Label -->
+                          <g :transform="`translate(${house.x / 2}, ${house.y / 2})`">
+                              <rect
+                                  :x="-25" :y="-10"
+                                  width="50" height="20"
+                                  rx="4"
+                                  class="fill-white/90 stroke-gray-200 stroke-1"
+                              />
+                              <text
+                                  y="4"
+                                  text-anchor="middle"
+                                  class="text-[9px] font-medium fill-gray-600"
+                              >
+                                  {{ formatRelativeDistance(house.distance_meters, 'ft') }}
+                              </text>
+                          </g>
+
+                          <!-- Direction Label at Point (Small) -->
+                          <text
+                              :x="house.x" :y="house.y + 12"
+                              text-anchor="middle"
+                              class="text-[8px] fill-gray-400 font-mono"
+                          >
+                              {{ house.direction }}
+                          </text>
+                      </g>
+                  </svg>
+                  <!-- Map Legend -->
+                  <div class="absolute bottom-2 left-2 flex flex-col space-y-1">
+                      <div class="flex items-center space-x-2">
+                          <span class="w-2 h-2 rounded-full bg-emerald-500"></span>
+                          <span class="text-[10px] text-gray-500 font-medium">Target Home</span>
+                      </div>
+                      <div class="flex items-center space-x-2">
+                          <span class="w-2 h-2 rounded-full bg-blue-500"></span>
+                          <span class="text-[10px] text-gray-500 font-medium">Nearest Neighbors</span>
+                      </div>
+                  </div>
+              </div>
+              <div v-else class="h-64 flex items-center justify-center bg-gray-50 border border-gray-200 rounded-lg">
+                  <p class="text-sm text-gray-400">Map data not available. Please re-run analysis.</p>
+              </div>
+          </div>
         <div class="space-y-1">
             <ul>
                 <li v-for="(house, index) in nearestHouses" :key="index" class="flex py-0.5 text-xs">

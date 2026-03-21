@@ -151,6 +151,8 @@ QUERY;
                         $nearestHouses[] = [
                             'distance_meters' => $dist,
                             'direction' => $direction,
+                            'lat' => $building['center']['lat'],
+                            'lng' => $building['center']['lon'],
                         ];
                     }
                 }
@@ -261,6 +263,8 @@ QUERY;
                 }
 
                 return $results;
+            } else {
+                Log::error('POI analysis failed: '.$response->json());
             }
         } catch (\Exception $e) {
             Log::error('POI analysis failed: '.$e->getMessage());

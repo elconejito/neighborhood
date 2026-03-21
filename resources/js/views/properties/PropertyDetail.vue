@@ -126,7 +126,7 @@
                     </p>
 
                     <!-- Neighbor Distance Analysis -->
-                    <Neighborhood :analysis="property.analysis" />
+                    <Neighborhood :analysis="property.analysis" :property="property" />
 
                     <!-- POI Analysis -->
                     <div class="bg-white shadow overflow-hidden sm:rounded-lg">
@@ -138,7 +138,7 @@
                             <h3 class="text-lg leading-6 font-medium text-gray-900">Nearby Amenities</h3>
                         </div>
                         <div class="border-t border-gray-200 divide-y divide-gray-200">
-                            <Medical :hospitals="pointsOfInterest.hospital" :pharmacies="pointsOfInterest.pharmacy" />
+                            <Medical :hospitals="pointsOfInterest.hospital ?? {}" :pharmacies="pointsOfInterest.pharmacy ?? {}" />
 
                             <div class="grid grid-cols-1 lg:grid-cols-3 [&>*]:border-b [&>*]:border-gray-200 [&>*:last-child]:border-b-0 lg:[&>*:nth-last-child(-n+3)]:border-b-0 lg:[&>*:not(:nth-child(3n))]:border-r">
                                 <template v-for="(poiData, category) in otherAmenities" :key="category">
