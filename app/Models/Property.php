@@ -15,6 +15,7 @@ class Property extends Model
     protected $fillable = [
         'user_id',
         'neighborhood_id',
+        'is_pinned',
         'address',
         'city',
         'state',
@@ -52,6 +53,7 @@ class Property extends Model
             'bathrooms' => 'decimal:1',
             'analysis' => 'array',
             'analyzed_at' => 'datetime',
+            'is_pinned' => 'boolean',
             'basement_walkout' => 'boolean',
             'fireplace' => 'boolean',
             'main_level_primary_bedroom' => 'boolean',

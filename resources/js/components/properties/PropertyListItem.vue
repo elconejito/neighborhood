@@ -1,55 +1,91 @@
 <script setup>
+import { computed } from 'vue';
+import { formatRelativeDistance } from '@/helpers';
+
 const props = defineProps({
-  property: {
-    type: Object,
-    required: true,
-  },
+    property: { type: Object, required: true },
+    isPinned: { type: Boolean, default: false },
+});
+
+const nearestNeighbor = computed(() => {
+    return props.property.analysis?.neighbor_distance?.nearest_houses?.[0];
+});
+
+const neighborLabel = computed(() => {
+    if (!nearestNeighbor.value) return '—';
+    return formatRelativeDistance(nearestNeighbor.value.distance_meters);
 });
 </script>
 
 <template>
-  <div class="flex p-4">
-    <!-- Property Address -->
-    <div class="basis-1/4">
-      <router-link :to="`/properties/${property.id}`" class="block hover:bg-gray-50">
-        <p class="font-medium text-emerald-600 truncate">
-          {{ property.address }}
-        </p>
-        <p class="mt-1 text-sm text-gray-500">
-          {{ property.city }}, {{ property.state }} {{ property.zip_code }}
-          <span v-if="property.neighborhood" class="block px-2 py-0.5 bg-gray-100 rounded text-gray-600">
-            {{ property.neighborhood.name ?? '-' }}
-          </span>
-        </p>
-      </router-link>
+    <!-- Active Holding (Pinned) -->
+    <div
+        v-if="isPinned"
+        class="bg-primary-container/30 border-l-4 border-primary rounded-xl p-4 flex items-center gap-8 relative overflow-hidden"
+    >
+        <div class="absolute top-3 right-6 flex items-center gap-1 text-primary font-bold text-xs uppercase tracking-widest">
+            <span class="material-symbols-outlined text-base" style="font-variation-settings: 'FILL' 1;">flag</span>
+            Active Holding
+        </div>
+        <router-link :to="`/properties/${property.id}`" class="flex items-center gap-8 flex-grow min-w-0">
+            <div class="w-14 h-14 rounded-lg overflow-hidden shrink-0 shadow-sm bg-primary-container flex items-center justify-center">
+                <span class="material-symbols-outlined text-primary/50 text-2xl">home</span>
+            </div>
+            <div class="flex-grow grid grid-cols-12 gap-4 items-center">
+                <div class="col-span-3">
+                    <h3 class="text-base font-bold text-primary leading-tight">{{ property.address }}</h3>
+                    <p class="text-xs text-on-surface-variant">{{ property.city }}, {{ property.state }}</p>
+                </div>
+                <div class="col-span-2 text-center">
+                    <p class="text-[10px] font-bold text-on-surface-variant uppercase mb-1">Bed/Bath</p>
+                    <p class="text-sm font-semibold">{{ property.bedrooms ?? '—' }} / {{ property.bathrooms ?? '—' }}</p>
+                </div>
+                <div class="col-span-2 text-center">
+                    <p class="text-[10px] font-bold text-on-surface-variant uppercase mb-1">Dimensions</p>
+                    <p class="text-sm font-semibold">{{ property.square_feet ? `${property.square_feet.toLocaleString()} sqft` : '—' }}</p>
+                </div>
+                <div class="col-span-2 text-center">
+                    <p class="text-[10px] font-bold text-on-surface-variant uppercase mb-1">Closest Neighbor</p>
+                    <p class="text-sm font-semibold text-primary">{{ neighborLabel }}</p>
+                </div>
+                <div class="col-span-3 text-right pr-12">
+                    <p class="text-[10px] font-bold text-on-surface-variant uppercase mb-1">HOA</p>
+                    <p class="text-lg font-black text-primary">{{ property.hoa ?? '—' }}</p>
+                </div>
+            </div>
+        </router-link>
     </div>
 
-    <!-- Property Stats -->
-    <div class="basis-5/8 flex text-sm">
-      <div class="p-2">Year: {{ property.year_built ?? '-' }}</div>
-      <div class="p-2">SqFt: {{ property.square_feet ?? '-' }}</div>
-      <div class="p-2">Acres: {{ property.acreage ?? '-' }}</div>
-      <div class="p-2">Bed/Bath: {{ property.bedrooms ?? '-' }} / {{ property.bathrooms ?? '-' }}</div>
-      <div class="p-2">Garage: {{ property.garage ?? '-' }}</div>
-      <div class="p-2 flex flex-col">
-        <div>Basement: {{ property.basement ?? '-' }}</div>
-        <div>Walkout: {{ property.basement_walkout ?? '-' }}</div>
-      </div>
-      <div class="p-2 flex flex-col">
-        <div>Water: {{ property.water ?? '-' }}</div>
-        <div>Sewer: {{ property.sewer ?? '-' }}</div>
-      </div>
-      <div class="p-2">HOA: {{ property.hoa ?? '-' }}</div>
-    </div>
-
-    <!-- Property Analysis Status -->
-    <div class="basis-1/8 p-2">
-      <span v-if="property.analyzed_at" class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
-          Analyzed
-      </span>
-      <span v-else class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800">
-          Pending
-      </span>
-    </div>
-  </div>
+    <!-- Standard Catalog Row -->
+    <router-link
+        v-else
+        :to="`/properties/${property.id}`"
+        class="bg-surface-container-lowest border border-transparent hover:border-primary-container rounded-xl p-4 flex items-center gap-8 hover:bg-surface-container-low transition-colors group"
+    >
+        <div class="w-14 h-14 bg-surface-container-highest rounded-lg overflow-hidden shrink-0 flex items-center justify-center">
+            <span class="material-symbols-outlined text-outline-variant">home</span>
+        </div>
+        <div class="flex-grow grid grid-cols-12 gap-4 items-center">
+            <div class="col-span-3">
+                <h3 class="text-base font-bold text-on-surface leading-tight">{{ property.address }}</h3>
+                <p class="text-xs text-on-surface-variant">{{ property.city }}, {{ property.state }}</p>
+            </div>
+            <div class="col-span-2 text-center">
+                <p class="text-[10px] font-bold text-on-surface-variant uppercase mb-1">Bed/Bath</p>
+                <p class="text-sm font-semibold">{{ property.bedrooms ?? '—' }} / {{ property.bathrooms ?? '—' }}</p>
+            </div>
+            <div class="col-span-2 text-center">
+                <p class="text-[10px] font-bold text-on-surface-variant uppercase mb-1">Dimensions</p>
+                <p class="text-sm font-semibold">{{ property.square_feet ? `${property.square_feet.toLocaleString()} sqft` : '—' }}</p>
+            </div>
+            <div class="col-span-2 text-center">
+                <p class="text-[10px] font-bold text-on-surface-variant uppercase mb-1">Neighbor</p>
+                <p class="text-sm font-semibold">{{ neighborLabel }}</p>
+            </div>
+            <div class="col-span-3 text-right pr-4">
+                <p class="text-[10px] font-bold text-on-surface-variant uppercase mb-1">HOA</p>
+                <p class="text-lg font-black text-on-surface">{{ property.hoa ?? '—' }}</p>
+            </div>
+        </div>
+    </router-link>
 </template>

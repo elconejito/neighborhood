@@ -1,64 +1,78 @@
 <template>
-    <div class="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
-        <div class="max-w-md w-full space-y-8">
-            <div>
-                <h2 class="mt-6 text-center text-3xl font-extrabold text-gray-900">
-                    Set new password
-                </h2>
+    <div class="min-h-screen bg-surface text-on-surface flex flex-col">
+        <main class="flex-grow flex items-center justify-center px-8">
+            <div class="w-full max-w-[440px]">
+                <!-- Header -->
+                <div class="mb-12 text-center">
+                    <h1 class="text-primary font-extrabold tracking-tight text-3xl mb-2">Set New Password</h1>
+                    <p class="text-on-surface-variant font-medium tracking-tight">Choose a strong password for your account.</p>
+                </div>
+
+                <!-- Card -->
+                <div class="bg-surface-container-lowest p-10 rounded-xl shadow-[0_12px_40px_rgba(43,52,55,0.05)]">
+                    <form @submit.prevent="handleSubmit" class="space-y-6">
+                        <div v-if="error" class="bg-error-container/20 text-error px-4 py-3 rounded text-sm font-medium">
+                            {{ error }}
+                        </div>
+
+                        <!-- Email -->
+                        <div class="space-y-2">
+                            <label for="email" class="block text-on-surface-variant text-sm font-medium tracking-tight">Email Address</label>
+                            <input
+                                id="email"
+                                v-model="form.email"
+                                type="email"
+                                autocomplete="email"
+                                required
+                                placeholder="name@neighborhood.com"
+                                class="w-full bg-surface-container-highest border-none rounded px-4 py-3.5 text-on-surface placeholder:text-outline/50 focus:bg-surface-container-lowest focus:ring-1 focus:ring-primary/30 transition-colors"
+                            />
+                        </div>
+
+                        <!-- New Password -->
+                        <div class="space-y-2">
+                            <label for="password" class="block text-on-surface-variant text-sm font-medium tracking-tight">New Password</label>
+                            <input
+                                id="password"
+                                v-model="form.password"
+                                type="password"
+                                autocomplete="new-password"
+                                required
+                                placeholder="••••••••"
+                                class="w-full bg-surface-container-highest border-none rounded px-4 py-3.5 text-on-surface placeholder:text-outline/50 focus:bg-surface-container-lowest focus:ring-1 focus:ring-primary/30 transition-colors"
+                            />
+                        </div>
+
+                        <!-- Confirm Password -->
+                        <div class="space-y-2">
+                            <label for="password_confirmation" class="block text-on-surface-variant text-sm font-medium tracking-tight">Confirm Password</label>
+                            <input
+                                id="password_confirmation"
+                                v-model="form.password_confirmation"
+                                type="password"
+                                autocomplete="new-password"
+                                required
+                                placeholder="••••••••"
+                                class="w-full bg-surface-container-highest border-none rounded px-4 py-3.5 text-on-surface placeholder:text-outline/50 focus:bg-surface-container-lowest focus:ring-1 focus:ring-primary/30 transition-colors"
+                            />
+                        </div>
+
+                        <!-- CTA -->
+                        <button
+                            type="submit"
+                            :disabled="loading"
+                            class="w-full bg-gradient-to-br from-primary to-primary-dim text-on-primary py-4 rounded-lg font-bold tracking-tight shadow-md hover:shadow-lg active:scale-[0.98] transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                        >
+                            {{ loading ? 'Resetting...' : 'Reset Password' }}
+                        </button>
+                    </form>
+                </div>
             </div>
+        </main>
 
-            <form class="mt-8 space-y-6" @submit.prevent="handleSubmit">
-                <div v-if="error" class="bg-red-50 border border-red-200 text-red-600 px-4 py-3 rounded-md text-sm">
-                    {{ error }}
-                </div>
-
-                <div class="space-y-4">
-                    <div>
-                        <label for="email" class="block text-sm font-medium text-gray-700">Email address</label>
-                        <input
-                            id="email"
-                            v-model="form.email"
-                            type="email"
-                            autocomplete="email"
-                            required
-                            class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-emerald-500 focus:border-emerald-500"
-                        />
-                    </div>
-
-                    <div>
-                        <label for="password" class="block text-sm font-medium text-gray-700">New password</label>
-                        <input
-                            id="password"
-                            v-model="form.password"
-                            type="password"
-                            autocomplete="new-password"
-                            required
-                            class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-emerald-500 focus:border-emerald-500"
-                        />
-                    </div>
-
-                    <div>
-                        <label for="password_confirmation" class="block text-sm font-medium text-gray-700">Confirm password</label>
-                        <input
-                            id="password_confirmation"
-                            v-model="form.password_confirmation"
-                            type="password"
-                            autocomplete="new-password"
-                            required
-                            class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-emerald-500 focus:border-emerald-500"
-                        />
-                    </div>
-                </div>
-
-                <button
-                    type="submit"
-                    :disabled="loading"
-                    class="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-emerald-600 hover:bg-emerald-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-emerald-500 disabled:opacity-50 disabled:cursor-not-allowed"
-                >
-                    <span v-if="loading">Resetting...</span>
-                    <span v-else>Reset password</span>
-                </button>
-            </form>
+        <!-- Background decorations -->
+        <div class="fixed top-0 right-0 -z-10 w-1/2 h-screen overflow-hidden pointer-events-none opacity-20">
+            <div class="absolute -top-24 -right-24 w-[600px] h-[600px] rounded-full bg-primary-container blur-3xl"></div>
         </div>
     </div>
 </template>
@@ -85,7 +99,6 @@ const error = ref(null);
 const handleSubmit = async () => {
     loading.value = true;
     error.value = null;
-
     try {
         await authStore.resetPassword(form);
         router.push('/login');

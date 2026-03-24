@@ -22,6 +22,7 @@ class PropertyTransformer extends TransformerAbstract
             'id' => (int) $property->id,
             'user_id' => (int) $property->user_id,
             'neighborhood_id' => $property->neighborhood_id ? (int) $property->neighborhood_id : null,
+            'is_pinned' => (bool) $property->is_pinned,
             'address' => $property->address,
             'city' => $property->city,
             'state' => $property->state,

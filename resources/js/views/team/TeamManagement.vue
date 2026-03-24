@@ -1,122 +1,156 @@
 <template>
-    <div class="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
-        <div class="px-4 sm:px-0">
-            <h1 class="text-2xl font-bold text-gray-900 mb-6">Team Management</h1>
+    <div class="min-h-screen bg-surface p-8">
+        <div class="max-w-6xl mx-auto space-y-10">
 
-            <!-- Manage Teams -->
-            <div class="bg-white shadow sm:rounded-lg mb-6">
-                <div class="px-4 py-5 sm:p-6">
-                    <h3 class="text-lg leading-6 font-medium text-gray-900">Your Teams</h3>
-                    <div class="mt-4 space-y-4">
-                        <div v-for="team in authStore.teams" :key="team.id" class="flex items-center justify-between border-b pb-4 last:border-0 last:pb-0">
-                            <div v-if="editingTeamId === team.id" class="flex items-center space-x-2 w-full">
+            <!-- Invite + Permissions -->
+            <section class="grid grid-cols-1 lg:grid-cols-5 gap-8">
+                <!-- Invite Member + Create Team (left 3-col) -->
+                <div class="lg:col-span-3 space-y-6">
+                    <!-- Invite Member -->
+                    <div class="bg-surface-container-low p-8 rounded-xl">
+                        <h3 class="text-2xl font-bold tracking-tight text-on-surface mb-6">Invite Member</h3>
+                        <form @submit.prevent="inviteMember" class="space-y-6">
+                            <div>
+                                <label class="block text-xs font-bold text-on-surface-variant uppercase tracking-widest mb-3">Email Address</label>
                                 <input
-                                    v-model="editTeamName"
-                                    type="text"
-                                    class="shadow-sm focus:ring-emerald-500 focus:border-emerald-500 block w-full sm:text-sm border-gray-300 rounded-md"
+                                    v-model="inviteForm.email"
+                                    type="email"
+                                    required
+                                    placeholder="e.g. manager@neighborhood.com"
+                                    class="w-full bg-surface-container-highest border-none rounded-lg h-12 px-4 text-on-surface placeholder:text-outline-variant focus:ring-1 focus:ring-primary focus:bg-surface-container-lowest transition-all"
                                 />
-                                <button @click="updateTeamName(team)" class="text-xs text-emerald-600 font-medium">Save</button>
-                                <button @click="editingTeamId = null" class="text-xs text-gray-500 font-medium">Cancel</button>
                             </div>
-                            <div v-else class="flex items-center justify-between w-full">
-                                <div>
-                                    <span class="text-sm font-medium text-gray-900">{{ team.name }}</span>
-                                    <span v-if="team.id === authStore.user?.team_id" class="ml-2 inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-emerald-100 text-emerald-800">
-                                        Active
-                                    </span>
+                            <div v-if="error" class="bg-error-container/20 text-error px-4 py-3 rounded text-sm font-medium">{{ error }}</div>
+                            <div v-if="success" class="bg-primary-container/30 text-primary px-4 py-3 rounded text-sm font-medium">{{ success }}</div>
+                            <button
+                                type="submit"
+                                :disabled="inviting"
+                                class="w-full h-12 bg-primary text-on-primary font-bold text-sm rounded-lg hover:bg-primary-dim transition-all shadow-md disabled:opacity-50"
+                            >
+                                {{ inviting ? 'Sending...' : 'Send Invite' }}
+                            </button>
+                        </form>
+                    </div>
+
+                    <!-- Create / Rename Team -->
+                    <div class="bg-surface-container-low p-8 rounded-xl">
+                        <h3 class="text-lg font-bold tracking-tight text-on-surface mb-6">Your Teams</h3>
+                        <div class="space-y-3 mb-6">
+                            <div
+                                v-for="team in authStore.teams"
+                                :key="team.id"
+                                class="flex items-center justify-between bg-surface-container-lowest p-4 rounded-lg"
+                            >
+                                <div v-if="editingTeamId === team.id" class="flex items-center gap-3 flex-1">
+                                    <input
+                                        v-model="editTeamName"
+                                        type="text"
+                                        class="flex-1 bg-surface-container-highest border-none rounded px-3 py-2 text-sm focus:ring-1 focus:ring-primary"
+                                    />
+                                    <button @click="updateTeamName(team)" class="text-xs text-primary font-bold">Save</button>
+                                    <button @click="editingTeamId = null" class="text-xs text-on-surface-variant">Cancel</button>
                                 </div>
-                                <div class="flex space-x-3">
-                                    <button @click="startEditing(team)" class="text-xs text-emerald-600 font-medium hover:text-emerald-500">Rename</button>
+                                <div v-else class="flex items-center justify-between w-full">
+                                    <div class="flex items-center gap-2">
+                                        <span class="text-sm font-semibold text-on-surface">{{ team.name }}</span>
+                                        <span v-if="team.id === authStore.user?.team_id" class="text-[10px] font-bold px-2 py-0.5 bg-primary/10 text-primary rounded-full uppercase tracking-wide">Active</span>
+                                    </div>
+                                    <button @click="startEditing(team)" class="text-xs text-on-surface-variant hover:text-primary font-medium transition-colors">Rename</button>
                                 </div>
                             </div>
                         </div>
-                    </div>
-
-                    <div class="mt-6 border-t pt-6">
-                        <h4 class="text-sm font-medium text-gray-900">Create New Team</h4>
-                        <form @submit.prevent="createTeam" class="mt-2 sm:flex sm:items-center">
-                            <div class="w-full sm:max-w-xs">
-                                <input
-                                    v-model="newTeamName"
-                                    type="text"
-                                    placeholder="Team Name"
-                                    class="shadow-sm focus:ring-emerald-500 focus:border-emerald-500 block w-full sm:text-sm border-gray-300 rounded-md"
-                                    required
-                                />
-                            </div>
-                            <button
-                                type="submit"
-                                class="mt-3 w-full inline-flex items-center justify-center px-4 py-2 border border-transparent shadow-sm font-medium rounded-md text-white bg-emerald-600 hover:bg-emerald-700 sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm"
-                            >
+                        <form @submit.prevent="createTeam" class="flex gap-3">
+                            <input
+                                v-model="newTeamName"
+                                type="text"
+                                placeholder="New team name"
+                                required
+                                class="flex-1 bg-surface-container-highest border-none rounded-lg h-10 px-4 text-sm focus:ring-1 focus:ring-primary focus:bg-surface-container-lowest transition-all"
+                            />
+                            <button type="submit" class="px-4 h-10 bg-primary text-on-primary text-sm font-bold rounded-lg hover:bg-primary-dim transition-all">
                                 Create
                             </button>
                         </form>
                     </div>
                 </div>
-            </div>
 
-            <!-- Invite Member -->
-            <div class="bg-white shadow sm:rounded-lg mb-6">
-                <div class="px-4 py-5 sm:p-6">
-                    <h3 class="text-lg leading-6 font-medium text-gray-900">Invite New Member</h3>
-                    <div class="mt-2 max-w-xl text-sm text-gray-500">
-                        <p>Enter the email address of the user you want to invite to your team.</p>
-                    </div>
-                    <form @submit.prevent="inviteMember" class="mt-5 sm:flex sm:items-center">
-                        <div class="w-full sm:max-w-xs">
-                            <label for="email" class="sr-only">Email</label>
-                            <input
-                                v-model="inviteForm.email"
-                                type="email"
-                                name="email"
-                                id="email"
-                                class="shadow-sm focus:ring-emerald-500 focus:border-emerald-500 block w-full sm:text-sm border-gray-300 rounded-md"
-                                placeholder="user@example.com"
-                                required
-                            />
-                        </div>
-                        <button
-                            type="submit"
-                            :disabled="inviting"
-                            class="mt-3 w-full inline-flex items-center justify-center px-4 py-2 border border-transparent shadow-sm font-medium rounded-md text-white bg-emerald-600 hover:bg-emerald-700 focus:outline-none sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm"
+                <!-- Permissions Matrix (right 2-col) -->
+                <div class="lg:col-span-2 bg-surface-container-lowest p-8 rounded-xl shadow-sm border border-primary/5">
+                    <h4 class="font-bold text-on-surface uppercase text-xs tracking-[0.2em] mb-6">Permissions Matrix</h4>
+                    <div class="space-y-4">
+                        <div
+                            v-for="permission in permissions"
+                            :key="permission.icon"
+                            class="flex items-center gap-4 p-4 hover:bg-surface transition-colors rounded-lg group"
                         >
-                            {{ inviting ? 'Inviting...' : 'Invite' }}
-                        </button>
-                    </form>
-                    <p v-if="error" class="mt-2 text-sm text-red-600">{{ error }}</p>
-                    <p v-if="success" class="mt-2 text-sm text-green-600">{{ success }}</p>
+                            <div class="w-10 h-10 rounded-lg bg-primary/5 flex items-center justify-center group-hover:bg-primary transition-colors shrink-0">
+                                <span class="material-symbols-outlined text-primary group-hover:text-on-primary">{{ permission.icon }}</span>
+                            </div>
+                            <div class="flex-1">
+                                <p class="text-sm font-bold">{{ permission.title }}</p>
+                                <p class="text-xs text-on-surface-variant">{{ permission.description }}</p>
+                            </div>
+                        </div>
+                    </div>
                 </div>
-            </div>
+            </section>
 
-            <!-- Members List -->
-            <div class="bg-white shadow overflow-hidden sm:rounded-md">
-                <div class="px-4 py-5 sm:px-6">
-                    <h3 class="text-lg leading-6 font-medium text-gray-900">Team Members</h3>
+            <!-- Team Directory -->
+            <section class="space-y-6">
+                <div class="flex justify-between items-center border-b border-surface-container-high pb-4">
+                    <h3 class="text-xl font-bold tracking-tight text-on-surface">
+                        Active Members <span class="text-on-surface-variant font-normal">({{ members.length }})</span>
+                    </h3>
                 </div>
-                <ul class="divide-y divide-gray-200">
-                    <li v-for="member in members" :key="member.id" class="px-4 py-4 sm:px-6">
-                        <div class="flex items-center justify-between">
-                            <div class="flex flex-col">
-                                <p class="text-sm font-medium text-emerald-600 truncate">{{ member.name }}</p>
-                                <p class="text-sm text-gray-500">{{ member.email }}</p>
+
+                <div class="grid grid-cols-1 gap-5">
+                    <!-- Member Card -->
+                    <div
+                        v-for="member in members"
+                        :key="member.id"
+                        class="bg-surface-container-lowest p-6 rounded-xl shadow-sm flex flex-wrap items-center justify-between gap-6 hover:shadow-md transition-shadow"
+                    >
+                        <div class="flex items-center gap-4">
+                            <div class="w-12 h-12 rounded-full bg-primary-container flex items-center justify-center text-primary font-bold text-lg shrink-0">
+                                {{ memberInitials(member.name) }}
                             </div>
-                            <div v-if="member.id !== currentUserId" class="ml-4 flex-shrink-0">
-                                <button
-                                    @click="confirmRemove(member)"
-                                    class="text-sm font-medium text-red-600 hover:text-red-500"
-                                >
-                                    Remove
-                                </button>
+                            <div>
+                                <h4 class="font-bold text-on-surface">{{ member.name }}</h4>
+                                <p class="text-xs text-on-surface-variant">{{ member.email }}</p>
                             </div>
-                            <div v-else class="ml-4 flex-shrink-0">
-                                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800">
-                                    You
+                        </div>
+
+                        <div class="flex flex-wrap gap-8 items-center">
+                            <div class="text-center md:text-left">
+                                <span class="block text-[10px] font-bold text-outline-variant uppercase tracking-widest mb-1">Role</span>
+                                <span class="text-sm font-semibold px-3 py-1 rounded-full"
+                                      :class="member.id === currentUserId ? 'bg-primary/10 text-primary' : 'bg-surface-container-high text-on-surface-variant'">
+                                    {{ member.id === currentUserId ? 'You' : 'Member' }}
                                 </span>
                             </div>
                         </div>
-                    </li>
-                </ul>
-            </div>
+
+                        <div class="flex items-center gap-2">
+                            <template v-if="member.id !== currentUserId">
+                                <button
+                                    @click="confirmRemove(member)"
+                                    class="p-2 hover:bg-error/10 text-error rounded transition-colors"
+                                    title="Remove member"
+                                >
+                                    <span class="material-symbols-outlined">delete_outline</span>
+                                </button>
+                            </template>
+                            <template v-else>
+                                <span class="text-xs text-on-surface-variant italic px-2">Cannot remove yourself</span>
+                            </template>
+                        </div>
+                    </div>
+
+                    <div v-if="!members.length" class="bg-surface-container-lowest p-8 rounded-xl text-center text-on-surface-variant italic text-sm">
+                        No team members yet. Invite someone to get started.
+                    </div>
+                </div>
+            </section>
         </div>
 
         <ConfirmationModal
@@ -143,13 +177,21 @@ const inviting = ref(false);
 const inviteForm = ref({ email: '' });
 const error = ref('');
 const success = ref('');
-
 const newTeamName = ref('');
 const editingTeamId = ref(null);
 const editTeamName = ref('');
-
 const showConfirmModal = ref(false);
 const memberToRemove = ref(null);
+
+const permissions = [
+    { icon: 'visibility', title: 'View Valuations', description: 'Ability to see total portfolio value and equity splits.' },
+    { icon: 'edit_note', title: 'Manage Properties', description: 'Create, delete or update property listings and details.' },
+    { icon: 'share', title: 'Invite Others', description: 'Grant access to new team members for your estate.' },
+];
+
+const memberInitials = (name) => {
+    return (name ?? '').split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2) || '?';
+};
 
 const createTeam = async () => {
     try {
@@ -191,7 +233,7 @@ const inviteMember = async () => {
     success.value = '';
     try {
         await api.post('/teams/invite', inviteForm.value);
-        success.value = 'Member invited successfully.';
+        success.value = 'Invitation sent successfully.';
         inviteForm.value.email = '';
         await loadMembers();
     } catch (err) {

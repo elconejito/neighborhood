@@ -12,6 +12,7 @@ import Dashboard from '@/views/Dashboard.vue';
 import PropertyList from '@/views/properties/PropertyList.vue';
 import PropertyDetail from '@/views/properties/PropertyDetail.vue';
 import PropertyCreate from '@/views/properties/PropertyCreate.vue';
+import PropertyEdit from '@/views/properties/PropertyEdit.vue';
 import TeamManagement from '@/views/team/TeamManagement.vue';
 import NeighborhoodManagement from '@/views/neighborhoods/NeighborhoodManagement.vue';
 
@@ -59,6 +60,12 @@ const routes = [
         path: '/properties/create',
         name: 'property-create',
         component: PropertyCreate,
+        meta: { requiresAuth: true },
+    },
+    {
+        path: '/properties/:id/edit',
+        name: 'property-edit',
+        component: PropertyEdit,
         meta: { requiresAuth: true },
     },
     {

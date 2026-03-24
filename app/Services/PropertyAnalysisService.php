@@ -223,6 +223,7 @@ QUERY;
 
                 $categorizedDistances = [];
                 foreach ($elements as $element) {
+                    Log::debug(__METHOD__.':'.__LINE__, [$element]);
                     $poiLat = $element['lat'] ?? ($element['center']['lat'] ?? null);
                     $poiLng = $element['lon'] ?? ($element['center']['lon'] ?? null);
 
@@ -234,9 +235,12 @@ QUERY;
                     $name = $element['tags']['name']
                         ?? $element['tags']['brand']
                         ?? $element['tags']['operator']
-                        ?? $element['tags']['amenity']
-                        ?? $element['tags']['shop']
-                        ?? 'Unknown';
+                        ?? null;
+
+                    // Skip elements with no real name (raw tag values like "hospital" are not useful)
+                    if (! $name) {
+                        continue;
+                    }
 
                     $poiData = [
                         'name' => $name,

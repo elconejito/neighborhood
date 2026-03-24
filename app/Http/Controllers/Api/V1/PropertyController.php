@@ -70,6 +70,17 @@ class PropertyController extends Controller
     {
         $validated = $request->validated();
 
+        // Enforce one pinned property per neighborhood
+        if (! empty($validated['is_pinned'])) {
+            $neighborhoodId = $validated['neighborhood_id'] ?? $property->neighborhood_id;
+            if ($neighborhoodId) {
+                Property::where('neighborhood_id', $neighborhoodId)
+                    ->where('id', '!=', $property->id)
+                    ->where('is_pinned', true)
+                    ->update(['is_pinned' => false]);
+            }
+        }
+
         $property->update($validated);
         $property->refresh();
 

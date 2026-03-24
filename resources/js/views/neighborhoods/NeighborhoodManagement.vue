@@ -1,88 +1,116 @@
 <template>
-    <div class="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
-        <div class="px-4 sm:px-0">
-            <div class="flex justify-between items-center mb-6">
-                <h1 class="text-2xl font-bold text-gray-900">Neighborhoods</h1>
+    <div class="min-h-screen bg-surface p-8 md:p-12">
+        <div class="max-w-5xl mx-auto">
+            <!-- Header -->
+            <header class="flex flex-col md:flex-row md:items-end justify-between mb-12 gap-6">
+                <div>
+                    <h1 class="text-4xl md:text-5xl font-extrabold tracking-tight text-on-surface mb-2">Tracked Neighborhoods</h1>
+                    <p class="text-on-surface-variant font-medium">Monitoring residential corridors and geographic zones.</p>
+                </div>
                 <button
                     @click="openCreateModal"
-                    class="inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-emerald-600 hover:bg-emerald-700"
+                    class="bg-gradient-to-br from-primary to-primary-dim text-on-primary px-6 py-3 rounded shadow-lg hover:opacity-90 transition-all flex items-center gap-2 font-semibold self-start md:self-auto"
                 >
-                    Add Neighborhood
+                    <span class="material-symbols-outlined">add</span>
+                    Create Neighborhood
                 </button>
-            </div>
+            </header>
 
+            <!-- Loading -->
             <div v-if="loading" class="text-center py-12">
-                <div class="inline-block animate-spin rounded-full h-8 w-8 border-4 border-emerald-500 border-t-transparent"></div>
+                <div class="inline-block animate-spin rounded-full h-8 w-8 border-4 border-primary border-t-transparent"></div>
             </div>
 
-            <div v-else-if="neighborhoods.length === 0" class="bg-white shadow rounded-lg p-12 text-center">
-                <p class="text-gray-500 italic">No neighborhoods found. Add one to get started.</p>
+            <!-- Empty -->
+            <div v-else-if="neighborhoods.length === 0" class="bg-surface-container-lowest rounded-xl p-16 text-center border border-outline-variant/10">
+                <span class="material-symbols-outlined text-outline-variant text-5xl mb-4 block">map</span>
+                <p class="text-on-surface-variant italic">No neighborhoods found. Add one to get started.</p>
             </div>
 
-            <div v-else class="bg-white shadow overflow-hidden sm:rounded-md">
-                <ul class="divide-y divide-gray-200">
-                    <li v-for="neighborhood in neighborhoods" :key="neighborhood.id" class="px-4 py-4 sm:px-6">
-                        <div class="flex items-center justify-between">
-                            <p class="text-sm font-medium text-emerald-600 truncate">{{ neighborhood.name }}</p>
-                            <div class="ml-4 flex-shrink-0 flex space-x-3">
-                                <button
-                                    @click="openEditModal(neighborhood)"
-                                    class="text-sm font-medium text-blue-600 hover:text-blue-500"
-                                >
-                                    Edit
-                                </button>
-                                <button
-                                    @click="confirmDelete(neighborhood)"
-                                    class="text-sm font-medium text-red-600 hover:text-red-500"
-                                >
-                                    Delete
-                                </button>
+            <!-- Neighborhood List -->
+            <div v-else class="space-y-5">
+                <h2 class="text-xs font-bold text-on-surface-variant tracking-[0.2em] uppercase">Detailed Portfolio View</h2>
+                <div
+                    v-for="neighborhood in neighborhoods"
+                    :key="neighborhood.id"
+                    class="group bg-surface-container-lowest p-6 rounded-lg transition-all hover:bg-white border-l-4 border-primary"
+                >
+                    <div class="grid grid-cols-1 md:grid-cols-12 items-center gap-6">
+                        <!-- Icon -->
+                        <div class="md:col-span-1">
+                            <div class="w-12 h-12 rounded bg-primary-container/50 flex items-center justify-center">
+                                <span class="material-symbols-outlined text-primary">map</span>
                             </div>
                         </div>
-                    </li>
-                </ul>
+
+                        <!-- Name -->
+                        <div class="md:col-span-5">
+                            <h3 class="text-xl font-bold text-on-surface">{{ neighborhood.name }}</h3>
+                        </div>
+
+                        <!-- Properties count placeholder -->
+                        <div class="md:col-span-3">
+                            <div class="text-xs text-on-surface-variant uppercase tracking-wider font-bold mb-1">Properties</div>
+                            <div class="text-lg font-semibold text-primary">
+                                {{ neighborhood.properties_count ?? '—' }}
+                            </div>
+                        </div>
+
+                        <!-- Actions -->
+                        <div class="md:col-span-3 flex justify-end gap-2">
+                            <button
+                                @click="openEditModal(neighborhood)"
+                                class="p-2 hover:bg-surface-container-high rounded transition-colors text-on-surface-variant"
+                                title="Edit"
+                            >
+                                <span class="material-symbols-outlined">edit</span>
+                            </button>
+                            <button
+                                @click="confirmDelete(neighborhood)"
+                                class="p-2 hover:bg-error/10 hover:text-error rounded transition-colors text-on-surface-variant"
+                                title="Delete"
+                            >
+                                <span class="material-symbols-outlined">delete</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
 
         <!-- Add/Edit Modal -->
         <Teleport to="body">
             <div v-if="showEditModal" class="fixed inset-0 z-50 flex items-center justify-center p-4">
-                <!-- Overlay -->
-                <div @click="showEditModal = false" class="fixed inset-0 bg-gray-500 opacity-75 transition-opacity" aria-hidden="true"></div>
-
-                <!-- Modal Content -->
-                <div class="relative bg-white rounded-lg shadow-xl transform transition-all sm:max-w-lg sm:w-full p-6">
-                    <div>
-                        <h3 class="text-lg leading-6 font-medium text-gray-900" id="modal-title">
-                            {{ editingNeighborhood ? 'Edit Neighborhood' : 'Add Neighborhood' }}
-                        </h3>
-                        <div class="mt-4">
-                            <label for="name" class="block text-sm font-medium text-gray-700">Name</label>
+                <div @click="showEditModal = false" class="fixed inset-0 bg-on-surface/20 backdrop-blur-sm"></div>
+                <div class="relative bg-surface-container-lowest rounded-xl shadow-[0_12px_40px_rgba(43,52,55,0.12)] w-full max-w-lg p-8">
+                    <h3 class="text-xl font-bold text-on-surface mb-6">
+                        {{ editingNeighborhood ? 'Edit Neighborhood' : 'Create Neighborhood' }}
+                    </h3>
+                    <div class="space-y-4">
+                        <div class="space-y-2">
+                            <label for="name" class="block text-xs font-bold text-on-surface-variant uppercase tracking-widest">Name</label>
                             <input
                                 v-model="neighborhoodForm.name"
                                 type="text"
-                                name="name"
                                 id="name"
-                                class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-emerald-500 focus:border-emerald-500 sm:text-sm"
                                 placeholder="e.g. Sunset Hills"
                                 autofocus
+                                class="w-full bg-surface-container-highest border-none rounded-lg px-4 py-3 text-on-surface placeholder:text-outline-variant focus:bg-surface-container-lowest focus:ring-1 focus:ring-primary/30 transition-all"
                             />
                         </div>
                     </div>
-                    <div class="mt-5 sm:mt-6 sm:grid sm:grid-cols-2 sm:gap-3 sm:grid-flow-row-dense">
-                        <button
-                            @click="saveNeighborhood"
-                            type="button"
-                            class="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-emerald-600 text-base font-medium text-white hover:bg-emerald-700 focus:outline-none sm:col-start-2 sm:text-sm"
-                        >
-                            Save
-                        </button>
+                    <div class="mt-6 grid grid-cols-2 gap-3">
                         <button
                             @click="showEditModal = false"
-                            type="button"
-                            class="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none sm:mt-0 sm:col-start-1 sm:text-sm"
+                            class="w-full py-3 bg-surface-container-high text-on-surface rounded-lg font-semibold text-sm hover:bg-surface-dim transition-colors"
                         >
                             Cancel
+                        </button>
+                        <button
+                            @click="saveNeighborhood"
+                            class="w-full py-3 bg-gradient-to-br from-primary to-primary-dim text-on-primary rounded-lg font-bold text-sm shadow-sm hover:opacity-95 transition-all"
+                        >
+                            Save
                         </button>
                     </div>
                 </div>
@@ -110,7 +138,6 @@ const loading = ref(true);
 const showEditModal = ref(false);
 const editingNeighborhood = ref(null);
 const neighborhoodForm = ref({ name: '' });
-
 const showConfirmModal = ref(false);
 const neighborhoodToDelete = ref(null);
 

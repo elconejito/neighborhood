@@ -40,6 +40,7 @@ class UpdatePropertyRequest extends FormRequest
     {
         return [
             'neighborhood_id' => ['sometimes', 'nullable', 'exists:neighborhoods,id'],
+            'is_pinned' => ['sometimes', 'boolean'],
             'address' => ['sometimes', 'required', 'string', 'max:255'],
             'city' => ['sometimes', 'required', 'string', 'max:255'],
             'state' => ['sometimes', 'required', 'string', 'size:2'],
