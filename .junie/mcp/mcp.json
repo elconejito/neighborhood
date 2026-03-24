@@ -6,6 +6,10 @@
                 "artisan",
                 "boost:mcp"
             ]
+        },
+        "stitch": {
+            "command": "npx",
+            "args": ["@_davideast/stitch-mcp", "proxy"]
         }
     }
 }
