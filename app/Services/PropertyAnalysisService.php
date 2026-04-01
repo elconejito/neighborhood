@@ -27,6 +27,21 @@ class PropertyAnalysisService
 
     public function geocodeAddress(string|array $address): ?array
     {
+        if (is_array($address)) {
+            // Geocod.io: rooftop-level accuracy for US addresses
+            $result = $this->geocodeWithGeocodio($address);
+            if ($result) {
+                return $result;
+            }
+
+            // Census Bureau: road-interpolated fallback, still better than Nominatim
+            $result = $this->geocodeWithCensus($address);
+            if ($result) {
+                return $result;
+            }
+        }
+
+        // Last resort: Nominatim
         $attempts = $this->prepareGeocodeAttempts($address);
 
         foreach ($attempts as $params) {
@@ -52,6 +67,86 @@ class PropertyAnalysisService
             } catch (Exception $e) {
                 Log::error('Geocoding attempt failed: '.$e->getMessage());
             }
+        }
+
+        return null;
+    }
+
+    protected function geocodeWithGeocodio(array $address): ?array
+    {
+        $apiKey = config('services.geocodio.key');
+        if (! $apiKey) {
+            return null;
+        }
+
+        try {
+            $query = implode(', ', array_filter([
+                $address['street'] ?? null,
+                $address['city'] ?? null,
+                $address['state'] ?? null,
+                $address['postalcode'] ?? null,
+            ]));
+
+            $response = Http::get('https://api.geocod.io/v1.7/geocode', [
+                'q'      => $query,
+                'api_key' => $apiKey,
+                'limit'  => 1,
+            ]);
+
+            $results = $response->json('results') ?? [];
+
+            if ($response->successful() && ! empty($results)) {
+                $location = $results[0]['location'];
+
+                Log::debug(__CLASS__.':'.__LINE__, [
+                    'source'          => 'geocodio',
+                    'matched_address' => $results[0]['formatted_address'] ?? null,
+                    'accuracy'        => $results[0]['accuracy_type'] ?? null,
+                    'coordinates'     => $location,
+                ]);
+
+                return [
+                    'lat' => (float) $location['lat'],
+                    'lng' => (float) $location['lng'],
+                ];
+            }
+        } catch (Exception $e) {
+            Log::error('Geocod.io geocoding failed: '.$e->getMessage());
+        }
+
+        return null;
+    }
+
+    protected function geocodeWithCensus(array $address): ?array
+    {
+        try {
+            $response = Http::get('https://geocoding.geo.census.gov/geocoder/locations/address', [
+                'street'    => $address['street'] ?? '',
+                'city'      => $address['city'] ?? '',
+                'state'     => $address['state'] ?? '',
+                'zip'       => $address['postalcode'] ?? '',
+                'benchmark' => 'Public_AR_Current',
+                'format'    => 'json',
+            ]);
+
+            $matches = $response->json('result.addressMatches') ?? [];
+
+            if ($response->successful() && ! empty($matches)) {
+                $coords = $matches[0]['coordinates'];
+
+                Log::debug(__CLASS__.':'.__LINE__, [
+                    'source' => 'census',
+                    'matched_address' => $matches[0]['matchedAddress'] ?? null,
+                    'coordinates' => $coords,
+                ]);
+
+                return [
+                    'lat' => (float) $coords['y'],
+                    'lng' => (float) $coords['x'],
+                ];
+            }
+        } catch (Exception $e) {
+            Log::error('Census geocoding failed: '.$e->getMessage());
         }
 
         return null;
