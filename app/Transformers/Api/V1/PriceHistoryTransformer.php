@@ -12,6 +12,7 @@ class PriceHistoryTransformer extends TransformerAbstract
         return [
             'id' => (int) $history->id,
             'property_id' => (int) $history->property_id,
+            'listing_cycle_id' => $history->listing_cycle_id ? (int) $history->listing_cycle_id : null,
             'price' => (float) $history->price,
             'price_date' => $history->price_date ? $history->price_date->toDateString() : null,
             'type' => $history->type,

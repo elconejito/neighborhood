@@ -2,7 +2,9 @@
 
 use App\Http\Controllers\Api\V1\AuthController;
 use App\Http\Controllers\Api\V1\DashboardController;
+use App\Http\Controllers\Api\V1\ListingCycleController;
 use App\Http\Controllers\Api\V1\NeighborhoodController;
+use App\Http\Controllers\Api\V1\PriceHistoryController;
 use App\Http\Controllers\Api\V1\PropertyController;
 use App\Http\Controllers\Api\V1\TeamController;
 use Illuminate\Support\Facades\Route;
@@ -27,6 +29,16 @@ Route::prefix('v1')->group(function () {
         // Properties
         Route::apiResource('properties', PropertyController::class);
         Route::post('properties/{property}/analyze', [PropertyController::class, 'analyze']);
+
+        // Listing Cycles
+        Route::post('properties/{property}/listing-cycles', [ListingCycleController::class, 'store']);
+        Route::put('listing-cycles/{listingCycle}', [ListingCycleController::class, 'update']);
+        Route::delete('listing-cycles/{listingCycle}', [ListingCycleController::class, 'destroy']);
+
+        // Price History Events
+        Route::post('listing-cycles/{listingCycle}/price-histories', [PriceHistoryController::class, 'store']);
+        Route::put('price-histories/{priceHistory}', [PriceHistoryController::class, 'update']);
+        Route::delete('price-histories/{priceHistory}', [PriceHistoryController::class, 'destroy']);
 
         // Neighborhoods
         Route::apiResource('neighborhoods', NeighborhoodController::class);

@@ -62,7 +62,7 @@ class PropertyController extends Controller
     public function show(ShowPropertyRequest $request, Property $property): JsonResponse
     {
         return fractal()->item($property, PropertyTransformer::class)
-            ->parseIncludes(['price_histories', 'neighborhood', 'notes'])
+            ->parseIncludes(['price_histories', 'neighborhood', 'notes', 'listing_cycles'])
             ->respond();
     }
 

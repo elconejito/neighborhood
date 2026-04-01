@@ -12,6 +12,7 @@ class PropertyTransformer extends TransformerAbstract
     protected array $availableIncludes = [
         'neighborhood',
         'price_histories',
+        'listing_cycles',
         'notes',
         'user',
     ];
@@ -64,6 +65,11 @@ class PropertyTransformer extends TransformerAbstract
     public function includePriceHistories(Property $property): Collection
     {
         return $this->collection($property->priceHistories, new PriceHistoryTransformer);
+    }
+
+    public function includeListingCycles(Property $property): Collection
+    {
+        return $this->collection($property->listingCycles()->orderByDesc('created_at')->get(), new ListingCycleTransformer);
     }
 
     public function includeNotes(Property $property): Collection

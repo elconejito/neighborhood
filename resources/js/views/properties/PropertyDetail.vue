@@ -52,7 +52,7 @@
                         </div>
                         <p class="text-lg text-on-surface-variant">{{ property.city }}, {{ property.state }} {{ property.zip_code }}</p>
                     </div>
-                    <div class="flex flex-wrap lg:flex-nowrap gap-8 lg:text-right">
+                    <div class="flex flex-wrap lg:flex-nowrap gap-8 lg:text-right items-end">
                         <div v-if="property.neighborhood" class="flex flex-col">
                             <span class="text-[10px] text-on-surface-variant font-bold uppercase tracking-widest">Neighborhood</span>
                             <span class="text-2xl font-bold text-primary">{{ property.neighborhood.name }}</span>
@@ -60,6 +60,10 @@
                         <div v-if="property.analyzed_at" class="flex flex-col">
                             <span class="text-[10px] text-on-surface-variant font-bold uppercase tracking-widest">Last Analyzed</span>
                             <span class="text-2xl font-bold text-primary">{{ formatDate(property.analyzed_at) }}</span>
+                        </div>
+                        <div class="flex flex-col">
+                            <span class="text-[10px] text-on-surface-variant font-bold uppercase tracking-widest">Last Sale Price</span>
+                            <span class="text-5xl font-black tracking-tighter text-primary">{{ lastSalePrice ?? '—' }}</span>
                         </div>
                     </div>
                 </div>
@@ -157,38 +161,10 @@
                         <Neighborhood v-if="property.analyzed_at" :analysis="property.analysis" :property="property" />
 
                         <!-- Listing Lifecycle -->
-                        <section class="bg-surface-container-lowest p-8 rounded-xl border border-outline-variant/20 shadow-sm">
-                            <div class="flex justify-between items-center mb-6">
-                                <h2 class="text-xl font-bold text-primary tracking-tight">Listing Lifecycle</h2>
-                                <span class="text-[10px] font-bold text-on-surface-variant uppercase tracking-widest">Audit Archive</span>
-                            </div>
-                            <div v-if="property.notes?.length" class="space-y-8 relative">
-                                <div class="absolute left-[3px] top-4 bottom-4 w-0.5 bg-surface-container-high hidden md:block"></div>
-                                <div
-                                    v-for="(note, index) in property.notes"
-                                    :key="note.id"
-                                    class="relative md:pl-10"
-                                >
-                                    <div
-                                        class="absolute left-0 top-1 w-2 h-2 rounded-full ring-4 ring-surface hidden md:block"
-                                        :class="index === 0 ? 'bg-primary' : 'bg-outline-variant'"
-                                    ></div>
-                                    <div class="flex items-center justify-between mb-3">
-                                        <span class="text-[10px] font-black uppercase tracking-wider bg-surface-container-low px-2 py-0.5 rounded"
-                                              :class="index === 0 ? 'text-primary' : 'text-on-surface-variant'">
-                                            {{ formatDate(note.created_at) }}
-                                        </span>
-                                    </div>
-                                    <div
-                                        class="bg-surface-container-low/30 p-4 rounded-lg border border-outline-variant/10"
-                                        :class="{ 'opacity-70': index > 0 }"
-                                    >
-                                        <p class="text-sm text-on-surface whitespace-pre-wrap">{{ note.content }}</p>
-                                    </div>
-                                </div>
-                            </div>
-                            <p v-else class="text-sm text-on-surface-variant italic">No listing history recorded.</p>
-                        </section>
+                        <ListingLifecycle
+                            :property-id="property.id"
+                            :initial-cycles="property.listing_cycles ?? []"
+                        />
                     </div>
 
                     <!-- Right Sidebar -->
@@ -326,6 +302,7 @@ import { useRouter, useRoute } from 'vue-router';
 import api from '@/api';
 import { formatRelativeDistance } from '@/helpers';
 import Neighborhood from '@/components/properties/analyses/Neighborhood.vue';
+import ListingLifecycle from '@/components/properties/ListingLifecycle.vue';
 
 const router = useRouter();
 const route = useRoute();
@@ -368,6 +345,20 @@ const getCategoryIcon = (category) => categoryIcons[category.toLowerCase()] ?? '
 
 const formatDate = (date) => new Date(date).toLocaleDateString('en-US', { dateStyle: 'medium' });
 const formatPoiDistance = (meters) => formatRelativeDistance(meters, 'mi');
+
+const fmtCurrency = new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD', maximumFractionDigits: 0 });
+
+const lastSalePrice = computed(() => {
+    const cycles = property.value?.listing_cycles ?? [];
+    for (const cycle of cycles) {
+        const histories = [...(cycle.price_histories ?? [])]
+            .sort((a, b) => new Date(a.price_date) - new Date(b.price_date));
+        if (!histories.length) continue;
+        const last = histories[histories.length - 1];
+        if (last.type === 'sold') return fmtCurrency.format(last.price);
+    }
+    return null;
+});
 
 const loadProperty = async () => {
     try {
