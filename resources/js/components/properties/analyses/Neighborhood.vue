@@ -1,6 +1,8 @@
 <script setup>
-import {computed} from "vue";
-import {formatRelativeDistance} from "@/helpers";
+import { computed, ref, onMounted, onUnmounted } from "vue";
+import { formatRelativeDistance } from "@/helpers";
+import L from "leaflet";
+import "leaflet/dist/leaflet.css";
 
 const props = defineProps({
   analysis: {
@@ -16,81 +18,103 @@ const props = defineProps({
 
 const centerLat = computed(() => props.property?.latitude);
 const centerLng = computed(() => props.property?.longitude);
+const neighborDistance = computed(() => props.analysis.neighbor_distance);
+const nearestHouses = computed(() => props.analysis.neighbor_distance.nearest_houses ?? []);
+const nearestHouse = computed(() => nearestHouses.value?.[0]);
 
-const neighborDistance = computed(() => {
-    return props.analysis.neighbor_distance;
-});
-const nearestHouses = computed(() => {
-  return props.analysis.neighbor_distance.nearest_houses ?? [];
-});
+// Map
+const mapContainer = ref(null);
+const activeView = ref('street');
+let map = null;
+let markersLayer = null;
 
-const mapData = computed(() => {
-    if (!centerLat.value || !centerLng.value) return [];
+const tileLayers = {
+  street: L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    attribution: '© OpenStreetMap contributors',
+    maxZoom: 19,
+  }),
+  satellite: L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
+    attribution: '© Esri World Imagery',
+    maxZoom: 19,
+  }),
+  topo: L.tileLayer('https://basemap.nationalmap.gov/arcgis/rest/services/USGSTopo/MapServer/tile/{z}/{y}/{x}', {
+    attribution: 'USGS National Map',
+    maxNativeZoom: 16,
+    maxZoom: 19,
+  }),
+};
 
-    // Simple Mercator-ish projection for small areas
-    const latScale = 111320; // meters per degree latitude
-    const lngScale = 40075000 * Math.cos(centerLat.value * Math.PI / 180) / 360; // meters per degree longitude
+function switchLayer(view) {
+  if (!map || view === activeView.value) return;
+  map.removeLayer(tileLayers[activeView.value]);
+  activeView.value = view;
+  tileLayers[view].addTo(map);
+}
 
-    return nearestHouses.value.map(house => {
-        if (!house.lat || !house.lng) return null;
+function buildMarkers() {
+  if (!map) return;
+  if (markersLayer) markersLayer.clearLayers();
+  else markersLayer = L.layerGroup().addTo(map);
 
-        const dy = (house.lat - centerLat.value) * latScale;
-        const dx = (house.lng - centerLng.value) * lngScale;
+  // Center marker
+  const centerIcon = L.divIcon({
+    className: '',
+    html: `<div style="width:22px;height:22px;background:#455f88;border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:Manrope,sans-serif;font-size:9px;font-weight:900;color:#f6f7ff;box-shadow:0 2px 6px rgba(0,0,0,0.35);">A</div>`,
+    iconSize: [22, 22],
+    iconAnchor: [11, 11],
+  });
+  L.marker([centerLat.value, centerLng.value], { icon: centerIcon, zIndexOffset: 1000 })
+    .addTo(markersLayer);
 
-        return {
-            ...house,
-            x: dx,
-            y: -dy, // SVG y is down
-        };
-    }).filter(Boolean);
-});
-
-const viewBox = computed(() => {
-    if (!mapData.value.length) return "-100 -100 200 200";
-
-    const padding = 40;
-    const maxDist = Math.max(...mapData.value.map(h => Math.max(Math.abs(h.x), Math.abs(h.y)))) + padding;
-
-    return `${-maxDist} ${-maxDist} ${maxDist * 2} ${maxDist * 2}`;
-});
-
-const nearestHouse = computed(() => {
-  return nearestHouses.value?.[0];
-});
-const directionGrid = [
-  ['NW', 'N', 'NE'],
-  ['W', null, 'E'],
-  ['SW', 'S', 'SE'],
-];
-const directionalNearest = computed(() => {
-  const summary = {
-    NW: {nearest: null, count: 0},
-    N: {nearest: null, count: 0},
-    NE: {nearest: null, count: 0},
-    W: {nearest: null, count: 0},
-    E: {nearest: null, count: 0},
-    SW: {nearest: null, count: 0},
-    S: {nearest: null, count: 0},
-    SE: {nearest: null, count: 0},
-  };
-
+  // Neighbor markers
   for (const house of nearestHouses.value) {
-    const direction = house.direction?.toUpperCase();
-
-    if (!direction || !summary[direction]) {
-      continue;
-    }
-
-    summary[direction].count += 1;
-    if (
-      summary[direction].nearest === null ||
-      house.distance_meters < summary[direction].nearest
-    ) {
-      summary[direction].nearest = house.distance_meters;
-    }
+    if (!house.lat || !house.lng) continue;
+    const dist = formatRelativeDistance(house.distance_meters, 'ft');
+    const icon = L.divIcon({
+      className: '',
+      html: `<div style="display:flex;flex-direction:column;align-items:center;gap:2px;">
+        <div style="width:20px;height:20px;background:white;border:1.5px solid rgba(69,95,136,0.4);border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:Manrope,sans-serif;font-size:7px;font-weight:800;color:#455f88;box-shadow:0 1px 4px rgba(0,0,0,0.25);">${house.direction}</div>
+        <span style="font-family:Manrope,sans-serif;font-size:9px;font-weight:700;color:#1a2a3a;background:rgba(255,255,255,0.82);padding:0 3px;border-radius:2px;white-space:nowrap;">${dist}</span>
+      </div>`,
+      iconSize: [60, 36],
+      iconAnchor: [30, 10],
+    });
+    L.marker([house.lat, house.lng], { icon }).addTo(markersLayer);
   }
+}
 
-  return summary;
+onMounted(() => {
+  if (!centerLat.value || !centerLng.value || !mapContainer.value) return;
+
+  map = L.map(mapContainer.value, {
+    center: [centerLat.value, centerLng.value],
+    zoom: 17,
+    zoomControl: true,
+    attributionControl: true,
+  });
+
+  // Small attribution
+  map.attributionControl.setPrefix('');
+
+  tileLayers[activeView.value].addTo(map);
+  buildMarkers();
+
+  // Fit to include all neighbors
+  const points = [
+    [centerLat.value, centerLng.value],
+    ...nearestHouses.value.filter(h => h.lat && h.lng).map(h => [h.lat, h.lng]),
+  ];
+  if (points.length > 1) {
+    map.fitBounds(points, { padding: [48, 48] });
+  }
+});
+
+onUnmounted(() => {
+  if (map) {
+    map.remove();
+    map = null;
+    markersLayer = null;
+  }
 });
 
 </script>
@@ -110,45 +134,35 @@ const directionalNearest = computed(() => {
         <!-- Map Column -->
         <div>
           <div
-            v-if="mapData.length"
-            class="bg-surface-container-low rounded-lg border border-outline-variant/10 relative h-80 overflow-hidden"
-            style="background-image: radial-gradient(#455f88 1px, transparent 1px); background-size: 28px 28px; background-position: center;"
+            v-if="centerLat && centerLng"
+            class="rounded-lg border border-outline-variant/10 relative aspect-square overflow-hidden"
           >
-            <svg :viewBox="viewBox" class="absolute inset-0 w-full h-full">
-              <!-- Neighbor Connections -->
-              <g v-for="(house, index) in mapData" :key="index">
-                <line
-                  x1="0" y1="0"
-                  :x2="house.x" :y2="house.y"
-                  stroke="#455f88"
-                  stroke-opacity="0.2"
-                  stroke-width="1.5"
-                  stroke-dasharray="4 4"
-                />
-                <g :transform="`translate(${house.x / 2}, ${house.y / 2})`">
-                  <rect :x="-24" :y="-9" width="48" height="18" rx="3" fill="white" fill-opacity="0.92" stroke="#abb3b7" stroke-width="0.5" />
-                  <text y="4" text-anchor="middle" font-family="Manrope" font-size="8" font-weight="700" fill="#455f88">
-                    {{ formatRelativeDistance(house.distance_meters, 'ft') }}
-                  </text>
-                </g>
-                <circle :cx="house.x" :cy="house.y" r="7" fill="white" stroke="#455f88" stroke-width="1.5" stroke-opacity="0.3" />
-                <text :x="house.x" :y="house.y + 4" text-anchor="middle" font-family="Manrope" font-size="7" font-weight="800" fill="#455f88">
-                  {{ house.direction }}
-                </text>
-              </g>
-              <!-- Center Point (Home) -->
-              <circle cx="0" cy="0" r="16" fill="#455f88" fill-opacity="0.08" />
-              <circle cx="0" cy="0" r="10" fill="#455f88" />
-              <text x="0" y="4" text-anchor="middle" font-family="Manrope" font-size="9" font-weight="900" fill="#f6f7ff">A</text>
-            </svg>
-            <!-- Map badge -->
-            <div class="absolute bottom-3 left-3 bg-white/90 px-3 py-1.5 rounded text-[10px] font-bold shadow-sm border border-outline-variant/10">
+            <!-- Leaflet map target -->
+            <div ref="mapContainer" class="absolute inset-0 w-full h-full" />
+
+            <!-- Layer toggle -->
+            <div class="absolute top-3 right-3 z-[1000] flex rounded overflow-hidden shadow-sm border border-outline-variant/20">
+              <button
+                v-for="view in ['street', 'satellite', 'topo']"
+                :key="view"
+                @click="switchLayer(view)"
+                class="px-2.5 py-1 text-[10px] font-bold uppercase tracking-wide transition-colors"
+                :class="activeView === view
+                  ? 'bg-primary text-white'
+                  : 'bg-white/90 text-on-surface-variant hover:bg-white'"
+              >
+                {{ view === 'street' ? 'Street' : view === 'satellite' ? 'Sat' : 'Topo' }}
+              </button>
+            </div>
+
+            <!-- Badge -->
+            <div class="absolute bottom-7 left-3 z-[1000] bg-white/90 px-3 py-1.5 rounded text-[10px] font-bold shadow-sm border border-outline-variant/10">
               <span class="text-on-surface-variant">ASSET</span>
               <span class="text-primary ml-1">·</span>
               <span class="text-primary ml-1">{{ nearestHouses.length }} NEIGHBORS PLOTTED</span>
             </div>
           </div>
-          <div v-else class="h-80 flex items-center justify-center bg-surface-container-low rounded-lg border border-outline-variant/10">
+          <div v-else class="aspect-square flex items-center justify-center bg-surface-container-low rounded-lg border border-outline-variant/10">
             <p class="text-sm text-on-surface-variant">Map data not available. Please re-run analysis.</p>
           </div>
         </div>
@@ -195,4 +209,10 @@ const directionalNearest = computed(() => {
   </div>
 </template>
 
-<style scoped></style>
+<style scoped>
+/* Push Leaflet attribution above the bottom edge */
+:deep(.leaflet-control-attribution) {
+  font-size: 9px;
+  opacity: 0.7;
+}
+</style>
