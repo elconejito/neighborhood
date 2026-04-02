@@ -9,7 +9,9 @@ use App\Http\Requests\Api\V1\Property\IndexPropertyRequest;
 use App\Http\Requests\Api\V1\Property\ShowPropertyRequest;
 use App\Http\Requests\Api\V1\Property\StorePropertyRequest;
 use App\Http\Requests\Api\V1\Property\UpdatePropertyRequest;
+use App\Jobs\AnalyzeNeighborDistanceJob;
 use App\Jobs\AnalyzePropertyJob;
+use App\Jobs\GeocodePropertyJob;
 use App\Models\Property;
 use App\Services\PropertyAnalysisService;
 use App\Transformers\Api\V1\PropertyTransformer;
@@ -39,7 +41,7 @@ class PropertyController extends Controller
             });
         }
 
-        $properties = $query->orderByDesc('created_at')->paginate(15);
+        $properties = $query->with('priceHistories')->orderByDesc('is_pinned')->orderByDesc('created_at')->paginate(15);
 
         return fractal($properties, PropertyTransformer::class)
             ->parseIncludes(['neighborhood', 'price_histories'])
@@ -106,6 +108,20 @@ class PropertyController extends Controller
 
         return response()->json([
             'data' => ['message' => 'Property analysis has been queued'],
+        ]);
+    }
+
+    public function geocode(AnalyzePropertyRequest $request, Property $property): JsonResponse
+    {
+        $property->update([
+            'latitude' => null,
+            'longitude' => null,
+        ]);
+
+        GeocodePropertyJob::dispatch($property->fresh(), [AnalyzeNeighborDistanceJob::class]);
+
+        return response()->json([
+            'data' => ['message' => 'Property geocoding and analysis has been queued'],
         ]);
     }
 }

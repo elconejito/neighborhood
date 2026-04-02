@@ -48,17 +48,17 @@
                     </div>
 
                     <!-- Pinned -->
-                    <div v-if="form.neighborhood_id" class="flex items-center gap-3">
-                        <div class="relative inline-flex items-center cursor-pointer">
+                    <div v-if="form.neighborhood_id" class="flex flex-col gap-1.5">
+                        <label for="is_pinned" class="inline-flex items-center gap-3 cursor-pointer">
                             <input
                                 id="is_pinned"
                                 v-model="form.is_pinned"
                                 type="checkbox"
                                 class="sr-only peer"
                             />
-                            <div class="w-11 h-6 bg-surface-container-highest peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary"></div>
-                            <label for="is_pinned" class="ml-3 text-sm font-bold text-on-surface-variant uppercase tracking-widest">Pinned Property</label>
-                        </div>
+                            <div class="relative w-11 h-6 bg-surface-container-highest peer-focus:outline-none rounded-full peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary shrink-0"></div>
+                            <span class="text-sm font-bold text-on-surface-variant uppercase tracking-widest">Pinned Property</span>
+                        </label>
                         <p class="text-[10px] text-on-surface-variant">Marks this as the primary reference property for the neighborhood. Only one property can be pinned per neighborhood.</p>
                     </div>
 

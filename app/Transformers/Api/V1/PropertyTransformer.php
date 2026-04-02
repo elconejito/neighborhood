@@ -49,6 +49,10 @@ class PropertyTransformer extends TransformerAbstract
             'hoa' => $property->hoa,
             'listing_url' => $property->listing_url,
             'analysis' => $property->analysis,
+            'last_sale_price' => $property->priceHistories
+                ->where('type', 'sold')
+                ->sortByDesc('price_date')
+                ->first()?->price,
             'analyzed_at' => $property->analyzed_at ? $property->analyzed_at->toDateTimeString() : null,
             'created_at' => $property->created_at ? $property->created_at->toDateTimeString() : null,
             'updated_at' => $property->updated_at ? $property->updated_at->toDateTimeString() : null,

@@ -38,6 +38,69 @@ class PropertyAnalysisTest extends TestCase
         });
     }
 
+    public function test_geocode_endpoint_clears_coordinates_and_dispatches_job(): void
+    {
+        Queue::fake();
+
+        $user = User::factory()->create();
+        $property = Property::factory()->create([
+            'user_id' => $user->id,
+            'latitude' => 40.7128,
+            'longitude' => -74.0060,
+        ]);
+
+        $response = $this->actingAs($user, 'api')->postJson("/api/v1/properties/{$property->id}/geocode");
+
+        $response->assertStatus(200)
+            ->assertJsonPath('data.message', 'Property geocoding and analysis has been queued');
+
+        $property->refresh();
+        $this->assertNull($property->latitude);
+        $this->assertNull($property->longitude);
+
+        Queue::assertPushed(GeocodePropertyJob::class, function ($job) use ($property) {
+            return $job->property->id === $property->id
+                && $job->analysisJobClasses === [AnalyzeNeighborDistanceJob::class];
+        });
+
+        Queue::assertNotPushed(AnalyzePropertyJob::class);
+    }
+
+    public function test_geocode_endpoint_requires_authorization(): void
+    {
+        Queue::fake();
+
+        $owner = User::factory()->create();
+        $other = User::factory()->create();
+        $property = Property::factory()->create(['user_id' => $owner->id]);
+
+        $this->actingAs($other, 'api')->postJson("/api/v1/properties/{$property->id}/geocode")
+            ->assertStatus(403);
+
+        Queue::assertNotPushed(AnalyzePropertyJob::class);
+        Queue::assertNotPushed(GeocodePropertyJob::class);
+    }
+
+    public function test_geocode_job_runs_only_specified_analysis_jobs(): void
+    {
+        Bus::fake();
+
+        $property = Property::factory()->create([
+            'latitude' => 40.7128,
+            'longitude' => -74.0060,
+        ]);
+
+        $job = new GeocodePropertyJob($property, [AnalyzeNeighborDistanceJob::class]);
+        $job->handle(app(\App\Services\PropertyAnalysisService::class));
+
+        Bus::assertBatched(function ($batch) {
+            return $batch->jobs->count() === 1
+                && $batch->jobs->contains(fn ($job) => $job instanceof AnalyzeNeighborDistanceJob)
+                && ! $batch->jobs->contains(fn ($job) => $job instanceof AnalyzePointsOfInterestJob)
+                && ! $batch->jobs->contains(fn ($job) => $job instanceof AnalyzeRoadAccessibilityJob);
+        });
+    }
+
     public function test_analyze_job_performs_analysis(): void
     {
         Queue::fake();

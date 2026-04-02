@@ -15,8 +15,13 @@ class GeocodePropertyJob implements ShouldQueue
 
     /**
      * Create a new job instance.
+     *
+     * @param  array<class-string>|null  $analysisJobClasses  Limit which analysis jobs run. Null runs all.
      */
-    public function __construct(public Property $property) {}
+    public function __construct(
+        public Property $property,
+        public ?array $analysisJobClasses = null,
+    ) {}
 
     /**
      * Execute the job.
@@ -50,10 +55,14 @@ class GeocodePropertyJob implements ShouldQueue
 
     protected function dispatchAnalysisJobs(): void
     {
-        Bus::batch([
-            new AnalyzeNeighborDistanceJob($this->property),
-            new AnalyzePointsOfInterestJob($this->property),
-            new AnalyzeRoadAccessibilityJob($this->property),
-        ])->dispatch();
+        $classes = $this->analysisJobClasses ?? [
+            AnalyzeNeighborDistanceJob::class,
+            AnalyzePointsOfInterestJob::class,
+            AnalyzeRoadAccessibilityJob::class,
+        ];
+
+        Bus::batch(
+            array_map(fn ($class) => new $class($this->property), $classes)
+        )->dispatch();
     }
 }

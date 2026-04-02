@@ -1,6 +1,7 @@
 <script setup>
 import { computed, ref, onMounted, onUnmounted } from "vue";
 import { formatRelativeDistance } from "@/helpers";
+import api from "@/api";
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
 
@@ -15,6 +16,22 @@ const props = defineProps({
     default: () => ({}),
   },
 });
+
+const refreshing = ref(false);
+const refreshQueued = ref(false);
+
+const refreshGeo = async () => {
+  refreshing.value = true;
+  try {
+    await api.post(`/properties/${props.property.id}/geocode`);
+    refreshQueued.value = true;
+    setTimeout(() => { refreshQueued.value = false; }, 10000);
+  } catch (error) {
+    console.error('Geo refresh failed', error);
+  } finally {
+    refreshing.value = false;
+  }
+};
 
 const centerLat = computed(() => props.property?.latitude);
 const centerLng = computed(() => props.property?.longitude);
@@ -120,10 +137,24 @@ onUnmounted(() => {
 </script>
 
 <template>
-  <div class="bg-surface-container-lowest rounded-xl border border-outline-variant/20 shadow-sm p-8">
+  <div class="bg-surface-container-lowest rounded-xl border border-outline-variant/20 shadow-sm p-8 isolate">
     <div class="flex justify-between items-center mb-6">
       <h3 class="text-xl font-bold text-primary tracking-tight">Neighbor Distance</h3>
-      <span class="text-[10px] font-bold text-on-surface-variant uppercase tracking-widest">Proximity Survey</span>
+      <div class="flex items-center gap-3">
+        <span class="text-[10px] font-bold text-on-surface-variant uppercase tracking-widest">Proximity Survey</span>
+        <button
+          @click="refreshGeo"
+          :disabled="refreshing || refreshQueued"
+          class="flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-[10px] font-bold uppercase tracking-wide transition-colors disabled:opacity-50 bg-surface-container-high text-on-surface-variant hover:bg-surface-container-highest"
+          :title="refreshQueued ? 'Queued' : 'Refresh geo & neighbor data'"
+        >
+          <span
+            class="material-symbols-outlined text-sm"
+            :class="{ 'animate-spin': refreshing }"
+          >{{ refreshQueued ? 'check_circle' : 'refresh' }}</span>
+          {{ refreshQueued ? 'Queued' : 'Refresh' }}
+        </button>
+      </div>
     </div>
 
     <div v-if="nearestHouses.length" class="space-y-4">

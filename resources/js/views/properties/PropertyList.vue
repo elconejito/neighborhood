@@ -46,7 +46,24 @@
 
             <!-- Catalog List -->
             <div v-else class="space-y-3">
-                <PropertyListItem v-for="property in properties" :property="property" :isPinned="false" :key="property.id" />
+                <PropertyListItem
+                    v-if="pinnedProperty"
+                    :property="pinnedProperty"
+                    :isPinned="true"
+                    :key="pinnedProperty.id"
+                />
+                <template v-if="unpinnedProperties.length">
+                    <div v-if="pinnedProperty" class="px-6 py-1">
+                        <h4 class="text-[10px] font-bold uppercase tracking-widest text-outline">Market Comparables</h4>
+                    </div>
+                    <PropertyListItem
+                        v-for="property in unpinnedProperties"
+                        :property="property"
+                        :isPinned="false"
+                        :pinnedProperty="pinnedProperty"
+                        :key="property.id"
+                    />
+                </template>
             </div>
         </div>
     </div>
@@ -61,13 +78,16 @@
 </template>
 
 <script setup>
-import { onMounted, ref } from 'vue';
+import { computed, onMounted, ref } from 'vue';
 import api from '@/api';
 import EmptyState from '@/components/EmptyState.vue';
 import PropertyListItem from '@/components/properties/PropertyListItem.vue';
 
 const properties = ref([]);
 const loading = ref(true);
+
+const pinnedProperty = computed(() => properties.value.find(p => p.is_pinned) ?? null);
+const unpinnedProperties = computed(() => properties.value.filter(p => !p.is_pinned));
 
 onMounted(async () => {
     try {
