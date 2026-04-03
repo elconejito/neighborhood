@@ -22,12 +22,9 @@ class DatabaseSeeder extends Seeder
         if (! app()->isProduction()) {
             $this->call([
                 UserSeeder::class,
+                NeighborhoodSeeder::class,
+                PropertySeeder::class,
             ]);
         }
-
-        User::factory()->create([
-            'name' => 'Test User',
-            'email' => 'test@example.com',
-        ]);
     }
 }
