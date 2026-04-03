@@ -114,7 +114,8 @@ class PropertySeeder extends Seeder
         $elements = $response->json('elements', []);
 
         $addresses = collect($elements)
-            ->filter(fn ($e) => isset($e['tags']['addr:housenumber'], $e['tags']['addr:street']))
+            ->filter(fn ($e) => isset($e['tags']['addr:housenumber'], $e['tags']['addr:street'])
+                && mb_detect_encoding($e['tags']['addr:street'], 'ASCII', strict: true) !== false)
             ->map(fn ($e) => [
                 'address'  => $e['tags']['addr:housenumber'] . ' ' . $e['tags']['addr:street'],
                 'city'     => $e['tags']['addr:city'] ?? $e['tags']['addr:suburb'] ?? '',

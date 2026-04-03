@@ -28,6 +28,7 @@ class IndexPropertyRequest extends FormRequest
             'filter'       => ['sometimes', 'string', 'regex:/^[\w;,]+$/'],
             'orderBy'      => ['sometimes', 'string', 'alpha_dash', 'max:64'],
             'sortedBy'     => ['sometimes', 'string', 'in:asc,desc'],
+            'per_page'     => ['sometimes', 'integer', 'in:10,25,50'],
         ];
     }
 }

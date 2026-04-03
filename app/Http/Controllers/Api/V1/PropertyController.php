@@ -23,12 +23,15 @@ class PropertyController extends Controller
 
     public function index(IndexPropertyRequest $request): JsonResponse
     {
+        $multipleNeighborhoods = str_contains($request->input('searchFields', ''), 'neighborhood_id')
+            && str_contains($request->input('search', ''), ',');
+
         $properties = Property::forUser($request->user())
             ->filter($request)
             ->with('priceHistories')
-            ->orderByDesc('is_pinned')
+            ->when(! $multipleNeighborhoods, fn ($q) => $q->orderByDesc('is_pinned'))
             ->orderByDesc('created_at')
-            ->paginate(15);
+            ->paginate($request->integer('per_page', 10));
 
         return fractal($properties, PropertyTransformer::class)
             ->parseIncludes(['neighborhood', 'price_histories'])
