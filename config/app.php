@@ -139,4 +139,6 @@ return [
         'password' => env('SEEDER_USER_PASSWORD', 'password'),
     ],
 
+    'seed_property_zips' => env('SEED_PROPERTY_ZIPS', ''),
+
 ];
