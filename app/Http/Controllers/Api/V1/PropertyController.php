@@ -23,25 +23,12 @@ class PropertyController extends Controller
 
     public function index(IndexPropertyRequest $request): JsonResponse
     {
-        $user = $request->user();
-
-        // #TODO better filtering here for team > neighborhood
-        if ($user->team_id) {
-            $query = Property::whereIn('neighborhood_id', $user->team->neighborhoods()->pluck('id'));
-        } else {
-            $query = $user->properties();
-        }
-
-        if ($request->has('search')) {
-            $search = $request->input('search');
-            $query->where(function ($q) use ($search) {
-                $q->where('address', 'like', "%{$search}%")
-                    ->orWhere('city', 'like', "%{$search}%")
-                    ->orWhere('zip_code', 'like', "%{$search}%");
-            });
-        }
-
-        $properties = $query->with('priceHistories')->orderByDesc('is_pinned')->orderByDesc('created_at')->paginate(15);
+        $properties = Property::forUser($request->user())
+            ->filter($request)
+            ->with('priceHistories')
+            ->orderByDesc('is_pinned')
+            ->orderByDesc('created_at')
+            ->paginate(15);
 
         return fractal($properties, PropertyTransformer::class)
             ->parseIncludes(['neighborhood', 'price_histories'])

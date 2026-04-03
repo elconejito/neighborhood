@@ -2,6 +2,8 @@
 
 namespace App\Models;
 
+use App\Traits\Filterable;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -10,7 +12,13 @@ use Illuminate\Database\Eloquent\Relations\MorphMany;
 
 class Property extends Model
 {
-    use HasFactory;
+    use HasFactory, Filterable;
+
+    public array $searchable = ['address', 'city', 'zip_code'];
+
+    public array $filterable = ['bedrooms', 'bathrooms', 'city', 'state', 'is_pinned', 'neighborhood_id'];
+
+    public array $sortable = ['created_at', 'updated_at', 'address', 'city'];
 
     protected $fillable = [
         'user_id',
@@ -94,6 +102,15 @@ class Property extends Model
     public function notes(): MorphMany
     {
         return $this->morphMany(Note::class, 'notable');
+    }
+
+    public function scopeForUser(Builder $query, User $user): Builder
+    {
+        if ($user->team_id) {
+            return $query->whereIn('neighborhood_id', $user->team->neighborhoods()->pluck('id'));
+        }
+
+        return $query->where('user_id', $user->id);
     }
 
     public function getFullAddressAttribute(): string

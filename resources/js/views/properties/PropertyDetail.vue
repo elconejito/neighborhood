@@ -9,9 +9,9 @@
             <main class="pt-8 pb-20 px-8 max-w-7xl mx-auto">
                 <!-- Back link + Actions -->
                 <div class="flex justify-between items-center mb-6">
-                    <router-link to="/properties" class="text-sm text-on-surface-variant hover:text-primary transition-colors flex items-center gap-1">
+                    <button @click="goBackToList" class="text-sm text-on-surface-variant hover:text-primary transition-colors flex items-center gap-1">
                         <span class="material-symbols-outlined text-sm">arrow_back</span> Back to catalog
-                    </router-link>
+                    </button>
                     <div class="flex gap-3">
                         <button
                             @click="runAnalysis"
@@ -306,6 +306,15 @@ import ListingLifecycle from '@/components/properties/ListingLifecycle.vue';
 
 const router = useRouter();
 const route = useRoute();
+
+function goBackToList() {
+    const prev = window.history.state?.back ?? '';
+    if (prev === '/properties' || prev.startsWith('/properties?')) {
+        router.back();
+    } else {
+        router.push({ name: 'properties' });
+    }
+}
 
 const property = ref(null);
 const loading = ref(true);

@@ -10,9 +10,64 @@
                     </p>
                 </div>
                 <div class="flex flex-wrap gap-3">
-                    <button class="flex items-center gap-2 px-4 py-2 bg-surface-container-highest rounded-lg text-sm font-semibold text-on-surface-variant hover:bg-surface-container-high transition-colors">
-                        <span class="material-symbols-outlined text-base">filter_list</span> Neighborhoods
-                    </button>
+                    <!-- Neighborhood filter -->
+                    <div class="relative" ref="filterDropdownRef">
+                        <button
+                            @click="showNeighborhoodFilter = !showNeighborhoodFilter"
+                            :class="[
+                                'flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-semibold transition-colors',
+                                selectedNeighborhoodIds.length > 0
+                                    ? 'bg-primary text-on-primary'
+                                    : 'bg-surface-container-highest text-on-surface-variant hover:bg-surface-container-high',
+                            ]"
+                        >
+                            <span class="material-symbols-outlined text-base">filter_list</span>
+                            Neighborhoods
+                            <span
+                                v-if="selectedNeighborhoodIds.length > 0"
+                                class="inline-flex items-center justify-center w-5 h-5 rounded-full bg-on-primary text-primary text-xs font-bold"
+                            >
+                                {{ selectedNeighborhoodIds.length }}
+                            </span>
+                        </button>
+
+                        <!-- Dropdown panel -->
+                        <div
+                            v-if="showNeighborhoodFilter"
+                            class="absolute right-0 top-full mt-2 w-64 bg-surface-container rounded-xl shadow-lg z-10 overflow-hidden"
+                        >
+                            <div class="px-4 py-3 border-b border-outline-variant flex justify-between items-center">
+                                <span class="text-xs font-bold uppercase tracking-wider text-on-surface-variant">Filter by Neighborhood</span>
+                                <button
+                                    v-if="selectedNeighborhoodIds.length > 0"
+                                    @click="clearFilter"
+                                    class="text-xs text-primary font-semibold hover:opacity-75 transition-opacity"
+                                >
+                                    Clear
+                                </button>
+                            </div>
+                            <div class="max-h-64 overflow-y-auto">
+                                <p v-if="neighborhoods.length === 0" class="p-4 text-sm text-on-surface-variant text-center">
+                                    No neighborhoods found
+                                </p>
+                                <button
+                                    v-for="neighborhood in neighborhoods"
+                                    :key="neighborhood.id"
+                                    @click="toggleNeighborhood(neighborhood.id)"
+                                    class="w-full flex items-center gap-3 px-4 py-2.5 hover:bg-surface-container-high transition-colors text-left"
+                                >
+                                    <span
+                                        class="material-symbols-outlined text-base"
+                                        :class="isSelected(neighborhood.id) ? 'text-primary' : 'text-outline'"
+                                    >
+                                        {{ isSelected(neighborhood.id) ? 'check_box' : 'check_box_outline_blank' }}
+                                    </span>
+                                    <span class="text-sm text-on-surface">{{ neighborhood.name }}</span>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
                     <router-link
                         to="/properties/create"
                         class="bg-primary text-on-primary px-4 py-2 rounded-lg font-bold text-sm flex items-center justify-center gap-2 shadow-sm hover:opacity-90 transition-opacity"
@@ -78,25 +133,100 @@
 </template>
 
 <script setup>
-import { computed, onMounted, ref } from 'vue';
+import { computed, onMounted, onUnmounted, ref } from 'vue';
+import { useRoute, useRouter } from 'vue-router';
 import api from '@/api';
 import EmptyState from '@/components/EmptyState.vue';
 import PropertyListItem from '@/components/properties/PropertyListItem.vue';
 
+const route = useRoute();
+const router = useRouter();
+
 const properties = ref([]);
+const neighborhoods = ref([]);
 const loading = ref(true);
+const showNeighborhoodFilter = ref(false);
+const selectedNeighborhoodIds = ref([]);
+const filterDropdownRef = ref(null);
 
 const pinnedProperty = computed(() => properties.value.find(p => p.is_pinned) ?? null);
 const unpinnedProperties = computed(() => properties.value.filter(p => !p.is_pinned));
 
 onMounted(async () => {
+    // Restore filter from URL on mount (preserves state when navigating back from detail)
+    const urlNeighborhoods = route.query.neighborhoods;
+    if (urlNeighborhoods) {
+        selectedNeighborhoodIds.value = urlNeighborhoods.split(',').map(Number);
+    }
+
+    document.addEventListener('mousedown', onDocumentClick);
+    await Promise.all([fetchNeighborhoods(), fetchProperties()]);
+});
+
+onUnmounted(() => {
+    document.removeEventListener('mousedown', onDocumentClick);
+});
+
+function onDocumentClick(e) {
+    if (filterDropdownRef.value && !filterDropdownRef.value.contains(e.target)) {
+        showNeighborhoodFilter.value = false;
+    }
+}
+
+async function fetchNeighborhoods() {
     try {
-        const response = await api.get('/properties');
+        const response = await api.get('/neighborhoods');
+        neighborhoods.value = response.data.data;
+    } catch (error) {
+        console.error('Failed to load neighborhoods', error);
+    }
+}
+
+async function fetchProperties() {
+    loading.value = true;
+    try {
+        const params = {};
+        if (selectedNeighborhoodIds.value.length > 0) {
+            params.search = selectedNeighborhoodIds.value.join(',');
+            params.searchFields = 'neighborhood_id:in';
+        }
+        const response = await api.get('/properties', { params });
         properties.value = response.data.data;
     } catch (error) {
         console.error('Failed to load properties', error);
     } finally {
         loading.value = false;
     }
-});
+}
+
+function isSelected(id) {
+    return selectedNeighborhoodIds.value.includes(id);
+}
+
+function toggleNeighborhood(id) {
+    const idx = selectedNeighborhoodIds.value.indexOf(id);
+    if (idx === -1) {
+        selectedNeighborhoodIds.value.push(id);
+    } else {
+        selectedNeighborhoodIds.value.splice(idx, 1);
+    }
+    syncToUrl();
+    fetchProperties();
+}
+
+function clearFilter() {
+    selectedNeighborhoodIds.value = [];
+    syncToUrl();
+    fetchProperties();
+}
+
+function syncToUrl() {
+    const query = { ...route.query };
+    if (selectedNeighborhoodIds.value.length > 0) {
+        query.neighborhoods = selectedNeighborhoodIds.value.join(',');
+    } else {
+        delete query.neighborhoods;
+    }
+    router.replace({ query });
+}
 </script>

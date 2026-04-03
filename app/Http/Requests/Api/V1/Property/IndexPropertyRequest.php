@@ -22,7 +22,12 @@ class IndexPropertyRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'search' => ['sometimes', 'string', 'max:255'],
+            'search'       => ['sometimes', 'string', 'max:255'],
+            'searchFields' => ['sometimes', 'string', 'regex:/^[\w,.:;]+$/'],
+            'searchJoin'   => ['sometimes', 'string', 'in:and,or'],
+            'filter'       => ['sometimes', 'string', 'regex:/^[\w;,]+$/'],
+            'orderBy'      => ['sometimes', 'string', 'alpha_dash', 'max:64'],
+            'sortedBy'     => ['sometimes', 'string', 'in:asc,desc'],
         ];
     }
 }
