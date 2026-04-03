@@ -34,9 +34,6 @@
                         <div class="space-y-2">
                             <div class="flex justify-between items-center">
                                 <label for="password" class="block text-on-surface-variant text-sm font-medium tracking-tight">Password</label>
-                                <router-link to="/forgot-password" class="text-primary text-xs font-semibold hover:opacity-80 transition-opacity">
-                                    Forgot Password?
-                                </router-link>
                             </div>
                             <input
                                 id="password"
@@ -47,6 +44,9 @@
                                 placeholder="••••••••"
                                 class="w-full bg-surface-container-highest border-none rounded px-4 py-3.5 text-on-surface placeholder:text-outline/50 focus:bg-surface-container-lowest focus:ring-1 focus:ring-primary/30 transition-colors"
                             />
+                            <router-link to="/forgot-password" class="text-primary text-xs font-semibold hover:opacity-80 transition-opacity">
+                                Forgot Password?
+                            </router-link>
                         </div>
 
                         <!-- CTA -->
@@ -55,7 +55,7 @@
                             :disabled="loading"
                             class="w-full bg-gradient-to-br from-primary to-primary-dim text-on-primary py-4 rounded-lg font-bold tracking-tight shadow-md hover:shadow-lg active:scale-[0.98] transition-all disabled:opacity-50 disabled:cursor-not-allowed"
                         >
-                            {{ loading ? 'Signing in...' : 'Sign In to Portfolio' }}
+                            {{ loading ? 'Signing in...' : 'Sign In' }}
                         </button>
                     </form>
 
