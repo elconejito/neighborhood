@@ -1,157 +1,162 @@
 <template>
-    <div class="min-h-screen bg-surface p-8">
-        <!-- Editorial Header -->
-        <div class="max-w-7xl mx-auto mb-12">
-            <span class="text-primary font-bold tracking-widest text-xs uppercase mb-2 block">Portfolio Intel</span>
-            <h1 class="text-4xl font-extrabold tracking-tight text-on-surface mb-2">Dashboard</h1>
-            <p class="text-on-surface-variant max-w-2xl leading-relaxed">An overview of your portfolio activity and property performance.</p>
-        </div>
+    <div class="min-h-screen bg-surface">
+        <main class="max-w-screen-2xl mx-auto px-8 py-12">
+            <!-- Header -->
+            <section class="mb-16">
+                <h1 class="text-5xl font-extrabold text-primary tracking-tight mb-2">Dashboard</h1>
+                <p class="text-on-surface-variant text-lg">Performance metrics for the last 6 months.</p>
+            </section>
 
-        <div class="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-12 gap-6">
-            <!-- Primary Card: Portfolio Overview (8-col) -->
-            <div class="md:col-span-8 bg-primary-container/40 p-8 rounded-xl relative overflow-hidden flex flex-col justify-between min-h-[280px]">
-                <div class="relative z-10">
-                    <h3 class="text-on-primary-container text-sm font-bold uppercase tracking-widest mb-4">Portfolio Overview</h3>
-                    <div class="flex items-baseline gap-3">
-                        <span class="text-6xl font-black text-on-primary-container tracking-tighter">{{ stats.total_properties }}</span>
-                        <span class="text-primary-dim font-medium">Total Properties</span>
-                    </div>
-                    <p class="mt-2 text-on-primary-container/70 text-sm">
-                        {{ stats.analyzed_properties }} analyzed
-                        <span v-if="stats.total_properties > 0">
-                            ({{ Math.round((stats.analyzed_properties / stats.total_properties) * 100) }}%)
-                        </span>
-                    </p>
-                </div>
-                <!-- Decorative bar chart -->
-                <div class="mt-8 h-32 flex items-end gap-1.5">
-                    <div
-                        v-for="(bar, i) in barHeights"
-                        :key="i"
-                        class="flex-1 rounded-t-sm bg-primary/20 transition-all"
-                        :style="{ height: `${bar}%`, opacity: 0.3 + (i / barHeights.length) * 0.7 }"
-                    ></div>
-                    <div class="flex-1 rounded-t-sm bg-primary shadow-xl shadow-primary/20 h-full"></div>
-                </div>
+            <!-- Loading -->
+            <div v-if="loading" class="text-center py-24">
+                <div class="inline-block animate-spin rounded-full h-8 w-8 border-4 border-primary border-t-transparent"></div>
             </div>
 
-            <!-- Secondary Metric Cards (4-col) -->
-            <div class="md:col-span-4 flex flex-col gap-6">
-                <div class="bg-surface-container-low p-6 rounded-xl flex items-center justify-between">
-                    <div>
-                        <p class="text-xs text-on-surface-variant font-bold uppercase tracking-widest mb-1">Total Properties</p>
-                        <p class="text-2xl font-bold text-on-surface">{{ stats.total_properties }}</p>
-                    </div>
-                    <div class="p-3 bg-surface-container-lowest rounded-full shadow-sm">
-                        <span class="material-symbols-outlined text-primary">domain</span>
-                    </div>
-                </div>
-                <div class="bg-surface-container-low p-6 rounded-xl flex items-center justify-between">
-                    <div>
-                        <p class="text-xs text-on-surface-variant font-bold uppercase tracking-widest mb-1">Analyzed</p>
-                        <p class="text-2xl font-bold text-on-surface">{{ stats.analyzed_properties }}</p>
-                    </div>
-                    <div class="p-3 bg-surface-container-lowest rounded-full shadow-sm">
-                        <span class="material-symbols-outlined text-primary">radar</span>
-                    </div>
-                </div>
-                <div class="bg-surface-container-low p-6 rounded-xl flex flex-col gap-4">
-                    <div class="flex justify-between items-center">
-                        <p class="text-xs text-on-surface-variant font-bold uppercase tracking-widest">Analysis Coverage</p>
-                        <span class="text-primary font-bold text-xs">
-                            {{ stats.total_properties > 0 ? Math.round((stats.analyzed_properties / stats.total_properties) * 100) : 0 }}%
-                        </span>
-                    </div>
-                    <div class="w-full h-2 bg-surface-container-high rounded-full overflow-hidden">
-                        <div
-                            class="h-full bg-primary rounded-full transition-all"
-                            :style="{ width: `${stats.total_properties > 0 ? Math.round((stats.analyzed_properties / stats.total_properties) * 100) : 0}%` }"
-                        ></div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Recent Activity (full width) -->
-            <div class="md:col-span-12 mt-4">
-                <div class="flex items-center justify-between mb-8">
-                    <h2 class="text-2xl font-bold tracking-tight text-on-surface">Recent Activity</h2>
-                    <router-link to="/properties" class="text-primary font-bold text-sm hover:underline">View All Properties</router-link>
-                </div>
-                <div class="space-y-4">
-                    <router-link
-                        v-for="property in recentProperties"
-                        :key="property.id"
-                        :to="`/properties/${property.id}`"
-                        class="group bg-surface-container-lowest p-5 rounded-xl flex items-center gap-6 hover:bg-white hover:shadow-xl hover:shadow-on-surface/5 transition-all"
-                    >
-                        <div class="w-16 h-16 bg-surface-container-highest rounded-lg overflow-hidden shrink-0 flex items-center justify-center group-hover:bg-primary-container/30 transition-colors">
-                            <span class="material-symbols-outlined text-outline-variant group-hover:text-primary transition-colors">home</span>
-                        </div>
-                        <div class="flex-1 flex flex-col md:flex-row md:items-center justify-between gap-4 min-w-0">
-                            <div class="min-w-0">
-                                <h4 class="font-bold text-lg text-on-surface truncate">{{ property.address }}</h4>
-                                <p class="text-sm text-on-surface-variant">{{ property.city }}, {{ property.state }}</p>
+            <template v-else>
+                <!-- Market Trends & Analytics -->
+                <section>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                        <!-- Average Sale Price Trends -->
+                        <div class="bg-surface-container-lowest p-8 rounded-[2rem] shadow-sm border border-outline-variant/30">
+                            <div class="flex items-center justify-between mb-8">
+                                <h3 class="font-bold text-primary flex items-center gap-2">
+                                    <span class="material-symbols-outlined text-primary/70">show_chart</span>
+                                    Average Sale Price Trends
+                                </h3>
+                                <span class="text-xs font-semibold text-on-surface-variant uppercase tracking-widest">Last 6 Months</span>
                             </div>
-                            <div class="flex items-center gap-12 shrink-0">
-                                <div class="text-right">
-                                    <p class="text-xs text-on-surface-variant font-bold uppercase tracking-widest">Added</p>
-                                    <p class="font-bold text-on-surface">{{ formatDate(property.created_at) }}</p>
+
+                            <div v-if="hasAvgSalePrices" class="h-60 w-full flex items-end justify-between px-2 gap-2 relative">
+                                <!-- Grid lines -->
+                                <div class="absolute inset-0 flex flex-col justify-between pt-4 pb-8 pointer-events-none opacity-10">
+                                    <div class="w-full border-t border-primary"></div>
+                                    <div class="w-full border-t border-primary"></div>
+                                    <div class="w-full border-t border-primary"></div>
+                                    <div class="w-full border-t border-primary"></div>
                                 </div>
-                                <div class="text-right min-w-[80px]">
-                                    <p class="text-xs text-on-surface-variant font-bold uppercase tracking-widest">Status</p>
-                                    <div class="flex items-center justify-end gap-1 font-bold" :class="property.analyzed_at ? 'text-primary' : 'text-on-surface-variant'">
-                                        <span class="material-symbols-outlined text-sm">{{ property.analyzed_at ? 'check_circle' : 'pending' }}</span>
-                                        <span class="text-sm">{{ property.analyzed_at ? 'Analyzed' : 'Pending' }}</span>
+                                <div
+                                    v-for="item in analytics.monthly_avg_sale_prices"
+                                    :key="item.month"
+                                    class="flex-1 flex flex-col items-center group"
+                                >
+                                    <div
+                                        class="w-full bg-primary/15 rounded-t-xl mb-4 transition-all group-hover:bg-primary/25 relative"
+                                        :style="{ height: `${avgPriceBarHeight(item.avg_price)}%` }"
+                                    >
+                                        <div class="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 bg-primary text-on-primary text-[10px] py-1 px-2 rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap">
+                                            {{ formatPrice(item.avg_price) }}
+                                        </div>
+                                    </div>
+                                    <span class="text-[10px] text-on-surface-variant font-bold uppercase tracking-tighter">{{ item.month }}</span>
+                                </div>
+                            </div>
+                            <p v-else class="h-60 flex items-center justify-center text-sm text-on-surface-variant">No sale data yet.</p>
+                        </div>
+
+                        <!-- Days on Market by Neighborhood -->
+                        <div class="bg-surface-container-lowest p-8 rounded-[2rem] shadow-sm border border-outline-variant/30">
+                            <div class="flex items-center justify-between mb-8">
+                                <h3 class="font-bold text-primary flex items-center gap-2">
+                                    <span class="material-symbols-outlined text-primary/70">bar_chart</span>
+                                    Days on Market by Neighborhood
+                                </h3>
+                            </div>
+
+                            <div v-if="analytics.days_on_market_by_neighborhood.length" class="space-y-6 pt-4">
+                                <div
+                                    v-for="item in analytics.days_on_market_by_neighborhood"
+                                    :key="item.name"
+                                    class="flex flex-col"
+                                >
+                                    <div class="flex justify-between text-xs font-semibold mb-2">
+                                        <span class="text-primary truncate max-w-[60%]">{{ item.name }}</span>
+                                        <span class="text-on-surface-variant shrink-0">{{ item.avg_days }} Days</span>
+                                    </div>
+                                    <div class="w-full h-3 bg-surface-container-high rounded-full overflow-hidden">
+                                        <div
+                                            class="h-full bg-primary rounded-full transition-all"
+                                            :style="{ width: `${domBarWidth(item.avg_days)}%` }"
+                                        ></div>
                                     </div>
                                 </div>
                             </div>
+                            <p v-else class="pt-4 text-sm text-on-surface-variant">No sold listing data yet.</p>
                         </div>
-                    </router-link>
 
-                    <div v-if="!recentProperties.length" class="bg-surface-container-lowest p-8 rounded-xl text-center">
-                        <p class="text-on-surface-variant italic text-sm">No properties found.</p>
-                        <router-link to="/properties/create" class="mt-4 inline-flex items-center gap-2 text-primary font-bold text-sm hover:underline">
-                            <span class="material-symbols-outlined text-base">add</span> Add your first property
-                        </router-link>
+                        <!-- Monthly Sales Trend -->
+                        <div class="bg-surface-container-lowest p-8 rounded-[2rem] shadow-sm border border-outline-variant/30">
+                            <div class="flex items-center justify-between mb-8">
+                                <h3 class="font-bold text-primary flex items-center gap-2">
+                                    <span class="material-symbols-outlined text-primary/70">timeline</span>
+                                    Sales Volume Trend
+                                </h3>
+                                <span class="text-xs font-semibold text-on-surface-variant uppercase tracking-widest">Last 6 Months</span>
+                            </div>
+
+                            <div class="h-52 w-full relative flex items-center">
+                                <svg class="w-full h-full" viewBox="0 0 400 100" preserveAspectRatio="none">
+                                    <path
+                                        v-if="absorptionPath"
+                                        :d="absorptionPath"
+                                        fill="none"
+                                        stroke="currentColor"
+                                        stroke-width="2.5"
+                                        stroke-linecap="round"
+                                        stroke-linejoin="round"
+                                        class="text-primary"
+                                    />
+                                    <circle
+                                        v-for="(pt, i) in absorptionPoints"
+                                        :key="i"
+                                        :cx="pt.cx"
+                                        :cy="pt.cy"
+                                        r="4"
+                                        fill="currentColor"
+                                        class="text-primary"
+                                    />
+                                </svg>
+                                <div class="absolute bottom-0 left-0 w-full flex justify-between px-1 text-[10px] text-on-surface-variant font-bold uppercase">
+                                    <span v-for="item in analytics.monthly_sold_counts" :key="item.month">{{ item.month }}</span>
+                                </div>
+                            </div>
+
+                            <div class="mt-6 flex items-center justify-center text-sm text-primary font-semibold gap-1">
+                                <span class="material-symbols-outlined text-sm">{{ salesTrendIcon }}</span>
+                                {{ salesTrendLabel }}
+                            </div>
+                        </div>
+
+                        <!-- Property Inventory per Neighborhood -->
+                        <div class="bg-surface-container-lowest p-8 rounded-[2rem] shadow-sm border border-outline-variant/30">
+                            <div class="flex items-center justify-between mb-8">
+                                <h3 class="font-bold text-primary flex items-center gap-2">
+                                    <span class="material-symbols-outlined text-primary/70">inventory_2</span>
+                                    Property Inventory
+                                </h3>
+                                <span class="text-xs font-semibold text-on-surface-variant uppercase tracking-widest">Active Units</span>
+                            </div>
+
+                            <div v-if="analytics.inventory_by_neighborhood.length" class="flex justify-around items-end h-52 pt-4 gap-2">
+                                <div
+                                    v-for="item in analytics.inventory_by_neighborhood"
+                                    :key="item.name"
+                                    class="flex flex-col items-center gap-3 flex-1"
+                                >
+                                    <div
+                                        class="w-full max-w-16 bg-primary rounded-t-2xl flex items-center justify-center relative"
+                                        :style="{ height: `${inventoryBarHeight(item.count)}%` }"
+                                    >
+                                        <span class="text-on-primary font-bold text-sm">{{ item.count }}</span>
+                                    </div>
+                                    <span class="text-[9px] font-bold text-on-surface-variant text-center uppercase tracking-tight leading-tight">{{ item.name }}</span>
+                                </div>
+                            </div>
+                            <p v-else class="h-52 flex items-center justify-center text-sm text-on-surface-variant">No neighborhood data yet.</p>
+                        </div>
                     </div>
-                </div>
-            </div>
-
-            <!-- Recently Sold (full width) -->
-            <div v-if="stats.recently_sold?.length" class="md:col-span-12 mt-4">
-                <div class="flex items-center justify-between mb-8">
-                    <h2 class="text-2xl font-bold tracking-tight text-on-surface">Recent Sales</h2>
-                </div>
-                <div class="space-y-4">
-                    <router-link
-                        v-for="history in stats.recently_sold"
-                        :key="history.id"
-                        :to="`/properties/${history.property.id}`"
-                        class="group bg-surface-container-lowest p-5 rounded-xl flex items-center gap-6 hover:bg-white hover:shadow-xl hover:shadow-on-surface/5 transition-all"
-                    >
-                        <div class="w-16 h-16 bg-surface-container-highest rounded-lg overflow-hidden shrink-0 flex items-center justify-center">
-                            <span class="material-symbols-outlined text-outline-variant">home</span>
-                        </div>
-                        <div class="flex-1 flex flex-col md:flex-row md:items-center justify-between gap-4 min-w-0">
-                            <div class="min-w-0">
-                                <h4 class="font-bold text-lg text-on-surface truncate">{{ history.property.address }}</h4>
-                                <p class="text-sm text-on-surface-variant">{{ history.property.city }}, {{ history.property.state }}</p>
-                            </div>
-                            <div class="flex items-center gap-12 shrink-0">
-                                <div class="text-right">
-                                    <p class="text-xs text-on-surface-variant font-bold uppercase tracking-widest">Sale Price</p>
-                                    <p class="font-bold text-on-surface">${{ formatPrice(history.price) }}</p>
-                                </div>
-                                <div class="text-right">
-                                    <p class="text-xs text-on-surface-variant font-bold uppercase tracking-widest">Date</p>
-                                    <p class="text-sm text-on-surface-variant">{{ formatDate(history.price_date) }}</p>
-                                </div>
-                            </div>
-                        </div>
-                    </router-link>
-                </div>
-            </div>
-        </div>
+                </section>
+            </template>
+        </main>
     </div>
 </template>
 
@@ -159,19 +164,100 @@
 import { ref, computed, onMounted } from 'vue';
 import api from '@/api';
 
+const loading = ref(true);
 const stats = ref({
     total_properties: 0,
     analyzed_properties: 0,
-    recently_listed: [],
     recently_sold: [],
+    recently_listed: [],
+    analytics: {
+        monthly_avg_sale_prices: [],
+        days_on_market_by_neighborhood: [],
+        monthly_sold_counts: [],
+        inventory_by_neighborhood: [],
+    },
 });
 
-const barHeights = [15, 30, 22, 50, 40, 65, 55, 75, 70, 90];
+const analytics = computed(() => stats.value.analytics);
 
-const recentProperties = computed(() => stats.value.recently_listed ?? []);
+// ── Chart helpers ─────────────────────────────────────────────────────────────
 
-const formatPrice = (price) => new Intl.NumberFormat('en-US').format(price);
-const formatDate = (date) => new Date(date).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+const maxAvgPrice = computed(() =>
+    Math.max(...analytics.value.monthly_avg_sale_prices.map((m) => m.avg_price), 1),
+);
+
+const hasAvgSalePrices = computed(() =>
+    analytics.value.monthly_avg_sale_prices.some((m) => m.avg_price > 0),
+);
+
+function avgPriceBarHeight(price) {
+    return Math.max((price / maxAvgPrice.value) * 100, 4);
+}
+
+const maxDom = computed(() =>
+    Math.max(...analytics.value.days_on_market_by_neighborhood.map((n) => n.avg_days), 1),
+);
+
+function domBarWidth(days) {
+    return Math.max((days / maxDom.value) * 100, 4);
+}
+
+const maxInventory = computed(() =>
+    Math.max(...analytics.value.inventory_by_neighborhood.map((n) => n.count), 1),
+);
+
+function inventoryBarHeight(count) {
+    return Math.max((count / maxInventory.value) * 85, 8); // cap at 85% to leave label room
+}
+
+// SVG path for monthly sales trend
+const absorptionPoints = computed(() => {
+    const data = analytics.value.monthly_sold_counts;
+    if (!data.length) return [];
+    const max = Math.max(...data.map((m) => m.count), 1);
+    const svgW = 400;
+    const svgH = 80;
+    return data.map((m, i) => ({
+        cx: data.length > 1 ? (i / (data.length - 1)) * svgW : svgW / 2,
+        cy: svgH - (m.count / max) * svgH + 10,
+    }));
+});
+
+const absorptionPath = computed(() => {
+    if (!absorptionPoints.value.length) return '';
+    return absorptionPoints.value
+        .map((pt, i) => `${i === 0 ? 'M' : 'L'}${pt.cx},${pt.cy}`)
+        .join(' ');
+});
+
+const salesTrendIcon = computed(() => {
+    const counts = analytics.value.monthly_sold_counts.map((m) => m.count);
+    if (counts.length < 2) return 'horizontal_rule';
+    const first = counts[0];
+    const last = counts[counts.length - 1];
+    if (last > first) return 'trending_up';
+    if (last < first) return 'trending_down';
+    return 'horizontal_rule';
+});
+
+const salesTrendLabel = computed(() => {
+    const counts = analytics.value.monthly_sold_counts.map((m) => m.count);
+    if (counts.length < 2) return 'No trend data yet';
+    const first = counts[0];
+    const last = counts[counts.length - 1];
+    if (last > first) return 'Sales volume trending up';
+    if (last < first) return 'Sales volume trending down';
+    return 'Sales volume stable';
+});
+
+// ── Formatting ────────────────────────────────────────────────────────────────
+
+function formatPrice(price) {
+    if (!price) return '—';
+    return new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD', maximumFractionDigits: 0 }).format(price);
+}
+
+// ── Data fetching ─────────────────────────────────────────────────────────────
 
 onMounted(async () => {
     try {
@@ -179,6 +265,8 @@ onMounted(async () => {
         stats.value = response.data.data;
     } catch (error) {
         console.error('Failed to load dashboard stats', error);
+    } finally {
+        loading.value = false;
     }
 });
 </script>
