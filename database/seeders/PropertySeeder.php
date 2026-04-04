@@ -4,6 +4,7 @@ namespace Database\Seeders;
 
 use App\Models\ListingCycle;
 use App\Models\Neighborhood;
+use App\Models\PriceHistory;
 use App\Models\Property;
 use App\Models\User;
 use Illuminate\Database\Seeder;
@@ -57,7 +58,7 @@ class PropertySeeder extends Seeder
             ['user_id' => $userId, 'neighborhood_id' => $neighborhoodId, 'is_pinned' => true],
         ));
 
-        ListingCycle::create([
+        $pinnedCycle = ListingCycle::create([
             'property_id' => $pinned->id,
             'status'      => 'sold',
             'list_price'  => self::BASE_LIST_PRICE,
@@ -65,6 +66,7 @@ class PropertySeeder extends Seeder
             'listed_at'   => now()->subYears(2)->format('Y-m-d'),
             'sold_at'     => now()->subYears(2)->addDays(35)->format('Y-m-d'),
         ]);
+        $this->createPriceHistories($pinned->id, $pinnedCycle->id, self::BASE_LIST_PRICE, 575_000, $pinnedCycle->listed_at->format('Y-m-d'), $pinnedCycle->sold_at->format('Y-m-d'));
 
         // 14 comparables with varied prices and sale dates
         $pricePairs = $this->generateComparablePrices();
@@ -79,7 +81,7 @@ class PropertySeeder extends Seeder
                 ['user_id' => $userId, 'neighborhood_id' => $neighborhoodId, 'is_pinned' => false],
             ));
 
-            ListingCycle::create([
+            $cycle = ListingCycle::create([
                 'property_id' => $property->id,
                 'status'      => 'sold',
                 'list_price'  => $listPrice,
@@ -87,7 +89,27 @@ class PropertySeeder extends Seeder
                 'listed_at'   => $listedAt,
                 'sold_at'     => $soldAt,
             ]);
+            $this->createPriceHistories($property->id, $cycle->id, $listPrice, $soldPrice, $listedAt, $soldAt);
         }
+    }
+
+    private function createPriceHistories(int $propertyId, int $cycleId, int $listPrice, int $soldPrice, string $listedAt, string $soldAt): void
+    {
+        PriceHistory::create([
+            'property_id'      => $propertyId,
+            'listing_cycle_id' => $cycleId,
+            'price'            => $listPrice,
+            'price_date'       => $listedAt,
+            'type'             => 'listing',
+        ]);
+
+        PriceHistory::create([
+            'property_id'      => $propertyId,
+            'listing_cycle_id' => $cycleId,
+            'price'            => $soldPrice,
+            'price_date'       => $soldAt,
+            'type'             => 'sold',
+        ]);
     }
 
     // -------------------------------------------------------------------------
@@ -223,10 +245,10 @@ class PropertySeeder extends Seeder
     {
         $pairs = [];
 
-        // 5 over list (+1% to +8%)
+        // 5 over list (+1% to +5%)
         for ($i = 0; $i < 5; $i++) {
             $list = $this->randomListPrice();
-            $pairs[] = [$list, $this->applyMultiplier($list, 1.01, 1.08)];
+            $pairs[] = [$list, $this->applyMultiplier($list, 1.01, 1.05)];
         }
 
         // 4 at list (exactly at)
@@ -235,10 +257,10 @@ class PropertySeeder extends Seeder
             $pairs[] = [$list, $list];
         }
 
-        // 5 under list (-2% to -8%)
+        // 5 under list (-1% to -5%)
         for ($i = 0; $i < 5; $i++) {
             $list = $this->randomListPrice();
-            $pairs[] = [$list, $this->applyMultiplier($list, 0.92, 0.98)];
+            $pairs[] = [$list, $this->applyMultiplier($list, 0.95, 0.99)];
         }
 
         shuffle($pairs);
