@@ -27,7 +27,7 @@
                             {{ analyzing ? 'Analyzing...' : analysisQueued ? 'Analysis Queued' : 'Run Analysis' }}
                         </button>
                         <router-link
-                            :to="`/properties/${property.id}/edit`"
+                            :to="`/neighborhoods/${route.params.neighborhoodId}/properties/${property.id}/edit`"
                             class="flex items-center gap-2 px-4 py-2 bg-surface-container-highest rounded-lg text-sm font-semibold text-on-surface-variant hover:bg-surface-container-high transition-colors"
                         >
                             <span class="material-symbols-outlined text-base">edit</span> Edit
@@ -158,11 +158,12 @@
                         </div>
 
                         <!-- Neighborhood Proximity -->
-                        <Neighborhood v-if="property.analyzed_at" :analysis="property.analysis" :property="property" />
+                        <Neighborhood v-if="property.analyzed_at" :analysis="property.analysis" :property="property" :neighborhood-id="route.params.neighborhoodId" />
 
                         <!-- Listing Lifecycle -->
                         <ListingLifecycle
                             :property-id="property.id"
+                            :neighborhood-id="route.params.neighborhoodId"
                             :initial-cycles="property.listing_cycles ?? []"
                         />
                     </div>
@@ -308,11 +309,13 @@ const router = useRouter();
 const route = useRoute();
 
 function goBackToList() {
+    const neighborhoodId = route.params.neighborhoodId;
     const prev = window.history.state?.back ?? '';
-    if (prev === '/properties' || prev.startsWith('/properties?')) {
+    const base = `/neighborhoods/${neighborhoodId}/properties`;
+    if (prev === base || prev.startsWith(`${base}?`)) {
         router.back();
     } else {
-        router.push({ name: 'properties' });
+        router.push(base);
     }
 }
 
@@ -370,12 +373,13 @@ const lastSalePrice = computed(() => {
 });
 
 const loadProperty = async () => {
+    const { neighborhoodId, id } = route.params;
     try {
-        const response = await api.get(`/properties/${route.params.id}`);
+        const response = await api.get(`/neighborhoods/${neighborhoodId}/properties/${id}`);
         property.value = response.data.data;
     } catch (error) {
         console.error('Failed to load property', error);
-        await router.push('/properties');
+        await router.push(`/neighborhoods/${neighborhoodId}/properties`);
     } finally {
         loading.value = false;
     }
@@ -383,8 +387,9 @@ const loadProperty = async () => {
 
 const runAnalysis = async () => {
     analyzing.value = true;
+    const { neighborhoodId, id } = route.params;
     try {
-        await api.post(`/properties/${route.params.id}/analyze`);
+        await api.post(`/neighborhoods/${neighborhoodId}/properties/${id}/analyze`);
         analysisQueued.value = true;
         setTimeout(() => { analysisQueued.value = false; }, 10000);
     } catch (error) {
@@ -396,9 +401,10 @@ const runAnalysis = async () => {
 
 const deleteProperty = async () => {
     if (!confirm('Are you sure you want to delete this property?')) return;
+    const { neighborhoodId, id } = route.params;
     try {
-        await api.delete(`/properties/${route.params.id}`);
-        router.push('/properties');
+        await api.delete(`/neighborhoods/${neighborhoodId}/properties/${id}`);
+        router.push(`/neighborhoods/${neighborhoodId}/properties`);
     } catch (error) {
         console.error('Failed to delete property', error);
         alert('Failed to delete property.');

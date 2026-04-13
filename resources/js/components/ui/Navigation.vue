@@ -36,13 +36,6 @@ const handleLogout = async () => {
                     Dashboard
                 </router-link>
                 <router-link
-                    to="/properties"
-                    class="text-on-surface-variant font-medium px-3 py-1.5 rounded hover:bg-surface-container-low transition-colors text-sm"
-                    active-class="text-primary font-semibold"
-                >
-                    Properties
-                </router-link>
-                <router-link
                     to="/neighborhoods"
                     class="text-on-surface-variant font-medium px-3 py-1.5 rounded hover:bg-surface-container-low transition-colors text-sm"
                     active-class="text-primary font-semibold"

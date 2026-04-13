@@ -4,6 +4,7 @@ import api from '@/api';
 
 const props = defineProps({
     propertyId: { type: Number, required: true },
+    neighborhoodId: { type: [String, Number], required: true },
     initialCycles: { type: Array, default: () => [] },
 });
 
@@ -44,7 +45,7 @@ async function createCycleWithListing() {
     newCycleSaving.value = true;
     try {
         // Create the container cycle
-        const { data: cycleData } = await api.post(`/properties/${props.propertyId}/listing-cycles`);
+        const { data: cycleData } = await api.post(`/neighborhoods/${props.neighborhoodId}/properties/${props.propertyId}/listing-cycles`);
         const cycleId = cycleData.data.id;
 
         // Immediately attach the first listing event

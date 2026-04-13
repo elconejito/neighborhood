@@ -45,7 +45,7 @@
 
                         <!-- Name -->
                         <div class="md:col-span-5">
-                            <h3 class="text-xl font-bold text-on-surface">{{ neighborhood.name }}</h3>
+                            <router-link :to="`/neighborhoods/${neighborhood.id}/properties`" class="text-xl font-bold text-on-surface hover:text-primary transition-colors">{{ neighborhood.name }}</router-link>
                         </div>
 
                         <!-- Properties count placeholder -->
@@ -58,6 +58,20 @@
 
                         <!-- Actions -->
                         <div class="md:col-span-3 flex justify-end gap-2">
+                            <router-link
+                                :to="`/neighborhoods/${neighborhood.id}/properties`"
+                                class="p-2 hover:bg-surface-container-high rounded transition-colors text-on-surface-variant"
+                                title="View Properties"
+                            >
+                                <span class="material-symbols-outlined">home_work</span>
+                            </router-link>
+                            <router-link
+                                to="/"
+                                class="p-2 hover:bg-surface-container-high rounded transition-colors text-on-surface-variant"
+                                title="Dashboard"
+                            >
+                                <span class="material-symbols-outlined">bar_chart</span>
+                            </router-link>
                             <button
                                 @click="openEditModal(neighborhood)"
                                 class="p-2 hover:bg-surface-container-high rounded transition-colors text-on-surface-variant"

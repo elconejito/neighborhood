@@ -7,7 +7,7 @@
         <div class="bg-error/10 border border-error/20 text-error p-6 rounded-xl flex flex-col items-center gap-4">
             <span class="material-symbols-outlined text-4xl">error</span>
             <p class="font-bold tracking-tight">{{ errorInitial }}</p>
-            <router-link to="/properties" class="text-sm font-bold uppercase tracking-widest hover:underline">
+            <router-link :to="`/neighborhoods/${route.params.neighborhoodId}/properties`" class="text-sm font-bold uppercase tracking-widest hover:underline">
                 Back to properties
             </router-link>
         </div>
@@ -15,7 +15,7 @@
 
     <div v-else class="max-w-3xl mx-auto py-12 px-8">
         <div class="mb-10">
-            <router-link :to="`/properties/${route.params.id}`" class="text-sm text-on-surface-variant hover:text-primary transition-colors flex items-center gap-1 mb-4">
+            <router-link :to="`/neighborhoods/${route.params.neighborhoodId}/properties/${route.params.id}`" class="text-sm text-on-surface-variant hover:text-primary transition-colors flex items-center gap-1 mb-4">
                 <span class="material-symbols-outlined text-sm">arrow_back</span> Back to property
             </router-link>
             <h1 class="text-4xl font-extrabold tracking-tight text-primary">Edit Property</h1>
@@ -372,7 +372,7 @@
             <!-- Actions -->
             <div class="flex justify-end items-center gap-4 pt-4">
                 <router-link
-                    :to="`/properties/${route.params.id}`"
+                    :to="`/neighborhoods/${route.params.neighborhoodId}/properties/${route.params.id}`"
                     class="px-6 py-3 text-sm font-bold text-on-surface-variant hover:text-on-surface transition-colors"
                 >
                     Discard Changes
@@ -438,9 +438,11 @@ const handleSubmit = async () => {
     loading.value = true;
     error.value = null;
 
+    const neighborhoodId = route.params.neighborhoodId;
     try {
-        await api.put(`/properties/${route.params.id}`, form);
-        router.push(`/properties/${route.params.id}`);
+        await api.put(`/neighborhoods/${neighborhoodId}/properties/${route.params.id}`, form);
+        const newNeighborhoodId = form.neighborhood_id || neighborhoodId;
+        router.push(`/neighborhoods/${newNeighborhoodId}/properties/${route.params.id}`);
     } catch (e) {
         error.value = e.response?.data?.message || 'Failed to update property';
     } finally {
@@ -450,10 +452,11 @@ const handleSubmit = async () => {
 
 onMounted(async () => {
     try {
+        const neighborhoodId = route.params.neighborhoodId;
         const [neighborhoodsRes, hvacTypesRes, propertyRes] = await Promise.all([
             api.get('/neighborhoods'),
             api.get('/reference/hvac-types'),
-            api.get(`/properties/${route.params.id}`)
+            api.get(`/neighborhoods/${neighborhoodId}/properties/${route.params.id}`)
         ]);
 
         neighborhoods.value = neighborhoodsRes.data.data;

@@ -26,13 +26,13 @@ Route::prefix('v1')->group(function () {
         // Dashboard
         Route::get('dashboard/stats', [DashboardController::class, 'stats']);
 
-        // Properties
-        Route::apiResource('properties', PropertyController::class);
-        Route::post('properties/{property}/analyze', [PropertyController::class, 'analyze']);
-        Route::post('properties/{property}/geocode', [PropertyController::class, 'geocode']);
+        // Properties (nested under neighborhoods)
+        Route::apiResource('neighborhoods.properties', PropertyController::class);
+        Route::post('neighborhoods/{neighborhood}/properties/{property}/analyze', [PropertyController::class, 'analyze']);
+        Route::post('neighborhoods/{neighborhood}/properties/{property}/geocode', [PropertyController::class, 'geocode']);
 
         // Listing Cycles
-        Route::post('properties/{property}/listing-cycles', [ListingCycleController::class, 'store']);
+        Route::post('neighborhoods/{neighborhood}/properties/{property}/listing-cycles', [ListingCycleController::class, 'store']);
         Route::put('listing-cycles/{listingCycle}', [ListingCycleController::class, 'update']);
         Route::delete('listing-cycles/{listingCycle}', [ListingCycleController::class, 'destroy']);
 

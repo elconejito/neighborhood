@@ -1,75 +1,20 @@
 <template>
     <div class="min-h-screen bg-surface p-10">
         <div class="max-w-6xl mx-auto">
-            <!-- Header & Filters -->
+            <!-- Header -->
             <div class="flex flex-col md:flex-row md:items-end justify-between mb-8 gap-6">
                 <div>
+                    <router-link to="/neighborhoods" class="text-sm text-on-surface-variant hover:text-primary transition-colors flex items-center gap-1 mb-3">
+                        <span class="material-symbols-outlined text-sm">arrow_back</span> Neighborhoods
+                    </router-link>
                     <h1 class="text-4xl font-extrabold tracking-tight text-on-surface mb-2">Residential Catalog</h1>
                     <p class="text-on-surface-variant font-medium">
                         Managing {{ pagination.total }} {{ pagination.total === 1 ? 'property' : 'properties' }}
                     </p>
                 </div>
                 <div class="flex flex-wrap gap-3">
-                    <!-- Neighborhood filter -->
-                    <div class="relative" ref="filterDropdownRef">
-                        <button
-                            @click="showNeighborhoodFilter = !showNeighborhoodFilter"
-                            :class="[
-                                'flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-semibold transition-colors',
-                                selectedNeighborhoodIds.length > 0
-                                    ? 'bg-primary text-on-primary'
-                                    : 'bg-surface-container-highest text-on-surface-variant hover:bg-surface-container-high',
-                            ]"
-                        >
-                            <span class="material-symbols-outlined text-base">filter_list</span>
-                            Neighborhoods
-                            <span
-                                v-if="selectedNeighborhoodIds.length > 0"
-                                class="inline-flex items-center justify-center w-5 h-5 rounded-full bg-on-primary text-primary text-xs font-bold"
-                            >
-                                {{ selectedNeighborhoodIds.length }}
-                            </span>
-                        </button>
-
-                        <!-- Dropdown panel -->
-                        <div
-                            v-if="showNeighborhoodFilter"
-                            class="absolute right-0 top-full mt-2 w-64 bg-surface-container rounded-xl shadow-lg z-10 overflow-hidden"
-                        >
-                            <div class="px-4 py-3 border-b border-outline-variant flex justify-between items-center">
-                                <span class="text-xs font-bold uppercase tracking-wider text-on-surface-variant">Filter by Neighborhood</span>
-                                <button
-                                    v-if="selectedNeighborhoodIds.length > 0"
-                                    @click="clearFilter"
-                                    class="text-xs text-primary font-semibold hover:opacity-75 transition-opacity"
-                                >
-                                    Clear
-                                </button>
-                            </div>
-                            <div class="max-h-64 overflow-y-auto">
-                                <p v-if="neighborhoods.length === 0" class="p-4 text-sm text-on-surface-variant text-center">
-                                    No neighborhoods found
-                                </p>
-                                <button
-                                    v-for="neighborhood in neighborhoods"
-                                    :key="neighborhood.id"
-                                    @click="toggleNeighborhood(neighborhood.id)"
-                                    class="w-full flex items-center gap-3 px-4 py-2.5 hover:bg-surface-container-high transition-colors text-left"
-                                >
-                                    <span
-                                        class="material-symbols-outlined text-base"
-                                        :class="isSelected(neighborhood.id) ? 'text-primary' : 'text-outline'"
-                                    >
-                                        {{ isSelected(neighborhood.id) ? 'check_box' : 'check_box_outline_blank' }}
-                                    </span>
-                                    <span class="text-sm text-on-surface">{{ neighborhood.name }}</span>
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-
                     <router-link
-                        to="/properties/create"
+                        :to="`/neighborhoods/${neighborhoodId}/properties/create`"
                         class="bg-primary text-on-primary px-4 py-2 rounded-lg font-bold text-sm flex items-center justify-center gap-2 shadow-sm hover:opacity-90 transition-opacity"
                     >
                         <span class="material-symbols-outlined text-sm">add</span> Add Asset
@@ -90,7 +35,7 @@
             >
                 <template #action>
                     <router-link
-                        to="/properties/create"
+                        :to="`/neighborhoods/${neighborhoodId}/properties/create`"
                         class="inline-flex items-center gap-2 px-4 py-2 bg-primary text-on-primary rounded-lg text-sm font-bold shadow-sm hover:opacity-90 transition-opacity"
                     >
                         <span class="material-symbols-outlined text-sm">add</span>
@@ -103,20 +48,22 @@
                 <!-- Catalog List -->
                 <div class="space-y-3">
                     <PropertyListItem
-                        v-if="showPinnedSection && pinnedProperty"
+                        v-if="pinnedProperty"
                         :property="pinnedProperty"
                         :isPinned="true"
+                        :neighborhoodId="neighborhoodId"
                         :key="pinnedProperty.id"
                     />
                     <template v-if="unpinnedProperties.length">
-                        <div v-if="showPinnedSection && pinnedProperty" class="px-6 py-1">
+                        <div v-if="pinnedProperty" class="px-6 py-1">
                             <h4 class="text-[10px] font-bold uppercase tracking-widest text-outline">Market Comparables</h4>
                         </div>
                         <PropertyListItem
                             v-for="property in unpinnedProperties"
                             :property="property"
                             :isPinned="false"
-                            :pinnedProperty="showPinnedSection ? pinnedProperty : null"
+                            :pinnedProperty="pinnedProperty"
+                            :neighborhoodId="neighborhoodId"
                             :key="property.id"
                         />
                     </template>
@@ -185,7 +132,7 @@
 
     <!-- Mobile FAB -->
     <router-link
-        to="/properties/create"
+        :to="`/neighborhoods/${neighborhoodId}/properties/create`"
         class="md:hidden fixed bottom-6 right-6 w-14 h-14 bg-primary text-on-primary rounded-full shadow-2xl flex items-center justify-center z-50"
     >
         <span class="material-symbols-outlined">add</span>
@@ -193,7 +140,7 @@
 </template>
 
 <script setup>
-import { computed, onMounted, onUnmounted, ref } from 'vue';
+import { computed, onMounted, ref } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import api from '@/api';
 import EmptyState from '@/components/EmptyState.vue';
@@ -202,23 +149,16 @@ import PropertyListItem from '@/components/properties/PropertyListItem.vue';
 const route = useRoute();
 const router = useRouter();
 
+const neighborhoodId = computed(() => route.params.neighborhoodId);
+
 const properties = ref([]);
-const neighborhoods = ref([]);
 const loading = ref(true);
-const showNeighborhoodFilter = ref(false);
-const selectedNeighborhoodIds = ref([]);
-const filterDropdownRef = ref(null);
 const currentPage = ref(1);
 const perPage = ref(10);
 const pagination = ref({ total: 0, count: 0, per_page: 10, current_page: 1, total_pages: 1 });
 
-// Only show pinned section when 0 or 1 neighborhood is selected
-const showPinnedSection = computed(() => selectedNeighborhoodIds.value.length === 1);
-const pinnedProperty = computed(() => showPinnedSection.value ? (properties.value.find(p => p.is_pinned) ?? null) : null);
-const unpinnedProperties = computed(() => showPinnedSection.value
-    ? properties.value.filter(p => !p.is_pinned)
-    : properties.value,
-);
+const pinnedProperty = computed(() => properties.value.find(p => p.is_pinned) ?? null);
+const unpinnedProperties = computed(() => properties.value.filter(p => !p.is_pinned));
 
 const pageRange = computed(() => {
     const total = pagination.value.total_pages;
@@ -238,49 +178,16 @@ const pageRange = computed(() => {
 });
 
 onMounted(async () => {
-    const urlNeighborhoods = route.query.neighborhoods;
-    if (urlNeighborhoods) {
-        selectedNeighborhoodIds.value = urlNeighborhoods.split(',').map(Number);
-    }
-    if (route.query.page) {
-        currentPage.value = Number(route.query.page);
-    }
-    if (route.query.per_page) {
-        perPage.value = Number(route.query.per_page);
-    }
-
-    document.addEventListener('mousedown', onDocumentClick);
-    await Promise.all([fetchNeighborhoods(), fetchProperties()]);
+    if (route.query.page) currentPage.value = Number(route.query.page);
+    if (route.query.per_page) perPage.value = Number(route.query.per_page);
+    await fetchProperties();
 });
-
-onUnmounted(() => {
-    document.removeEventListener('mousedown', onDocumentClick);
-});
-
-function onDocumentClick(e) {
-    if (filterDropdownRef.value && !filterDropdownRef.value.contains(e.target)) {
-        showNeighborhoodFilter.value = false;
-    }
-}
-
-async function fetchNeighborhoods() {
-    try {
-        const response = await api.get('/neighborhoods');
-        neighborhoods.value = response.data.data;
-    } catch (error) {
-        console.error('Failed to load neighborhoods', error);
-    }
-}
 
 async function fetchProperties() {
     loading.value = true;
     try {
         const params = { page: currentPage.value, per_page: perPage.value };
-        if (selectedNeighborhoodIds.value.length > 0) {
-            params.search = selectedNeighborhoodIds.value.join(',');
-            params.searchFields = 'neighborhood_id:in';
-        }
-        const response = await api.get('/properties', { params });
+        const response = await api.get(`/neighborhoods/${neighborhoodId.value}/properties`, { params });
         properties.value = response.data.data;
         pagination.value = response.data.meta.pagination;
     } catch (error) {
@@ -288,29 +195,6 @@ async function fetchProperties() {
     } finally {
         loading.value = false;
     }
-}
-
-function isSelected(id) {
-    return selectedNeighborhoodIds.value.includes(id);
-}
-
-function toggleNeighborhood(id) {
-    const idx = selectedNeighborhoodIds.value.indexOf(id);
-    if (idx === -1) {
-        selectedNeighborhoodIds.value.push(id);
-    } else {
-        selectedNeighborhoodIds.value.splice(idx, 1);
-    }
-    currentPage.value = 1;
-    syncToUrl();
-    fetchProperties();
-}
-
-function clearFilter() {
-    selectedNeighborhoodIds.value = [];
-    currentPage.value = 1;
-    syncToUrl();
-    fetchProperties();
 }
 
 function goToPage(page) {
@@ -329,22 +213,9 @@ function changePerPage(value) {
 }
 
 function syncToUrl() {
-    const query = { ...route.query };
-    if (selectedNeighborhoodIds.value.length > 0) {
-        query.neighborhoods = selectedNeighborhoodIds.value.join(',');
-    } else {
-        delete query.neighborhoods;
-    }
-    if (currentPage.value > 1) {
-        query.page = currentPage.value;
-    } else {
-        delete query.page;
-    }
-    if (perPage.value !== 10) {
-        query.per_page = perPage.value;
-    } else {
-        delete query.per_page;
-    }
+    const query = {};
+    if (currentPage.value > 1) query.page = currentPage.value;
+    if (perPage.value !== 10) query.per_page = perPage.value;
     router.replace({ query });
 }
 </script>

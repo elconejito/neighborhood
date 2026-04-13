@@ -6,6 +6,7 @@ const props = defineProps({
     property: { type: Object, required: true },
     isPinned: { type: Boolean, default: false },
     pinnedProperty: { type: Object, default: null },
+    neighborhoodId: { type: [String, Number], required: true },
 });
 
 const fmtCurrency = new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD', maximumFractionDigits: 0 });
@@ -46,7 +47,7 @@ const sqftComparison = computed(() => {
         v-if="isPinned"
         class="bg-primary-container/30 border-l-4 border-primary rounded-xl p-4 flex items-center gap-8 relative overflow-hidden"
     >
-        <router-link :to="`/properties/${property.id}`" class="flex items-center gap-8 grow min-w-0">
+        <router-link :to="`/neighborhoods/${props.neighborhoodId}/properties/${property.id}`" class="flex items-center gap-8 grow min-w-0">
             <div class="w-14 h-14 rounded-lg overflow-hidden shrink-0 shadow-sm bg-primary-container flex items-center justify-center">
                 <span class="material-symbols-outlined text-primary/50 text-2xl">home</span>
             </div>
@@ -78,7 +79,7 @@ const sqftComparison = computed(() => {
     <!-- Standard Catalog Row -->
     <router-link
         v-else
-        :to="`/properties/${property.id}`"
+        :to="`/neighborhoods/${props.neighborhoodId}/properties/${property.id}`"
         class="bg-surface-container-lowest border border-transparent hover:border-primary-container rounded-xl p-4 flex items-center gap-8 hover:bg-surface-container-low transition-colors group"
     >
         <div class="w-14 h-14 bg-surface-container-highest rounded-lg overflow-hidden shrink-0 flex items-center justify-center">

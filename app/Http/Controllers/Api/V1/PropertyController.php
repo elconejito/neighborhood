@@ -12,6 +12,7 @@ use App\Http\Requests\Api\V1\Property\UpdatePropertyRequest;
 use App\Jobs\AnalyzeNeighborDistanceJob;
 use App\Jobs\AnalyzePropertyJob;
 use App\Jobs\GeocodePropertyJob;
+use App\Models\Neighborhood;
 use App\Models\Property;
 use App\Services\PropertyAnalysisService;
 use App\Transformers\Api\V1\PropertyTransformer;
@@ -21,15 +22,11 @@ class PropertyController extends Controller
 {
     public function __construct(protected PropertyAnalysisService $analysisService) {}
 
-    public function index(IndexPropertyRequest $request): JsonResponse
+    public function index(IndexPropertyRequest $request, Neighborhood $neighborhood): JsonResponse
     {
-        $multipleNeighborhoods = str_contains($request->input('searchFields', ''), 'neighborhood_id')
-            && str_contains($request->input('search', ''), ',');
-
-        $properties = Property::forUser($request->user())
-            ->filter($request)
+        $properties = Property::where('neighborhood_id', $neighborhood->id)
             ->with('priceHistories')
-            ->when(! $multipleNeighborhoods, fn ($q) => $q->orderByDesc('is_pinned'))
+            ->orderByDesc('is_pinned')
             ->orderByDesc('created_at')
             ->paginate($request->integer('per_page', 10));
 
@@ -38,9 +35,10 @@ class PropertyController extends Controller
             ->respond();
     }
 
-    public function store(StorePropertyRequest $request): JsonResponse
+    public function store(StorePropertyRequest $request, Neighborhood $neighborhood): JsonResponse
     {
         $validated = $request->validated();
+        $validated['neighborhood_id'] = $neighborhood->id;
 
         $property = $request->user()->properties()->create($validated);
 
@@ -51,14 +49,14 @@ class PropertyController extends Controller
             ->respond(201);
     }
 
-    public function show(ShowPropertyRequest $request, Property $property): JsonResponse
+    public function show(ShowPropertyRequest $request, Neighborhood $neighborhood, Property $property): JsonResponse
     {
         return fractal()->item($property, PropertyTransformer::class)
             ->parseIncludes(['price_histories', 'neighborhood', 'notes', 'listing_cycles'])
             ->respond();
     }
 
-    public function update(UpdatePropertyRequest $request, Property $property): JsonResponse
+    public function update(UpdatePropertyRequest $request, Neighborhood $neighborhood, Property $property): JsonResponse
     {
         $validated = $request->validated();
 
@@ -83,7 +81,7 @@ class PropertyController extends Controller
             ->respond();
     }
 
-    public function destroy(DestroyPropertyRequest $request, Property $property): JsonResponse
+    public function destroy(DestroyPropertyRequest $request, Neighborhood $neighborhood, Property $property): JsonResponse
     {
         $property->delete();
 
@@ -92,7 +90,7 @@ class PropertyController extends Controller
         ]);
     }
 
-    public function analyze(AnalyzePropertyRequest $request, Property $property): JsonResponse
+    public function analyze(AnalyzePropertyRequest $request, Neighborhood $neighborhood, Property $property): JsonResponse
     {
         AnalyzePropertyJob::dispatch($property);
 
@@ -101,7 +99,7 @@ class PropertyController extends Controller
         ]);
     }
 
-    public function geocode(AnalyzePropertyRequest $request, Property $property): JsonResponse
+    public function geocode(AnalyzePropertyRequest $request, Neighborhood $neighborhood, Property $property): JsonResponse
     {
         $property->update([
             'latitude' => null,

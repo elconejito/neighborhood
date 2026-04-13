@@ -2,7 +2,7 @@
     <div class="max-w-3xl mx-auto py-6 sm:px-6 lg:px-8">
         <div class="px-4 sm:px-0">
             <div class="mb-6">
-                <router-link to="/properties" class="text-sm text-gray-500 hover:text-gray-700">
+                <router-link :to="`/neighborhoods/${route.params.neighborhoodId}/properties`" class="text-sm text-gray-500 hover:text-gray-700">
                     ← Back to properties
                 </router-link>
                 <h1 class="mt-2 text-2xl font-bold text-gray-900">Add Property</h1>
@@ -12,21 +12,6 @@
                 <div class="px-4 py-5 sm:p-6 space-y-6">
                     <div v-if="error" class="bg-red-50 border border-red-200 text-red-600 px-4 py-3 rounded-md text-sm">
                         {{ error }}
-                    </div>
-
-                    <!-- Neighborhood -->
-                    <div v-if="neighborhoods.length > 0">
-                        <label for="neighborhood_id" class="block text-sm font-medium text-gray-700">Neighborhood</label>
-                        <select
-                            id="neighborhood_id"
-                            v-model="form.neighborhood_id"
-                            class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-emerald-500 focus:border-emerald-500"
-                        >
-                            <option :value="null">None</option>
-                            <option v-for="neighborhood in neighborhoods" :key="neighborhood.id" :value="neighborhood.id">
-                                {{ neighborhood.name }}
-                            </option>
-                        </select>
                     </div>
 
                     <!-- Address -->
@@ -327,7 +312,7 @@
 
                 <div class="px-4 py-3 bg-gray-50 text-right sm:px-6 space-x-3">
                     <router-link
-                        to="/properties"
+                        :to="`/neighborhoods/${route.params.neighborhoodId}/properties`"
                         class="inline-flex justify-center py-2 px-4 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50"
                     >
                         Cancel
@@ -347,18 +332,15 @@
 
 <script setup>
 import { ref, reactive, onMounted } from 'vue';
-import { useRouter } from 'vue-router';
+import { useRouter, useRoute } from 'vue-router';
 import api from '@/api';
 
 const router = useRouter();
+const route = useRoute();
 
-const neighborhoods = ref([]);
 const hvacTypes = ref([]);
-const loadingNeighborhoods = ref(false);
-const loadingHvacTypes = ref(false);
 
 const form = reactive({
-    neighborhood_id: null,
     address: '',
     city: '',
     state: '',
@@ -390,9 +372,10 @@ const handleSubmit = async () => {
     loading.value = true;
     error.value = null;
 
+    const neighborhoodId = route.params.neighborhoodId;
     try {
-        const response = await api.post('/properties', form);
-        router.push(`/properties/${response.data.data.id}`);
+        const response = await api.post(`/neighborhoods/${neighborhoodId}/properties`, form);
+        router.push(`/neighborhoods/${neighborhoodId}/properties/${response.data.data.id}`);
     } catch (e) {
         error.value = e.response?.data?.message || 'Failed to save property';
     } finally {
@@ -401,20 +384,11 @@ const handleSubmit = async () => {
 };
 
 onMounted(async () => {
-    loadingNeighborhoods.value = true;
-    loadingHvacTypes.value = true;
     try {
-        const [neighborhoodsRes, hvacTypesRes] = await Promise.all([
-            api.get('/neighborhoods'),
-            api.get('/reference/hvac-types')
-        ]);
-        neighborhoods.value = neighborhoodsRes.data.data;
-        hvacTypes.value = hvacTypesRes.data.data;
+        const response = await api.get('/reference/hvac-types');
+        hvacTypes.value = response.data.data;
     } catch (e) {
-        console.error('Failed to load initial data', e);
-    } finally {
-        loadingNeighborhoods.value = false;
-        loadingHvacTypes.value = false;
+        console.error('Failed to load HVAC types', e);
     }
 });
 </script>

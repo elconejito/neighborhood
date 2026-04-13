@@ -15,6 +15,10 @@ const props = defineProps({
     required: false,
     default: () => ({}),
   },
+  neighborhoodId: {
+    type: [String, Number],
+    required: true,
+  },
 });
 
 const refreshing = ref(false);
@@ -23,7 +27,7 @@ const refreshQueued = ref(false);
 const refreshGeo = async () => {
   refreshing.value = true;
   try {
-    await api.post(`/properties/${props.property.id}/geocode`);
+    await api.post(`/neighborhoods/${props.neighborhoodId}/properties/${props.property.id}/geocode`);
     refreshQueued.value = true;
     setTimeout(() => { refreshQueued.value = false; }, 10000);
   } catch (error) {
