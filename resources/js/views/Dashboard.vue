@@ -2,10 +2,21 @@
     <div class="min-h-screen bg-surface">
         <main class="max-w-screen-2xl mx-auto px-8 py-12">
             <!-- Header -->
-            <section class="mb-16">
-                <h1 class="text-5xl font-extrabold text-primary tracking-tight mb-2">Dashboard</h1>
-                <p class="text-on-surface-variant text-lg">Performance metrics for the last 6 months.</p>
+            <section class="mb-16 flex items-start justify-between gap-4">
+                <div>
+                    <h1 class="text-5xl font-extrabold text-primary tracking-tight mb-2">Dashboard</h1>
+                    <p class="text-on-surface-variant text-lg">Performance metrics for the last 6 months.</p>
+                </div>
+                <button
+                    @click="showDistanceCheck = true"
+                    class="flex items-center gap-2 px-5 py-2.5 rounded-2xl text-sm font-semibold bg-primary text-on-primary hover:bg-primary/90 transition-colors shrink-0 mt-2"
+                >
+                    <span class="material-symbols-outlined text-base">social_distance</span>
+                    Distance Check
+                </button>
             </section>
+
+            <DistanceCheckModal v-if="showDistanceCheck" @close="showDistanceCheck = false" />
 
             <!-- Loading -->
             <div v-if="loading" class="text-center py-24">
@@ -163,6 +174,9 @@
 <script setup>
 import { ref, computed, onMounted } from 'vue';
 import api from '@/api';
+import DistanceCheckModal from '@/components/DistanceCheckModal.vue';
+
+const showDistanceCheck = ref(false);
 
 const loading = ref(true);
 const stats = ref({

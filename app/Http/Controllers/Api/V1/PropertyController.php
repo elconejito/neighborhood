@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api\V1;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Api\V1\Property\AnalyzePropertyRequest;
 use App\Http\Requests\Api\V1\Property\DestroyPropertyRequest;
+use App\Http\Requests\Api\V1\Property\DistanceCheckRequest;
 use App\Http\Requests\Api\V1\Property\IndexPropertyRequest;
 use App\Http\Requests\Api\V1\Property\ShowPropertyRequest;
 use App\Http\Requests\Api\V1\Property\StorePropertyRequest;
@@ -110,6 +111,32 @@ class PropertyController extends Controller
 
         return response()->json([
             'data' => ['message' => 'Property geocoding and analysis has been queued'],
+        ]);
+    }
+
+    public function distanceCheck(DistanceCheckRequest $request): JsonResponse
+    {
+        $coords = $this->analysisService->geocodeAddress([
+            'street' => $request->string('address')->toString(),
+            'city' => $request->string('city')->toString(),
+            'state' => $request->string('state')->toString(),
+            'postalcode' => $request->string('zip_code')->toString(),
+        ]);
+
+        if (! $coords) {
+            return response()->json([
+                'message' => 'Could not geocode the provided address. Please check the address and try again.',
+            ], 422);
+        }
+
+        $neighborDistance = $this->analysisService->analyzeNeighborDistance($coords['lat'], $coords['lng']);
+
+        return response()->json([
+            'data' => [
+                'latitude' => $coords['lat'],
+                'longitude' => $coords['lng'],
+                'neighbor_distance' => $neighborDistance,
+            ],
         ]);
     }
 }

@@ -184,6 +184,36 @@ class PropertyAnalysisServiceTest extends TestCase
         });
     }
 
+    public function test_analyze_neighbor_distance_filters_out_impossibly_close_buildings(): void
+    {
+        // Building at ~0.8m (0.00001 lon diff) — should be excluded (own footprint)
+        // Building at ~8.4m (0.0001 lon diff) — should be included
+        Http::fake([
+            'https://overpass-api.de/api/interpreter' => Http::response([
+                'elements' => [
+                    [
+                        'type' => 'way',
+                        'id' => 1,
+                        'center' => ['lat' => 40.7128, 'lon' => -74.00601],
+                        'tags' => ['building' => 'yes'],
+                    ],
+                    [
+                        'type' => 'way',
+                        'id' => 2,
+                        'center' => ['lat' => 40.7128, 'lon' => -74.0061],
+                        'tags' => ['building' => 'yes'],
+                    ],
+                ],
+            ], 200),
+        ]);
+
+        $service = new PropertyAnalysisService;
+        $result = $service->analyzeNeighborDistance(40.7128, -74.0060);
+
+        $this->assertCount(1, $result['nearest_houses']);
+        $this->assertGreaterThanOrEqual(3.0, $result['nearest_houses'][0]['distance_meters']);
+    }
+
     public function test_analyze_property_handles_missing_names_with_fallbacks(): void
     {
         Http::fake([

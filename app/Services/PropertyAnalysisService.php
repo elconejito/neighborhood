@@ -13,6 +13,12 @@ class PropertyAnalysisService
 
     protected string $userAgent = 'NeighborhoodApp/1.0 (contact@neighborhood.app)';
 
+    /**
+     * Buildings closer than this are assumed to be the property's own footprint
+     * and are excluded from neighbor distance results.
+     */
+    protected float $minimumNeighborDistanceMeters = 3.0;
+
     public function analyzeProperty(Property $property): array
     {
         $lat = $property->latitude;
@@ -88,9 +94,9 @@ class PropertyAnalysisService
             ]));
 
             $response = Http::get('https://api.geocod.io/v1.7/geocode', [
-                'q'      => $query,
+                'q' => $query,
                 'api_key' => $apiKey,
-                'limit'  => 1,
+                'limit' => 1,
             ]);
 
             $results = $response->json('results') ?? [];
@@ -99,10 +105,10 @@ class PropertyAnalysisService
                 $location = $results[0]['location'];
 
                 Log::debug(__CLASS__.':'.__LINE__, [
-                    'source'          => 'geocodio',
+                    'source' => 'geocodio',
                     'matched_address' => $results[0]['formatted_address'] ?? null,
-                    'accuracy'        => $results[0]['accuracy_type'] ?? null,
-                    'coordinates'     => $location,
+                    'accuracy' => $results[0]['accuracy_type'] ?? null,
+                    'coordinates' => $location,
                 ]);
 
                 return [
@@ -121,12 +127,12 @@ class PropertyAnalysisService
     {
         try {
             $response = Http::get('https://geocoding.geo.census.gov/geocoder/locations/address', [
-                'street'    => $address['street'] ?? '',
-                'city'      => $address['city'] ?? '',
-                'state'     => $address['state'] ?? '',
-                'zip'       => $address['postalcode'] ?? '',
+                'street' => $address['street'] ?? '',
+                'city' => $address['city'] ?? '',
+                'state' => $address['state'] ?? '',
+                'zip' => $address['postalcode'] ?? '',
                 'benchmark' => 'Public_AR_Current',
-                'format'    => 'json',
+                'format' => 'json',
             ]);
 
             $matches = $response->json('result.addressMatches') ?? [];
@@ -222,6 +228,9 @@ QUERY;
                             $building['center']['lat'],
                             $building['center']['lon']
                         );
+                        if ($distance < $this->minimumNeighborDistanceMeters) {
+                            continue;
+                        }
                         $distances[] = $distance;
                     }
                 }
@@ -230,7 +239,6 @@ QUERY;
                 $nearestDistances = array_slice($distances, 0, 10);
 
                 $nearestHouses = [];
-                $houseCount = 0;
                 foreach ($buildings as $building) {
                     if (isset($building['center'])) {
                         $dist = $this->haversineDistance(
@@ -238,6 +246,9 @@ QUERY;
                             $building['center']['lat'],
                             $building['center']['lon']
                         );
+                        if ($dist < $this->minimumNeighborDistanceMeters) {
+                            continue;
+                        }
                         $direction = $this->calculateDirection(
                             $lat, $lng,
                             $building['center']['lat'],

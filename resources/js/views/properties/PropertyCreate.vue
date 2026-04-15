@@ -341,10 +341,10 @@ const route = useRoute();
 const hvacTypes = ref([]);
 
 const form = reactive({
-    address: '',
-    city: '',
-    state: '',
-    zip_code: '',
+    address: route.query.address ?? '',
+    city: route.query.city ?? '',
+    state: route.query.state ?? '',
+    zip_code: route.query.zip_code ?? '',
     acreage: null,
     bedrooms: null,
     bathrooms: null,
