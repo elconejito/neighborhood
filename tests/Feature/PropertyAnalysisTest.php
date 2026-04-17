@@ -19,6 +19,21 @@ class PropertyAnalysisTest extends TestCase
 {
     use RefreshDatabase;
 
+    private function analyzeUrl(Property $property): string
+    {
+        return "/api/v1/neighborhoods/{$property->neighborhood_id}/properties/{$property->id}/analyze";
+    }
+
+    private function geocodeUrl(Property $property): string
+    {
+        return "/api/v1/neighborhoods/{$property->neighborhood_id}/properties/{$property->id}/geocode";
+    }
+
+    private function analyzeSectionUrl(Property $property, string $section): string
+    {
+        return "/api/v1/neighborhoods/{$property->neighborhood_id}/properties/{$property->id}/analyze/{$section}";
+    }
+
     public function test_analyze_method_dispatches_job(): void
     {
         Queue::fake();
@@ -28,7 +43,7 @@ class PropertyAnalysisTest extends TestCase
             'user_id' => $user->id,
         ]);
 
-        $response = $this->actingAs($user, 'api')->postJson("/api/v1/properties/{$property->id}/analyze");
+        $response = $this->actingAs($user, 'api')->postJson($this->analyzeUrl($property));
 
         $response->assertStatus(200)
             ->assertJsonPath('data.message', 'Property analysis has been queued');
@@ -49,7 +64,7 @@ class PropertyAnalysisTest extends TestCase
             'longitude' => -74.0060,
         ]);
 
-        $response = $this->actingAs($user, 'api')->postJson("/api/v1/properties/{$property->id}/geocode");
+        $response = $this->actingAs($user, 'api')->postJson($this->geocodeUrl($property));
 
         $response->assertStatus(200)
             ->assertJsonPath('data.message', 'Property geocoding and analysis has been queued');
@@ -74,11 +89,84 @@ class PropertyAnalysisTest extends TestCase
         $other = User::factory()->create();
         $property = Property::factory()->create(['user_id' => $owner->id]);
 
-        $this->actingAs($other, 'api')->postJson("/api/v1/properties/{$property->id}/geocode")
+        $this->actingAs($other, 'api')->postJson($this->geocodeUrl($property))
             ->assertStatus(403);
 
         Queue::assertNotPushed(AnalyzePropertyJob::class);
         Queue::assertNotPushed(GeocodePropertyJob::class);
+    }
+
+    public function test_analyze_section_dispatches_correct_job(): void
+    {
+        Queue::fake();
+
+        $user = User::factory()->create();
+        $property = Property::factory()->create([
+            'user_id' => $user->id,
+            'latitude' => 40.7128,
+            'longitude' => -74.0060,
+        ]);
+
+        $sections = [
+            'neighbor-distance' => AnalyzeNeighborDistanceJob::class,
+            'points-of-interest' => AnalyzePointsOfInterestJob::class,
+            'road-accessibility' => AnalyzeRoadAccessibilityJob::class,
+        ];
+
+        foreach ($sections as $section => $jobClass) {
+            Queue::fake();
+            $response = $this->actingAs($user, 'api')->postJson($this->analyzeSectionUrl($property, $section));
+
+            $response->assertStatus(200)
+                ->assertJsonPath('data.message', "Section '{$section}' analysis has been queued");
+
+            Queue::assertPushed($jobClass, fn ($job) => $job->property->id === $property->id);
+        }
+    }
+
+    public function test_analyze_section_returns_422_for_invalid_section(): void
+    {
+        $user = User::factory()->create();
+        $property = Property::factory()->create([
+            'user_id' => $user->id,
+            'latitude' => 40.7128,
+            'longitude' => -74.0060,
+        ]);
+
+        $this->actingAs($user, 'api')
+            ->postJson($this->analyzeSectionUrl($property, 'invalid-section'))
+            ->assertStatus(422)
+            ->assertJsonPath('message', 'Invalid analysis section.');
+    }
+
+    public function test_analyze_section_returns_422_when_coordinates_missing(): void
+    {
+        $user = User::factory()->create();
+        $property = Property::factory()->create([
+            'user_id' => $user->id,
+            'latitude' => null,
+            'longitude' => null,
+        ]);
+
+        $this->actingAs($user, 'api')
+            ->postJson($this->analyzeSectionUrl($property, 'neighbor-distance'))
+            ->assertStatus(422)
+            ->assertJsonPath('message', 'Property coordinates are missing. Run the full analysis first.');
+    }
+
+    public function test_analyze_section_requires_authorization(): void
+    {
+        Queue::fake();
+
+        $owner = User::factory()->create();
+        $other = User::factory()->create();
+        $property = Property::factory()->create(['user_id' => $owner->id]);
+
+        $this->actingAs($other, 'api')
+            ->postJson($this->analyzeSectionUrl($property, 'neighbor-distance'))
+            ->assertStatus(403);
+
+        Queue::assertNotPushed(AnalyzeNeighborDistanceJob::class);
     }
 
     public function test_geocode_job_runs_only_specified_analysis_jobs(): void
@@ -147,17 +235,12 @@ class PropertyAnalysisTest extends TestCase
             'longitude' => -74.0060,
         ]);
 
+        $elements = ['elements' => [['type' => 'way', 'id' => 1, 'center' => ['lat' => 40.7128, 'lon' => -74.0061], 'tags' => ['building' => 'yes']]]];
+
         Http::fake([
-            'https://overpass-api.de/api/interpreter' => Http::response([
-                'elements' => [
-                    [
-                        'type' => 'way',
-                        'id' => 1,
-                        'center' => ['lat' => 40.7128, 'lon' => -74.0061],
-                        'tags' => ['building' => 'yes'],
-                    ],
-                ],
-            ], 200),
+            'https://overpass-api.de/api/interpreter' => Http::response($elements, 200),
+            'https://lz4.overpass-api.de/api/interpreter' => Http::response($elements, 200),
+            'https://overpass.kumi.systems/api/interpreter' => Http::response($elements, 200),
         ]);
 
         $job = new AnalyzeNeighborDistanceJob($property);

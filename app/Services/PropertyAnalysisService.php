@@ -9,7 +9,12 @@ use Illuminate\Support\Facades\Log;
 
 class PropertyAnalysisService
 {
-    protected string $overpassUrl = 'https://overpass-api.de/api/interpreter';
+    /** @var array<string> Overpass API mirrors tried in order until one succeeds */
+    protected array $overpassUrls = [
+        'https://overpass-api.de/api/interpreter',
+        'https://lz4.overpass-api.de/api/interpreter',
+        'https://overpass.kumi.systems/api/interpreter',
+    ];
 
     protected string $userAgent = 'NeighborhoodApp/1.0 (contact@neighborhood.app)';
 
@@ -195,29 +200,46 @@ class PropertyAnalysisService
         return $attempts;
     }
 
+    protected function queryOverpass(string $query, int $timeout = 30): ?array
+    {
+        foreach ($this->overpassUrls as $url) {
+            try {
+                $response = Http::asForm()->withHeaders([
+                    'User-Agent' => $this->userAgent,
+                ])->timeout($timeout)->post($url, ['data' => $query]);
+
+                if ($response->successful()) {
+                    return $response->json();
+                }
+
+                Log::warning("Overpass returned {$response->status()} from {$url}");
+            } catch (Exception $e) {
+                Log::warning("Overpass query failed at {$url}: {$e->getMessage()}");
+            }
+        }
+
+        Log::error('All Overpass API mirrors failed.');
+
+        return null;
+    }
+
     public function analyzeNeighborDistance(float $lat, float $lng): array
     {
-        $radiusMeters = 1609; // 1m search radius
+        $radiusMeters = 1609;
 
+        // Any "building" tag value covers rural types (detached, farm, barn, etc.)
         $query = <<<QUERY
 [out:json][timeout:25];
 (
-  way["building"="yes"](around:{$radiusMeters},{$lat},{$lng});
-  way["building"="house"](around:{$radiusMeters},{$lat},{$lng});
-  way["building"="residential"](around:{$radiusMeters},{$lat},{$lng});
+  way["building"](around:{$radiusMeters},{$lat},{$lng});
 );
 out center;
 QUERY;
 
         try {
-            $response = Http::asForm()->withHeaders([
-                'User-Agent' => $this->userAgent,
-            ])->timeout(30)->post($this->overpassUrl, [
-                'data' => $query,
-            ]);
+            $data = $this->queryOverpass($query, 35);
 
-            if ($response->successful()) {
-                $data = $response->json();
+            if ($data !== null) {
                 $buildings = $data['elements'] ?? [];
 
                 $distances = [];
@@ -308,14 +330,9 @@ QUERY;
         $query = "[out:json][timeout:30];\n(\n".implode("\n", $queryParts)."\n);\nout center;";
 
         try {
-            $response = Http::asForm()->withHeaders([
-                'User-Agent' => $this->userAgent,
-            ])->timeout(45)->post($this->overpassUrl, [
-                'data' => $query,
-            ]);
+            $data = $this->queryOverpass($query, 45);
 
-            if ($response->successful()) {
-                $data = $response->json();
+            if ($data !== null) {
                 $elements = $data['elements'] ?? [];
 
                 $results = [];
@@ -373,8 +390,6 @@ QUERY;
                 }
 
                 return $results;
-            } else {
-                Log::error('POI analysis failed: '.$response->json());
             }
         } catch (\Exception $e) {
             Log::error('POI analysis failed: '.$e->getMessage());
@@ -435,14 +450,9 @@ out geom;
 QUERY;
 
             try {
-                $response = Http::asForm()->withHeaders([
-                    'User-Agent' => $this->userAgent,
-                ])->timeout(30)->post($this->overpassUrl, [
-                    'data' => $query,
-                ]);
+                $data = $this->queryOverpass($query, 30);
 
-                if ($response->successful()) {
-                    $data = $response->json();
+                if ($data !== null) {
                     $roads = $data['elements'] ?? [];
 
                     $minDistance = PHP_FLOAT_MAX;

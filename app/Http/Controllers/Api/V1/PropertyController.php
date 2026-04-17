@@ -11,7 +11,9 @@ use App\Http\Requests\Api\V1\Property\ShowPropertyRequest;
 use App\Http\Requests\Api\V1\Property\StorePropertyRequest;
 use App\Http\Requests\Api\V1\Property\UpdatePropertyRequest;
 use App\Jobs\AnalyzeNeighborDistanceJob;
+use App\Jobs\AnalyzePointsOfInterestJob;
 use App\Jobs\AnalyzePropertyJob;
+use App\Jobs\AnalyzeRoadAccessibilityJob;
 use App\Jobs\GeocodePropertyJob;
 use App\Models\Neighborhood;
 use App\Models\Property;
@@ -97,6 +99,30 @@ class PropertyController extends Controller
 
         return response()->json([
             'data' => ['message' => 'Property analysis has been queued'],
+        ]);
+    }
+
+    public function analyzeSection(AnalyzePropertyRequest $request, Neighborhood $neighborhood, Property $property, string $section): JsonResponse
+    {
+        /** @var array<string, class-string> */
+        $jobMap = [
+            'neighbor-distance' => AnalyzeNeighborDistanceJob::class,
+            'points-of-interest' => AnalyzePointsOfInterestJob::class,
+            'road-accessibility' => AnalyzeRoadAccessibilityJob::class,
+        ];
+
+        if (! isset($jobMap[$section])) {
+            return response()->json(['message' => 'Invalid analysis section.'], 422);
+        }
+
+        if (! $property->latitude || ! $property->longitude) {
+            return response()->json(['message' => 'Property coordinates are missing. Run the full analysis first.'], 422);
+        }
+
+        dispatch(new $jobMap[$section]($property));
+
+        return response()->json([
+            'data' => ['message' => "Section '{$section}' analysis has been queued"],
         ]);
     }
 

@@ -23,15 +23,19 @@ const props = defineProps({
 
 const refreshing = ref(false);
 const refreshQueued = ref(false);
+const refreshError = ref(null);
 
 const refreshGeo = async () => {
   refreshing.value = true;
+  refreshError.value = null;
   try {
-    await api.post(`/neighborhoods/${props.neighborhoodId}/properties/${props.property.id}/geocode`);
+    await api.post(`/neighborhoods/${props.neighborhoodId}/properties/${props.property.id}/analyze/neighbor-distance`);
     refreshQueued.value = true;
     setTimeout(() => { refreshQueued.value = false; }, 10000);
   } catch (error) {
-    console.error('Geo refresh failed', error);
+    const msg = error.response?.data?.message;
+    refreshError.value = msg ?? 'The neighbor analysis service is busy. Please try again shortly.';
+    setTimeout(() => { refreshError.value = null; }, 8000);
   } finally {
     refreshing.value = false;
   }
@@ -150,16 +154,18 @@ onUnmounted(() => {
           @click="refreshGeo"
           :disabled="refreshing || refreshQueued"
           class="flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-[10px] font-bold uppercase tracking-wide transition-colors disabled:opacity-50 bg-surface-container-high text-on-surface-variant hover:bg-surface-container-highest"
-          :title="refreshQueued ? 'Queued' : 'Refresh geo & neighbor data'"
+          :title="refreshQueued ? 'Queued' : 'Redo neighbor analysis'"
         >
           <span
             class="material-symbols-outlined text-sm"
             :class="{ 'animate-spin': refreshing }"
           >{{ refreshQueued ? 'check_circle' : 'refresh' }}</span>
-          {{ refreshQueued ? 'Queued' : 'Refresh' }}
+          {{ refreshQueued ? 'Queued' : 'Redo' }}
         </button>
       </div>
     </div>
+
+    <p v-if="refreshError" class="mb-4 text-xs text-error bg-error-container/30 rounded px-3 py-2">{{ refreshError }}</p>
 
     <div v-if="nearestHouses.length" class="space-y-4">
 

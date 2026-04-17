@@ -172,7 +172,21 @@
                     <div class="lg:col-span-4 space-y-8">
                         <!-- Nearby Infrastructure -->
                         <section v-if="property.analyzed_at" class="bg-surface-container-lowest p-6 rounded-xl border border-outline-variant/20 shadow-sm">
-                            <h3 class="text-lg font-bold text-primary mb-6">Nearby Infrastructure</h3>
+                            <div class="flex items-center justify-between mb-6">
+                                <h3 class="text-lg font-bold text-primary">Nearby Infrastructure</h3>
+                                <button
+                                    @click="reanalyzeSection('points-of-interest')"
+                                    :disabled="sectionRedoing['points-of-interest'] || sectionQueued['points-of-interest']"
+                                    class="flex items-center gap-1 px-2 py-1 rounded-lg text-[10px] font-bold uppercase tracking-wide transition-colors disabled:opacity-50 bg-surface-container-high text-on-surface-variant hover:bg-surface-container-highest"
+                                    :title="sectionQueued['points-of-interest'] ? 'Queued' : 'Redo POI analysis'"
+                                >
+                                    <span class="material-symbols-outlined text-sm" :class="{ 'animate-spin': sectionRedoing['points-of-interest'] }">
+                                        {{ sectionQueued['points-of-interest'] ? 'check_circle' : 'refresh' }}
+                                    </span>
+                                    {{ sectionQueued['points-of-interest'] ? 'Queued' : 'Redo' }}
+                                </button>
+                            </div>
+                            <p v-if="sectionError['points-of-interest']" class="mb-4 text-xs text-error bg-error-container/30 rounded px-3 py-2">{{ sectionError['points-of-interest'] }}</p>
 
                             <!-- Medical & Pharmacy -->
                             <div v-if="pointsOfInterest.hospital || pointsOfInterest.pharmacy" class="mb-4">
@@ -233,7 +247,21 @@
 
                         <!-- Road Accessibility -->
                         <section v-if="property.analysis?.road_accessibility" class="bg-surface-container-lowest p-6 rounded-xl border border-outline-variant/20 shadow-sm">
-                            <h3 class="text-lg font-bold text-primary mb-4">Road Accessibility</h3>
+                            <div class="flex items-center justify-between mb-4">
+                                <h3 class="text-lg font-bold text-primary">Road Accessibility</h3>
+                                <button
+                                    @click="reanalyzeSection('road-accessibility')"
+                                    :disabled="sectionRedoing['road-accessibility'] || sectionQueued['road-accessibility']"
+                                    class="flex items-center gap-1 px-2 py-1 rounded-lg text-[10px] font-bold uppercase tracking-wide transition-colors disabled:opacity-50 bg-surface-container-high text-on-surface-variant hover:bg-surface-container-highest"
+                                    :title="sectionQueued['road-accessibility'] ? 'Queued' : 'Redo road analysis'"
+                                >
+                                    <span class="material-symbols-outlined text-sm" :class="{ 'animate-spin': sectionRedoing['road-accessibility'] }">
+                                        {{ sectionQueued['road-accessibility'] ? 'check_circle' : 'refresh' }}
+                                    </span>
+                                    {{ sectionQueued['road-accessibility'] ? 'Queued' : 'Redo' }}
+                                </button>
+                            </div>
+                            <p v-if="sectionError['road-accessibility']" class="mb-3 text-xs text-error bg-error-container/30 rounded px-3 py-2">{{ sectionError['road-accessibility'] }}</p>
                             <div class="mb-4">
                                 <span
                                     :class="[
@@ -323,6 +351,9 @@ const property = ref(null);
 const loading = ref(true);
 const analyzing = ref(false);
 const analysisQueued = ref(false);
+const sectionRedoing = ref({});
+const sectionQueued = ref({});
+const sectionError = ref({});
 
 const pointsOfInterest = computed(() => property.value?.analysis?.points_of_interest ?? {});
 
@@ -382,6 +413,23 @@ const loadProperty = async () => {
         await router.push(`/neighborhoods/${neighborhoodId}/properties`);
     } finally {
         loading.value = false;
+    }
+};
+
+const reanalyzeSection = async (section) => {
+    sectionRedoing.value[section] = true;
+    sectionError.value[section] = null;
+    const { neighborhoodId, id } = route.params;
+    try {
+        await api.post(`/neighborhoods/${neighborhoodId}/properties/${id}/analyze/${section}`);
+        sectionQueued.value[section] = true;
+        setTimeout(() => { sectionQueued.value[section] = false; }, 10000);
+    } catch (error) {
+        const msg = error.response?.data?.message;
+        sectionError.value[section] = msg ?? 'The analysis service is busy. Please try again shortly.';
+        setTimeout(() => { sectionError.value[section] = null; }, 8000);
+    } finally {
+        sectionRedoing.value[section] = false;
     }
 };
 
