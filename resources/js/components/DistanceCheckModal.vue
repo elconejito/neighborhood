@@ -101,6 +101,8 @@ function buildMap() {
         L.marker([house.lat, house.lng], { icon }).addTo(markersLayer);
     }
 
+    map.invalidateSize();
+
     const points = [
         [centerLat.value, centerLng.value],
         ...nearestHouses.value.filter(h => h.lat && h.lng).map(h => [h.lat, h.lng]),
@@ -121,8 +123,7 @@ function destroyMap() {
 // Initialize map once the results step is rendered
 watch(step, (val) => {
     if (val === 'results') {
-        // Wait for DOM to be ready
-        setTimeout(buildMap, 50);
+        setTimeout(buildMap, 100);
     } else {
         destroyMap();
     }
@@ -188,17 +189,17 @@ function reset() {
             <div @click="$emit('close')" class="fixed inset-0 bg-black/40 backdrop-blur-sm" aria-hidden="true" />
 
             <!-- Modal -->
-            <div class="relative bg-surface rounded-[2rem] shadow-2xl w-full transition-all"
-                :class="step === 'results' ? 'max-w-4xl' : 'max-w-lg'">
+            <div class="relative bg-surface rounded-xl shadow-2xl w-full max-h-[90vh] overflow-y-auto transition-all"
+                :class="step === 'results' ? 'md:w-[56rem] md:max-w-none' : 'max-w-lg'">
 
                 <!-- Header -->
-                <div class="flex items-center justify-between px-8 pt-8 pb-6 border-b border-outline-variant/20">
-                    <div class="flex items-center gap-3">
-                        <span class="material-symbols-outlined text-primary">social_distance</span>
-                        <h2 class="text-xl font-bold text-primary tracking-tight">Distance Check</h2>
+                <div class="flex items-center justify-between px-6 pt-5 pb-4 border-b border-outline-variant/20">
+                    <div class="flex items-center gap-2">
+                        <span class="material-symbols-outlined text-primary text-base">social_distance</span>
+                        <h2 class="text-sm font-bold text-primary tracking-tight uppercase">Distance Check</h2>
                     </div>
                     <button @click="$emit('close')" class="text-on-surface-variant hover:text-on-surface transition-colors">
-                        <span class="material-symbols-outlined">close</span>
+                        <span class="material-symbols-outlined text-xl">close</span>
                     </button>
                 </div>
 
@@ -206,7 +207,7 @@ function reset() {
                 <div v-if="step === 'form'" class="px-8 py-6 space-y-5">
                     <p class="text-sm text-on-surface-variant">Enter an address to analyze the nearest neighbors and isolation score.</p>
 
-                    <div v-if="error" class="bg-error/10 border border-error/20 text-error px-4 py-3 rounded-xl text-sm">
+                    <div v-if="error" class="bg-error/10 border border-error/20 text-error px-4 py-3 rounded-lg text-sm">
                         {{ error }}
                     </div>
 
@@ -218,7 +219,7 @@ function reset() {
                                 type="text"
                                 required
                                 placeholder="123 Main St"
-                                class="w-full px-4 py-2.5 bg-surface-container-low border border-outline-variant/40 rounded-xl text-sm text-on-surface placeholder:text-on-surface-variant/50 focus:outline-none focus:border-primary/50 focus:ring-1 focus:ring-primary/30"
+                                class="w-full px-4 py-2.5 bg-surface-container-low border border-outline-variant/40 rounded-lg text-sm text-on-surface placeholder:text-on-surface-variant/50 focus:outline-none focus:border-primary/50 focus:ring-1 focus:ring-primary/30"
                             />
                         </div>
 
@@ -229,7 +230,7 @@ function reset() {
                                     v-model="form.city"
                                     type="text"
                                     required
-                                    class="w-full px-4 py-2.5 bg-surface-container-low border border-outline-variant/40 rounded-xl text-sm text-on-surface placeholder:text-on-surface-variant/50 focus:outline-none focus:border-primary/50 focus:ring-1 focus:ring-primary/30"
+                                    class="w-full px-4 py-2.5 bg-surface-container-low border border-outline-variant/40 rounded-lg text-sm text-on-surface placeholder:text-on-surface-variant/50 focus:outline-none focus:border-primary/50 focus:ring-1 focus:ring-primary/30"
                                 />
                             </div>
                             <div class="col-span-1">
@@ -240,7 +241,7 @@ function reset() {
                                     required
                                     maxlength="2"
                                     placeholder="WV"
-                                    class="w-full px-4 py-2.5 bg-surface-container-low border border-outline-variant/40 rounded-xl text-sm text-on-surface placeholder:text-on-surface-variant/50 focus:outline-none focus:border-primary/50 focus:ring-1 focus:ring-primary/30"
+                                    class="w-full px-4 py-2.5 bg-surface-container-low border border-outline-variant/40 rounded-lg text-sm text-on-surface placeholder:text-on-surface-variant/50 focus:outline-none focus:border-primary/50 focus:ring-1 focus:ring-primary/30"
                                 />
                             </div>
                             <div class="col-span-2">
@@ -250,7 +251,7 @@ function reset() {
                                     type="text"
                                     required
                                     maxlength="10"
-                                    class="w-full px-4 py-2.5 bg-surface-container-low border border-outline-variant/40 rounded-xl text-sm text-on-surface placeholder:text-on-surface-variant/50 focus:outline-none focus:border-primary/50 focus:ring-1 focus:ring-primary/30"
+                                    class="w-full px-4 py-2.5 bg-surface-container-low border border-outline-variant/40 rounded-lg text-sm text-on-surface placeholder:text-on-surface-variant/50 focus:outline-none focus:border-primary/50 focus:ring-1 focus:ring-primary/30"
                                 />
                             </div>
                         </div>
@@ -259,13 +260,13 @@ function reset() {
                             <button
                                 type="button"
                                 @click="$emit('close')"
-                                class="px-5 py-2.5 rounded-xl text-sm font-semibold text-on-surface-variant hover:bg-surface-container-high transition-colors"
+                                class="px-5 py-2.5 rounded-lg text-sm font-semibold text-on-surface-variant hover:bg-surface-container-high transition-colors"
                             >
                                 Cancel
                             </button>
                             <button
                                 type="submit"
-                                class="px-5 py-2.5 rounded-xl text-sm font-semibold bg-primary text-on-primary hover:bg-primary/90 transition-colors"
+                                class="px-5 py-2.5 rounded-lg text-sm font-semibold bg-primary text-on-primary hover:bg-primary/90 transition-colors"
                             >
                                 Analyze
                             </button>
@@ -280,7 +281,7 @@ function reset() {
                 </div>
 
                 <!-- Step: Results -->
-                <div v-else-if="step === 'results' && neighborDistance" class="px-8 py-6 space-y-6">
+                <div v-else-if="step === 'results' && neighborDistance" class="px-6 py-4 space-y-4">
 
                     <!-- Address label -->
                     <p class="text-sm font-semibold text-on-surface-variant">
@@ -291,11 +292,11 @@ function reset() {
                         <!-- Map + Neighbor List -->
                         <div class="grid grid-cols-1 gap-6 md:grid-cols-[1fr_auto]">
                             <!-- Map -->
-                            <div class="rounded-xl border border-outline-variant/20 relative aspect-square overflow-hidden">
+                            <div class="rounded-xl border border-outline-variant/20 relative overflow-hidden" style="aspect-ratio: 16/9">
                                 <div ref="mapContainer" class="absolute inset-0 w-full h-full" />
 
                                 <!-- Layer toggle -->
-                                <div class="absolute top-3 right-3 z-[1000] flex rounded overflow-hidden shadow-sm border border-outline-variant/20">
+                                <div class="absolute top-3 right-3 z-[1000] flex rounded-lg overflow-hidden shadow-sm border border-outline-variant/20">
                                     <button
                                         v-for="view in ['street', 'satellite', 'topo']"
                                         :key="view"
@@ -310,7 +311,7 @@ function reset() {
                                 </div>
 
                                 <!-- Badge -->
-                                <div class="absolute bottom-7 left-3 z-[1000] bg-white/90 px-3 py-1.5 rounded text-[10px] font-bold shadow-sm border border-outline-variant/10">
+                                <div class="absolute bottom-7 left-3 z-[1000] bg-white/90 px-3 py-1.5 rounded-lg text-[10px] font-bold shadow-sm border border-outline-variant/10">
                                     <span class="text-on-surface-variant">LOCATION</span>
                                     <span class="text-primary ml-1">·</span>
                                     <span class="text-primary ml-1">{{ nearestHouses.length }} NEIGHBORS PLOTTED</span>
@@ -333,25 +334,6 @@ function reset() {
                             </div>
                         </div>
 
-                        <!-- Stats row -->
-                        <div class="flex gap-6 pt-2 border-t border-surface-container-high">
-                            <div class="flex justify-between text-sm w-full">
-                                <span class="text-on-surface-variant">Nearest neighbor</span>
-                                <span class="font-semibold text-on-surface">{{ formatRelativeDistance(nearestHouse.distance_meters) }} · {{ nearestHouse.direction }}</span>
-                            </div>
-                            <div class="flex justify-between text-sm w-full border-l border-surface-container-high pl-6">
-                                <span class="text-on-surface-variant">Nearby structures (1mi)</span>
-                                <span class="font-semibold text-on-surface">{{ neighborDistance.total_buildings_nearby ?? 0 }}</span>
-                            </div>
-                            <div class="flex justify-between text-sm w-full border-l border-surface-container-high pl-6">
-                                <span class="text-on-surface-variant">Isolation score</span>
-                                <span class="font-semibold text-on-surface">{{ neighborDistance.isolation_score }}</span>
-                            </div>
-                            <div class="flex justify-between text-sm w-full border-l border-surface-container-high pl-6">
-                                <span class="text-on-surface-variant">Avg. distance (top 10)</span>
-                                <span class="font-semibold text-on-surface">{{ formatRelativeDistance(neighborDistance.average_distance_meters) }}</span>
-                            </div>
-                        </div>
                     </div>
                     <p v-else class="text-sm text-on-surface-variant">No neighbor data found for this location.</p>
 
@@ -361,7 +343,7 @@ function reset() {
                             <label class="block text-xs font-bold text-on-surface-variant uppercase tracking-wider mb-1.5">Add to Neighborhood</label>
                             <select
                                 v-model="selectedNeighborhoodId"
-                                class="w-full px-4 py-2.5 bg-surface-container-low border border-outline-variant/40 rounded-xl text-sm text-on-surface focus:outline-none focus:border-primary/50 focus:ring-1 focus:ring-primary/30"
+                                class="w-full px-4 py-2.5 bg-surface-container-low border border-outline-variant/40 rounded-lg text-sm text-on-surface focus:outline-none focus:border-primary/50 focus:ring-1 focus:ring-primary/30"
                             >
                                 <option :value="null" disabled>Select a neighborhood…</option>
                                 <option v-for="n in neighborhoods" :key="n.id" :value="n.id">{{ n.name }}</option>
@@ -370,14 +352,14 @@ function reset() {
                         <div class="flex gap-3 shrink-0 self-end">
                             <button
                                 @click="reset"
-                                class="px-4 py-2.5 rounded-xl text-sm font-semibold text-on-surface-variant hover:bg-surface-container-high transition-colors"
+                                class="px-4 py-2.5 rounded-lg text-sm font-semibold text-on-surface-variant hover:bg-surface-container-high transition-colors"
                             >
                                 New Check
                             </button>
                             <button
                                 @click="handleCreateProperty"
                                 :disabled="!selectedNeighborhoodId"
-                                class="flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-semibold bg-primary text-on-primary hover:bg-primary/90 transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
+                                class="flex items-center gap-2 px-5 py-2.5 rounded-lg text-sm font-semibold bg-primary text-on-primary hover:bg-primary/90 transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
                             >
                                 <span class="material-symbols-outlined text-base">add_home</span>
                                 Create Property

@@ -74,7 +74,7 @@
                     <button
                         type="submit"
                         :disabled="loading"
-                        class="w-full bg-gradient-to-br from-primary to-primary-dim text-on-primary py-4 rounded-xl font-bold tracking-tight shadow-sm hover:opacity-95 active:scale-[0.98] transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                        class="w-full bg-gradient-to-br from-primary to-primary-dim text-on-primary py-4 rounded-lg font-bold tracking-tight shadow-sm hover:opacity-95 active:scale-[0.98] transition-all disabled:opacity-50 disabled:cursor-not-allowed"
                     >
                         {{ loading ? 'Creating account...' : 'Create Account' }}
                     </button>

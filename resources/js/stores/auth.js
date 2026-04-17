@@ -36,14 +36,19 @@ export const useAuthStore = defineStore('auth', () => {
         }
     }
 
+    function setToken(newToken) {
+        token.value = newToken;
+        localStorage.setItem('token', newToken);
+        api.defaults.headers.common.Authorization = `Bearer ${newToken}`;
+    }
+
     // Login
     async function login(credentials) {
         const response = await api.post('/auth/login', credentials);
         const { access_token, user: userData } = response.data.data;
 
-        token.value = access_token;
+        setToken(access_token);
         user.value = userData;
-        localStorage.setItem('token', access_token);
 
         return response.data.data;
     }
@@ -53,9 +58,8 @@ export const useAuthStore = defineStore('auth', () => {
         const response = await api.post('/auth/register', data);
         const { access_token, user: userData } = response.data.data;
 
-        token.value = access_token;
+        setToken(access_token);
         user.value = userData;
-        localStorage.setItem('token', access_token);
 
         return response.data.data;
     }
@@ -72,6 +76,7 @@ export const useAuthStore = defineStore('auth', () => {
             token.value = null;
             user.value = null;
             localStorage.removeItem('token');
+            delete api.defaults.headers.common.Authorization;
         }
     }
 

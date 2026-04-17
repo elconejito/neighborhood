@@ -9,7 +9,7 @@
                 </div>
                 <button
                     @click="showDistanceCheck = true"
-                    class="flex items-center gap-2 px-5 py-2.5 rounded-2xl text-sm font-semibold bg-primary text-on-primary hover:bg-primary/90 transition-colors shrink-0 mt-2"
+                    class="flex items-center gap-2 px-5 py-2.5 rounded-lg text-sm font-semibold bg-primary text-on-primary hover:bg-primary/90 transition-colors shrink-0 mt-2"
                 >
                     <span class="material-symbols-outlined text-base">social_distance</span>
                     Distance Check
