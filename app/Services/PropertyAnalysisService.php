@@ -29,10 +29,18 @@ class PropertyAnalysisService
         $lat = $property->latitude;
         $lng = $property->longitude;
 
+        $neighborDistance = $this->analyzeNeighborDistance($lat, $lng);
+        usleep(250000); // 250ms delay between requests
+
+        $pointsOfInterest = $this->analyzePointsOfInterest($lat, $lng);
+        usleep(250000); // 250ms delay between requests
+
+        $roadAccessibility = $this->analyzeRoadAccessibility($lat, $lng);
+
         return [
-            'neighbor_distance' => $this->analyzeNeighborDistance($lat, $lng),
-            'points_of_interest' => $this->analyzePointsOfInterest($lat, $lng),
-            'road_accessibility' => $this->analyzeRoadAccessibility($lat, $lng),
+            'neighbor_distance' => $neighborDistance,
+            'points_of_interest' => $pointsOfInterest,
+            'road_accessibility' => $roadAccessibility,
         ];
     }
 
@@ -204,9 +212,15 @@ class PropertyAnalysisService
     {
         foreach ($this->overpassUrls as $url) {
             try {
-                $response = Http::asForm()->withHeaders([
-                    'User-Agent' => $this->userAgent,
-                ])->timeout($timeout)->post($url, ['data' => $query]);
+                $response = Http::asForm()
+                    ->withHeaders([
+                        'User-Agent' => $this->userAgent,
+                    ])
+                    ->retry(3, function (int $attempt) {
+                        return $attempt * 500; // 500ms, 1000ms, 1500ms
+                    }, throw: false)
+                    ->timeout($timeout)
+                    ->post($url, ['data' => $query]);
 
                 if ($response->successful()) {
                     return $response->json();
