@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Api\V1;
 
 use App\Http\Controllers\Controller;
 use App\Models\ListingCycle;
+use App\Models\Neighborhood;
 use App\Models\Property;
 use App\Transformers\Api\V1\ListingCycleTransformer;
 use Illuminate\Http\JsonResponse;
@@ -11,7 +12,7 @@ use Illuminate\Http\Request;
 
 class ListingCycleController extends Controller
 {
-    public function store(Request $request, Property $property): JsonResponse
+    public function store(Request $request, Neighborhood $neighborhood, Property $property): JsonResponse
     {
         abort_if($property->user_id !== $request->user()->id, 403);
 
