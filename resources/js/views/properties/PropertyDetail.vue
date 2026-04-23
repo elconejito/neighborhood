@@ -151,14 +151,19 @@
                     <!-- Left Side -->
                     <div class="lg:col-span-8 space-y-8">
                         <!-- Not yet analyzed -->
-                        <div v-if="!property.analyzed_at" class="bg-surface-container-low border-l-4 border-primary/40 rounded-xl p-6">
+                        <div v-if="!property.analyzed_at && property.latitude" class="bg-surface-container-low border-l-4 border-primary/40 rounded-xl p-6">
                             <p class="text-sm text-on-surface-variant">
                                 This property hasn't been analyzed yet. Click <strong class="text-primary">Run Analysis</strong> above to get neighbor distance, POI, and road accessibility data.
                             </p>
                         </div>
 
                         <!-- Neighborhood Proximity -->
-                        <Neighborhood v-if="property.analyzed_at" :analysis="property.analysis" :property="property" :neighborhood-id="route.params.neighborhoodId" />
+                        <Neighborhood
+                            :analysis="property.analysis ?? {}"
+                            :property="property"
+                            :neighborhood-id="route.params.neighborhoodId"
+                            @location-set="onLocationSet"
+                        />
 
                         <!-- Listing Lifecycle -->
                         <ListingLifecycle
@@ -431,6 +436,12 @@ const reanalyzeSection = async (section) => {
     } finally {
         sectionRedoing.value[section] = false;
     }
+};
+
+const onLocationSet = async () => {
+    analysisQueued.value = true;
+    await loadProperty();
+    setTimeout(() => { analysisQueued.value = false; }, 10000);
 };
 
 const runAnalysis = async () => {

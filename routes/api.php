@@ -33,6 +33,7 @@ Route::prefix('v1')->group(function () {
         Route::apiResource('neighborhoods.properties', PropertyController::class);
         Route::post('neighborhoods/{neighborhood}/properties/{property}/analyze', [PropertyController::class, 'analyze']);
         Route::post('neighborhoods/{neighborhood}/properties/{property}/analyze/{section}', [PropertyController::class, 'analyzeSection']);
+        Route::post('neighborhoods/{neighborhood}/properties/{property}/location', [PropertyController::class, 'setLocation']);
         Route::post('neighborhoods/{neighborhood}/properties/{property}/geocode', [PropertyController::class, 'geocode']);
 
         // Listing Cycles

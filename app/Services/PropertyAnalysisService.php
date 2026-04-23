@@ -81,6 +81,8 @@ class PropertyAnalysisService
                     return [
                         'lat' => (float) $result['lat'],
                         'lng' => (float) $result['lon'],
+                        'source' => 'nominatim',
+                        'accuracy' => 'approximate',
                     ];
                 }
             } catch (Exception $e) {
@@ -127,6 +129,8 @@ class PropertyAnalysisService
                 return [
                     'lat' => (float) $location['lat'],
                     'lng' => (float) $location['lng'],
+                    'source' => 'geocodio',
+                    'accuracy' => $results[0]['accuracy_type'] ?? 'unknown',
                 ];
             }
         } catch (Exception $e) {
@@ -162,6 +166,8 @@ class PropertyAnalysisService
                 return [
                     'lat' => (float) $coords['y'],
                     'lng' => (float) $coords['x'],
+                    'source' => 'census',
+                    'accuracy' => 'range_interpolation',
                 ];
             }
         } catch (Exception $e) {

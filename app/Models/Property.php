@@ -12,7 +12,7 @@ use Illuminate\Database\Eloquent\Relations\MorphMany;
 
 class Property extends Model
 {
-    use HasFactory, Filterable;
+    use Filterable, HasFactory;
 
     public array $searchable = ['address', 'city', 'zip_code'];
 
@@ -50,6 +50,8 @@ class Property extends Model
         'listing_url',
         'analysis',
         'analyzed_at',
+        'geocoding_source',
+        'geocoding_accuracy',
     ];
 
     protected function casts(): array

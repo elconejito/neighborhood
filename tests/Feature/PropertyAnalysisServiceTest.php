@@ -29,6 +29,8 @@ class PropertyAnalysisServiceTest extends TestCase
         $this->assertNotNull($result);
         $this->assertEquals(40.7128, $result['lat']);
         $this->assertEquals(-74.0060, $result['lng']);
+        $this->assertEquals('nominatim', $result['source']);
+        $this->assertEquals('approximate', $result['accuracy']);
 
         Http::assertSent(function ($request) {
             return str_contains($request->url(), 'format=json') &&
@@ -63,6 +65,8 @@ class PropertyAnalysisServiceTest extends TestCase
         $result = $service->geocodeAddress($addressData);
 
         $this->assertNotNull($result);
+        $this->assertEquals('nominatim', $result['source']);
+        $this->assertEquals('approximate', $result['accuracy']);
 
         Http::assertSent(function ($request) {
             if (! str_contains($request->url(), 'nominatim')) {
@@ -132,6 +136,8 @@ class PropertyAnalysisServiceTest extends TestCase
         $this->assertNotNull($result);
         $this->assertEquals(38.2777996, $result['lat']);
         $this->assertEquals(-77.5092532, $result['lng']);
+        $this->assertEquals('nominatim', $result['source']);
+        $this->assertEquals('approximate', $result['accuracy']);
 
         // 1 Geocodio + 1 Census + 3 Nominatim attempts
         Http::assertSentCount(5);
@@ -196,6 +202,93 @@ class PropertyAnalysisServiceTest extends TestCase
             return $request->isForm() &&
                    str_contains($request['data'], '[out:json]');
         });
+    }
+
+    public function test_geocode_address_returns_geocodio_source_and_accuracy(): void
+    {
+        Http::fake([
+            'https://api.geocod.io/*' => Http::response([
+                'results' => [
+                    [
+                        'formatted_address' => '12128 Kingswood Blvd, Fredericksburg, VA 22408',
+                        'location' => ['lat' => 38.2737142, 'lng' => -77.5011839],
+                        'accuracy_type' => 'rooftop',
+                    ],
+                ],
+            ], 200),
+        ]);
+
+        $service = new PropertyAnalysisService;
+        $result = $service->geocodeAddress([
+            'street' => '12128 Kingswood Blvd',
+            'city' => 'Fredericksburg',
+            'state' => 'VA',
+            'postalcode' => '22408',
+        ]);
+
+        $this->assertNotNull($result);
+        $this->assertEquals(38.2737142, $result['lat']);
+        $this->assertEquals(-77.5011839, $result['lng']);
+        $this->assertEquals('geocodio', $result['source']);
+        $this->assertEquals('rooftop', $result['accuracy']);
+    }
+
+    public function test_geocode_address_returns_geocodio_range_interpolation_accuracy(): void
+    {
+        Http::fake([
+            'https://api.geocod.io/*' => Http::response([
+                'results' => [
+                    [
+                        'formatted_address' => '12128 Kingswood Blvd, Fredericksburg, VA 22408',
+                        'location' => ['lat' => 38.2747164, 'lng' => -77.4988546],
+                        'accuracy_type' => 'range_interpolation',
+                    ],
+                ],
+            ], 200),
+        ]);
+
+        $service = new PropertyAnalysisService;
+        $result = $service->geocodeAddress([
+            'street' => '12128 Kingswood Blvd',
+            'city' => 'Fredericksburg',
+            'state' => 'VA',
+            'postalcode' => '22408',
+        ]);
+
+        $this->assertNotNull($result);
+        $this->assertEquals('geocodio', $result['source']);
+        $this->assertEquals('range_interpolation', $result['accuracy']);
+    }
+
+    public function test_geocode_address_returns_census_source_and_accuracy(): void
+    {
+        Http::fake([
+            'https://api.geocod.io/*' => Http::response(['results' => []], 200),
+            'https://geocoding.geo.census.gov/*' => Http::response([
+                'result' => [
+                    'addressMatches' => [
+                        [
+                            'matchedAddress' => '12128 Kingswood Blvd, Fredericksburg, VA 22408',
+                            'coordinates' => ['x' => -77.5011839, 'y' => 38.2737142],
+                        ],
+                    ],
+                ],
+            ], 200),
+        ]);
+
+        $service = new PropertyAnalysisService;
+        $result = $service->geocodeAddress([
+            'street' => '12128 Kingswood Blvd',
+            'city' => 'Fredericksburg',
+            'state' => 'VA',
+            'postalcode' => '22408',
+        ]);
+
+        $this->assertNotNull($result);
+        $this->assertEquals(38.2737142, $result['lat']);
+        $this->assertEquals(-77.5011839, $result['lng']);
+        $this->assertEquals('census', $result['source']);
+        $this->assertEquals('range_interpolation', $result['accuracy']);
     }
 
     public function test_analyze_neighbor_distance_filters_out_impossibly_close_buildings(): void

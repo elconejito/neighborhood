@@ -7,6 +7,7 @@ use App\Http\Requests\Api\V1\Property\AnalyzePropertyRequest;
 use App\Http\Requests\Api\V1\Property\DestroyPropertyRequest;
 use App\Http\Requests\Api\V1\Property\DistanceCheckRequest;
 use App\Http\Requests\Api\V1\Property\IndexPropertyRequest;
+use App\Http\Requests\Api\V1\Property\SetPropertyLocationRequest;
 use App\Http\Requests\Api\V1\Property\ShowPropertyRequest;
 use App\Http\Requests\Api\V1\Property\StorePropertyRequest;
 use App\Http\Requests\Api\V1\Property\UpdatePropertyRequest;
@@ -126,11 +127,29 @@ class PropertyController extends Controller
         ]);
     }
 
+    public function setLocation(SetPropertyLocationRequest $request, Neighborhood $neighborhood, Property $property): JsonResponse
+    {
+        $property->update([
+            'latitude' => $request->float('latitude'),
+            'longitude' => $request->float('longitude'),
+            'geocoding_source' => 'manual',
+            'geocoding_accuracy' => 'manual',
+        ]);
+
+        AnalyzePropertyJob::dispatch($property->fresh());
+
+        return fractal()->item($property->fresh(), PropertyTransformer::class)
+            ->parseIncludes(['price_histories'])
+            ->respond();
+    }
+
     public function geocode(AnalyzePropertyRequest $request, Neighborhood $neighborhood, Property $property): JsonResponse
     {
         $property->update([
             'latitude' => null,
             'longitude' => null,
+            'geocoding_source' => null,
+            'geocoding_accuracy' => null,
         ]);
 
         GeocodePropertyJob::dispatch($property->fresh(), [AnalyzeNeighborDistanceJob::class]);

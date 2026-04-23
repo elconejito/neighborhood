@@ -43,11 +43,25 @@ class GeocodePropertyJob implements ShouldQueue
 
         if ($coordinates) {
             $this->property->update([
-                'latitude' => $coordinates['lat'],
-                'longitude' => $coordinates['lng'],
+                'geocoding_source' => $coordinates['source'],
+                'geocoding_accuracy' => $coordinates['accuracy'],
             ]);
 
-            $this->dispatchAnalysisJobs();
+            if (in_array($coordinates['accuracy'], ['rooftop', 'point'])) {
+                $this->property->update([
+                    'latitude' => $coordinates['lat'],
+                    'longitude' => $coordinates['lng'],
+                ]);
+
+                $this->dispatchAnalysisJobs();
+            } else {
+                Log::warning("Property {$this->property->id} could only be geocoded with low accuracy '{$coordinates['accuracy']}' via {$coordinates['source']}. Coordinates not stored; manual entry required.", [
+                    'property_id' => $this->property->id,
+                    'address' => $this->property->address,
+                    'source' => $coordinates['source'],
+                    'accuracy' => $coordinates['accuracy'],
+                ]);
+            }
         } else {
             Log::error("Geocoding failed for property {$this->property->id}. Analysis aborted.");
         }

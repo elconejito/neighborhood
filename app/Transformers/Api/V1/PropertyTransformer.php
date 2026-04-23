@@ -30,6 +30,8 @@ class PropertyTransformer extends TransformerAbstract
             'zip_code' => $property->zip_code,
             'latitude' => $property->latitude ? (float) $property->latitude : null,
             'longitude' => $property->longitude ? (float) $property->longitude : null,
+            'geocoding_source' => $property->geocoding_source,
+            'geocoding_accuracy' => $property->geocoding_accuracy,
             'acreage' => $property->acreage ? (float) $property->acreage : null,
             'bedrooms' => $property->bedrooms ? (int) $property->bedrooms : null,
             'bathrooms' => $property->bathrooms ? (float) $property->bathrooms : null,
