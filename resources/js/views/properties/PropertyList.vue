@@ -14,6 +14,12 @@
                 </div>
                 <div class="flex flex-wrap gap-3">
                     <router-link
+                        :to="`/neighborhoods/${neighborhoodId}/dashboard`"
+                        class="bg-surface-container-highest text-on-surface-variant px-4 py-2 rounded-lg font-bold text-sm flex items-center justify-center gap-2 hover:bg-surface-container-high transition-colors"
+                    >
+                        <span class="material-symbols-outlined text-sm">bar_chart</span> Dashboard
+                    </router-link>
+                    <router-link
                         :to="`/neighborhoods/${neighborhoodId}/properties/create`"
                         class="bg-primary text-on-primary px-4 py-2 rounded-lg font-bold text-sm flex items-center justify-center gap-2 shadow-sm hover:opacity-90 transition-opacity"
                     >

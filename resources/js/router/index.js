@@ -51,6 +51,12 @@ const routes = [
         meta: { requiresAuth: true },
     },
     {
+        path: '/neighborhoods/:neighborhoodId/dashboard',
+        name: 'neighborhood-dashboard',
+        component: Dashboard,
+        meta: { requiresAuth: true },
+    },
+    {
         path: '/neighborhoods/:neighborhoodId/properties',
         name: 'properties',
         component: PropertyList,

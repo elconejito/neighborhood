@@ -2,11 +2,11 @@
 
 namespace App\Http\Controllers\Api\V1;
 
+use App\Http\Controllers\Controller;
 use App\Models\ListingCycle;
 use App\Models\Neighborhood;
-use App\Models\Property;
 use App\Models\PriceHistory;
-use App\Http\Controllers\Controller;
+use App\Models\Property;
 use App\Transformers\Api\V1\PriceHistoryTransformer;
 use App\Transformers\Api\V1\PropertyTransformer;
 use Carbon\Carbon;
@@ -15,27 +15,37 @@ use Illuminate\Http\Request;
 
 class DashboardController extends Controller
 {
-    public function stats(Request $request): JsonResponse
+    public function stats(Request $request, ?Neighborhood $neighborhood = null): JsonResponse
     {
         $user = $request->user();
 
-        $neighborhoodIds = $user->team_id
-            ? $user->team->neighborhoods()->pluck('id')
-            : collect();
+        if ($neighborhood && $neighborhood->exists) {
+            $neighborhoodIds = collect([$neighborhood->id]);
+        } else {
+            $neighborhoodIds = $user->team_id
+                ? $user->team->neighborhoods()->pluck('id')
+                : collect();
+        }
 
-        $propertyScope = function ($query) use ($user, $neighborhoodIds) {
-            if ($user->team_id) {
+        $propertyScope = function ($query) use ($user, $neighborhoodIds, $neighborhood) {
+            if ($neighborhood && $neighborhood->exists) {
+                $query->where('neighborhood_id', $neighborhood->id);
+            } elseif ($user->team_id) {
                 $query->whereIn('neighborhood_id', $neighborhoodIds);
             } else {
                 $query->where('user_id', $user->id);
             }
         };
 
-        $propertiesQuery = $user->team_id
-            ? Property::whereIn('neighborhood_id', $neighborhoodIds)
-            : $user->properties();
+        if ($neighborhood && $neighborhood->exists) {
+            $propertiesQuery = Property::where('neighborhood_id', $neighborhood->id);
+        } else {
+            $propertiesQuery = $user->team_id
+                ? Property::whereIn('neighborhood_id', $neighborhoodIds)
+                : $user->properties();
+        }
 
-        $totalProperties    = $propertiesQuery->count();
+        $totalProperties = $propertiesQuery->count();
         $analyzedProperties = (clone $propertiesQuery)->whereNotNull('analyzed_at')->count();
 
         $recentlySold = PriceHistory::where('type', 'sold')
@@ -54,62 +64,75 @@ class DashboardController extends Controller
 
         return response()->json([
             'data' => [
-                'total_properties'    => $totalProperties,
+                'neighborhood_name' => $neighborhood && $neighborhood->exists ? $neighborhood->name : null,
+                'total_properties' => $totalProperties,
                 'analyzed_properties' => $analyzedProperties,
-                'recently_sold'       => fractal($recentlySold, new PriceHistoryTransformer())
+                'recently_sold' => fractal($recentlySold, new PriceHistoryTransformer)
                     ->parseIncludes(['property'])
                     ->toArray()['data'],
-                'recently_listed'     => fractal($recentlyListed, new PropertyTransformer())
+                'recently_listed' => fractal($recentlyListed, new PropertyTransformer)
                     ->toArray()['data'],
-                'analytics'           => $this->buildAnalytics($user, $neighborhoodIds, $propertyScope),
+                'analytics' => $this->buildAnalytics($user, $neighborhoodIds, $propertyScope, $neighborhood),
             ],
         ]);
     }
 
-    private function buildAnalytics($user, $neighborhoodIds, callable $propertyScope): array
+    private function buildAnalytics($user, $neighborhoodIds, callable $propertyScope, ?Neighborhood $neighborhood = null): array
     {
-        $sixMonthsAgo = now()->subMonths(5)->startOfMonth();
-        $monthKeys    = collect(range(0, 5))->map(fn ($i) => now()->subMonths(5 - $i)->format('Y-m'));
+        $twelveMonthsAgo = now()->subMonths(11)->startOfMonth();
+        $monthKeys = collect(range(0, 11))->map(fn ($i) => $twelveMonthsAgo->copy()->addMonths($i)->format('Y-m'));
+
+        $format = config('database.default') === 'sqlite' ? "strftime('%Y-%m', price_date)" : "DATE_FORMAT(price_date, '%Y-%m')";
 
         // 1. Monthly average sold price
         $rawPrices = PriceHistory::where('type', 'sold')
-            ->where('price_date', '>=', $sixMonthsAgo)
+            ->where('price_date', '>=', $twelveMonthsAgo->toDateString())
             ->whereHas('property', $propertyScope)
-            ->selectRaw("DATE_FORMAT(price_date, '%Y-%m') as month, ROUND(AVG(price)) as avg_price")
+            ->selectRaw("{$format} as month, ROUND(AVG(price)) as avg_price")
             ->groupBy('month')
             ->pluck('avg_price', 'month');
 
         $monthlyAvgSalePrices = $monthKeys->map(fn ($m) => [
-            'month'     => Carbon::createFromFormat('Y-m', $m)->format('M'),
+            'month' => Carbon::createFromFormat('Y-m', $m)->format('M'),
             'avg_price' => (int) $rawPrices->get($m, 0),
         ])->values();
 
-        // 2. Days on market by neighborhood
+        // 2. Days on market by month
+        $domFormat = config('database.default') === 'sqlite' ? "strftime('%Y-%m', listing_cycles.sold_at)" : "DATE_FORMAT(listing_cycles.sold_at, '%Y-%m')";
+
         $domQuery = ListingCycle::where('listing_cycles.status', 'sold')
             ->whereNotNull('listing_cycles.listed_at')
             ->whereNotNull('listing_cycles.sold_at')
-            ->join('properties', 'listing_cycles.property_id', '=', 'properties.id')
-            ->join('neighborhoods', 'properties.neighborhood_id', '=', 'neighborhoods.id');
+            ->where('listing_cycles.sold_at', '>=', $twelveMonthsAgo->toDateString())
+            ->join('properties', 'listing_cycles.property_id', '=', 'properties.id');
 
-        if ($user->team_id) {
+        if ($neighborhood && $neighborhood->exists) {
+            $domQuery->where('properties.neighborhood_id', $neighborhood->id);
+        } elseif ($user->team_id) {
             $domQuery->whereIn('properties.neighborhood_id', $neighborhoodIds);
         } else {
             $domQuery->where('properties.user_id', $user->id);
         }
 
-        $daysOnMarket = $domQuery
-            ->selectRaw('neighborhoods.name, ROUND(AVG(DATEDIFF(listing_cycles.sold_at, listing_cycles.listed_at))) as avg_days')
-            ->groupBy('neighborhoods.id', 'neighborhoods.name')
-            ->orderBy('avg_days')
-            ->get()
-            ->map(fn ($r) => ['name' => $r->name, 'avg_days' => (int) $r->avg_days])
-            ->values();
+        $diff = config('database.default') === 'sqlite'
+            ? 'JULIANDAY(listing_cycles.sold_at) - JULIANDAY(listing_cycles.listed_at)'
+            : 'DATEDIFF(listing_cycles.sold_at, listing_cycles.listed_at)';
+
+        $rawDom = $domQuery
+            ->selectRaw("{$domFormat} as month, ROUND(AVG({$diff})) as avg_days")
+            ->groupBy('month')
+            ->pluck('avg_days', 'month');
+
+        $monthlyDaysOnMarket = $monthKeys->map(fn ($m) => [
+            'month' => Carbon::createFromFormat('Y-m', $m)->format('M'),
+            'avg_days' => (int) $rawDom->get($m, 0),
+        ])->values();
 
         // 3. Monthly sold counts (absorption rate proxy)
         $rawCounts = PriceHistory::where('type', 'sold')
-            ->where('price_date', '>=', $sixMonthsAgo)
+            ->where('price_date', '>=', $twelveMonthsAgo->toDateString())
             ->whereHas('property', $propertyScope)
-            ->selectRaw("DATE_FORMAT(price_date, '%Y-%m') as month, COUNT(*) as count")
+            ->selectRaw("{$format} as month, COUNT(*) as count")
             ->groupBy('month')
             ->pluck('count', 'month');
 
@@ -118,21 +141,10 @@ class DashboardController extends Controller
             'count' => (int) $rawCounts->get($m, 0),
         ])->values();
 
-        // 4. Property inventory per neighborhood
-        $inventoryByNeighborhood = $user->team_id
-            ? Neighborhood::where('team_id', $user->team_id)
-                ->withCount('properties')
-                ->orderByDesc('properties_count')
-                ->get()
-                ->map(fn ($n) => ['name' => $n->name, 'count' => $n->properties_count])
-                ->values()
-            : collect();
-
         return [
-            'monthly_avg_sale_prices'        => $monthlyAvgSalePrices,
-            'days_on_market_by_neighborhood'  => $daysOnMarket,
-            'monthly_sold_counts'             => $monthlySoldCounts,
-            'inventory_by_neighborhood'       => $inventoryByNeighborhood,
+            'monthly_avg_sale_prices' => $monthlyAvgSalePrices,
+            'monthly_days_on_market' => $monthlyDaysOnMarket,
+            'monthly_sold_counts' => $monthlySoldCounts,
         ];
     }
 }

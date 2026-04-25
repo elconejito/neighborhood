@@ -66,7 +66,7 @@
                                 <span class="material-symbols-outlined">home_work</span>
                             </router-link>
                             <router-link
-                                to="/"
+                                :to="`/neighborhoods/${neighborhood.id}/dashboard`"
                                 class="p-2 hover:bg-surface-container-high rounded transition-colors text-on-surface-variant"
                                 title="Dashboard"
                             >

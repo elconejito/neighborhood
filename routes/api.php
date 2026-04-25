@@ -25,6 +25,7 @@ Route::prefix('v1')->group(function () {
 
         // Dashboard
         Route::get('dashboard/stats', [DashboardController::class, 'stats']);
+        Route::get('neighborhoods/{neighborhood}/stats', [DashboardController::class, 'stats']);
 
         // Distance Check
         Route::post('properties/distance-check', [PropertyController::class, 'distanceCheck']);
