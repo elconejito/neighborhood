@@ -1,6 +1,7 @@
 <script setup>
 import { computed } from 'vue';
 import { formatRelativeDistance } from '@/helpers';
+import ComparisonIndicator from './ComparisonIndicator.vue';
 
 const props = defineProps({
     property: { type: Object, required: true },
@@ -35,9 +36,19 @@ const bedroomComparison = computed(() => {
     return compareToPin(props.property.bedrooms, props.pinnedProperty.bedrooms);
 });
 
+const bathroomComparison = computed(() => {
+    if (!props.pinnedProperty) return null;
+    return compareToPin(props.property.bathrooms, props.pinnedProperty.bathrooms);
+});
+
 const sqftComparison = computed(() => {
     if (!props.pinnedProperty) return null;
     return compareToPin(props.property.square_feet, props.pinnedProperty.square_feet);
+});
+
+const acreageComparison = computed(() => {
+    if (!props.pinnedProperty) return null;
+    return compareToPin(props.property.acreage, props.pinnedProperty.acreage);
 });
 </script>
 
@@ -56,19 +67,27 @@ const sqftComparison = computed(() => {
                     <h3 class="text-base font-bold text-primary leading-tight">{{ property.address }}</h3>
                     <p class="text-xs text-on-surface-variant">{{ property.city }}, {{ property.state }}</p>
                 </div>
-                <div class="col-span-2 text-center">
-                    <p class="text-[10px] font-bold text-on-surface-variant uppercase mb-1">Bed/Bath</p>
-                    <p class="text-sm font-semibold">{{ property.bedrooms ?? '—' }} / {{ property.bathrooms ?? '—' }}</p>
+                <div class="col-span-1 text-center">
+                    <p class="text-[10px] font-bold text-on-surface-variant uppercase mb-1">Bed</p>
+                    <p class="text-sm font-semibold">{{ property.bedrooms ?? '—' }}</p>
                 </div>
-                <div class="col-span-2 text-center">
-                    <p class="text-[10px] font-bold text-on-surface-variant uppercase mb-1">Dimensions</p>
-                    <p class="text-sm font-semibold">{{ property.square_feet ? `${property.square_feet.toLocaleString()} sqft` : '—' }}</p>
+                <div class="col-span-1 text-center">
+                    <p class="text-[10px] font-bold text-on-surface-variant uppercase mb-1">Bath</p>
+                    <p class="text-sm font-semibold">{{ property.bathrooms ?? '—' }}</p>
+                </div>
+                <div class="col-span-1 text-center">
+                    <p class="text-[10px] font-bold text-on-surface-variant uppercase mb-1">Square Ft</p>
+                    <p class="text-sm font-semibold">{{ property.square_feet ?? '—' }}</p>
+                </div>
+                <div class="col-span-1 text-center">
+                    <p class="text-[10px] font-bold text-on-surface-variant uppercase mb-1">Acreage</p>
+                    <p class="text-sm font-semibold">{{ property.acreage ?? '—' }}</p>
                 </div>
                 <div class="col-span-2 text-center">
                     <p class="text-[10px] font-bold text-on-surface-variant uppercase mb-1">Closest Neighbor</p>
                     <p class="text-sm font-semibold text-primary">{{ neighborLabel }}</p>
                 </div>
-                <div class="col-span-3 text-right pr-12">
+                <div class="col-span-3 text-right pr-4">
                     <p class="text-[10px] font-bold text-on-surface-variant uppercase mb-1">Last Sale Price</p>
                     <p class="text-lg font-black text-primary">{{ lastSalePrice ?? '—' }}</p>
                 </div>
@@ -90,22 +109,32 @@ const sqftComparison = computed(() => {
                 <h3 class="text-base font-bold text-on-surface leading-tight">{{ property.address }}</h3>
                 <p class="text-xs text-on-surface-variant">{{ property.city }}, {{ property.state }}</p>
             </div>
-            <div class="col-span-2 text-center">
-                <p class="text-[10px] font-bold text-on-surface-variant uppercase mb-1">Bed/Bath</p>
+            <div class="col-span-1 text-center">
+                <p class="text-[10px] font-bold text-on-surface-variant uppercase mb-1">Bed</p>
                 <div class="flex items-center justify-center gap-1">
-                    <p class="text-sm font-semibold">{{ property.bedrooms ?? '—' }} / {{ property.bathrooms ?? '—' }}</p>
-                    <span v-if="bedroomComparison === 'up'" class="material-symbols-outlined text-primary text-[14px]">arrow_upward</span>
-                    <span v-else-if="bedroomComparison === 'down'" class="material-symbols-outlined text-error text-[14px]">arrow_downward</span>
-                    <span v-else-if="bedroomComparison === 'equal'" class="text-xs text-outline font-bold">≈</span>
+                    <p class="text-sm font-semibold">{{ property.bedrooms ?? '—' }}</p>
+                    <ComparisonIndicator :comparison="bedroomComparison" />
                 </div>
             </div>
-            <div class="col-span-2 text-center">
-                <p class="text-[10px] font-bold text-on-surface-variant uppercase mb-1">Dimensions</p>
+            <div class="col-span-1 text-center">
+                <p class="text-[10px] font-bold text-on-surface-variant uppercase mb-1">Bath</p>
                 <div class="flex items-center justify-center gap-1">
-                    <p class="text-sm font-semibold">{{ property.square_feet ? `${property.square_feet.toLocaleString()} sqft` : '—' }}</p>
-                    <span v-if="sqftComparison === 'up'" class="material-symbols-outlined text-primary text-[14px]">arrow_upward</span>
-                    <span v-else-if="sqftComparison === 'down'" class="material-symbols-outlined text-error text-[14px]">arrow_downward</span>
-                    <span v-else-if="sqftComparison === 'equal'" class="text-xs text-outline font-bold">≈</span>
+                    <p class="text-sm font-semibold">{{ property.bathrooms ?? '—' }}</p>
+                    <ComparisonIndicator :comparison="bathroomComparison" />
+                </div>
+            </div>
+            <div class="col-span-1 text-center">
+                <p class="text-[10px] font-bold text-on-surface-variant uppercase mb-1">Square Ft</p>
+                <div class="flex items-center justify-center gap-1">
+                    <p class="text-sm font-semibold">{{ property.square_feet ?? '—' }}</p>
+                    <ComparisonIndicator :comparison="sqftComparison" />
+                </div>
+            </div>
+            <div class="col-span-1 text-center">
+                <p class="text-[10px] font-bold text-on-surface-variant uppercase mb-1">Acreage</p>
+                <div class="flex items-center justify-center gap-1">
+                    <p class="text-sm font-semibold">{{ property.acreage ?? '—' }}</p>
+                    <ComparisonIndicator :comparison="acreageComparison" />
                 </div>
             </div>
             <div class="col-span-2 text-center">
