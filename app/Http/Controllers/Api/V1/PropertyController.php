@@ -161,17 +161,24 @@ class PropertyController extends Controller
 
     public function distanceCheck(DistanceCheckRequest $request): JsonResponse
     {
-        $coords = $this->analysisService->geocodeAddress([
-            'street' => $request->string('address')->toString(),
-            'city' => $request->string('city')->toString(),
-            'state' => $request->string('state')->toString(),
-            'postalcode' => $request->string('zip_code')->toString(),
-        ]);
+        $lat = $request->input('latitude');
+        $lng = $request->input('longitude');
 
-        if (! $coords) {
-            return response()->json([
-                'message' => 'Could not geocode the provided address. Please check the address and try again.',
-            ], 422);
+        if ($lat !== null && $lng !== null) {
+            $coords = ['lat' => (float) $lat, 'lng' => (float) $lng];
+        } else {
+            $coords = $this->analysisService->geocodeAddress([
+                'street' => $request->string('address')->toString(),
+                'city' => $request->string('city')->toString(),
+                'state' => $request->string('state')->toString(),
+                'postalcode' => $request->string('zip_code')->toString(),
+            ]);
+
+            if (! $coords) {
+                return response()->json([
+                    'message' => 'Could not geocode the provided address. Please check the address and try again.',
+                ], 422);
+            }
         }
 
         $neighborDistance = $this->analysisService->analyzeNeighborDistance($coords['lat'], $coords['lng']);
