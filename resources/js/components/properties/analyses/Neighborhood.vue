@@ -127,6 +127,8 @@ function enterSetLocationMode() {
   settingLocation.value = true;
   pendingLat.value = centerLat.value ?? null;
   pendingLng.value = centerLng.value ?? null;
+  locationSearchQuery.value = '';
+  locationSearchError.value = null;
   if (map) {
     map.getContainer().style.cursor = 'crosshair';
     map.on('click', handleMapClick);
@@ -138,6 +140,8 @@ function cancelSetLocation() {
   settingLocation.value = false;
   pendingLat.value = null;
   pendingLng.value = null;
+  locationSearchQuery.value = '';
+  locationSearchError.value = null;
   if (map) {
     map.getContainer().style.cursor = '';
     map.off('click', handleMapClick);
@@ -198,19 +202,76 @@ async function saveLocation() {
   }
 }
 
-async function fetchCityCenter() {
+const nominatimHeaders = { 'User-Agent': 'NeighborhoodApp/1.0 (contact@neighborhood.app)' };
+
+async function fetchInitialCenter() {
+  const address = props.property.address ?? '';
+  const city = props.property.city ?? '';
+  const state = props.property.state ?? '';
+  const zip = props.property.zip_code ?? '';
+
+  if (address) {
+    try {
+      const q = encodeURIComponent(`${address}, ${city}, ${state} ${zip}`);
+      const res = await fetch(
+        `https://nominatim.openstreetmap.org/search?q=${q}&country=US&format=json&limit=1`,
+        { headers: nominatimHeaders }
+      );
+      const data = await res.json();
+      if (data.length > 0) {
+        return { lat: parseFloat(data[0].lat), lng: parseFloat(data[0].lon), zoom: 17 };
+      }
+    } catch {}
+  }
+
   try {
-    const city = encodeURIComponent(props.property.city ?? '');
-    const state = encodeURIComponent(props.property.state ?? '');
-    const zip = encodeURIComponent(props.property.zip_code ?? '');
+    const q = encodeURIComponent(`${city}, ${state} ${zip}`);
     const res = await fetch(
-      `https://nominatim.openstreetmap.org/search?city=${city}&state=${state}&postalcode=${zip}&country=US&format=json&limit=1`,
-      { headers: { 'User-Agent': 'NeighborhoodApp/1.0 (contact@neighborhood.app)' } }
+      `https://nominatim.openstreetmap.org/search?q=${q}&country=US&format=json&limit=1`,
+      { headers: nominatimHeaders }
     );
     const data = await res.json();
-    if (data.length > 0) return { lat: parseFloat(data[0].lat), lng: parseFloat(data[0].lon) };
+    if (data.length > 0) {
+      return { lat: parseFloat(data[0].lat), lng: parseFloat(data[0].lon), zoom: 16 };
+    }
   } catch {}
+
   return null;
+}
+
+// Location search (used in set-location mode)
+const locationSearchQuery = ref('');
+const locationSearching = ref(false);
+const locationSearchError = ref(null);
+
+async function searchLocation() {
+  const query = locationSearchQuery.value.trim();
+  if (!query || !map) return;
+
+  locationSearching.value = true;
+  locationSearchError.value = null;
+
+  try {
+    const city = props.property.city ?? '';
+    const state = props.property.state ?? '';
+    const q = encodeURIComponent(`${query}, ${city}, ${state}`);
+    const res = await fetch(
+      `https://nominatim.openstreetmap.org/search?q=${q}&country=US&format=json&limit=1`,
+      { headers: nominatimHeaders }
+    );
+    const data = await res.json();
+    if (data.length > 0) {
+      map.setView([parseFloat(data[0].lat), parseFloat(data[0].lon)], 17);
+    } else {
+      locationSearchError.value = 'Location not found. Try a more specific description.';
+      setTimeout(() => { locationSearchError.value = null; }, 5000);
+    }
+  } catch {
+    locationSearchError.value = 'Search failed. Please try again.';
+    setTimeout(() => { locationSearchError.value = null; }, 5000);
+  } finally {
+    locationSearching.value = false;
+  }
 }
 
 onMounted(async () => {
@@ -221,11 +282,11 @@ onMounted(async () => {
   let initZoom = 17;
 
   if (!initLat || !initLng) {
-    const cityCenter = await fetchCityCenter();
-    if (!cityCenter) return;
-    initLat = cityCenter.lat;
-    initLng = cityCenter.lng;
-    initZoom = 14;
+    const center = await fetchInitialCenter();
+    if (!center) return;
+    initLat = center.lat;
+    initLng = center.lng;
+    initZoom = center.zoom;
   }
 
   map = L.map(mapContainer.value, {
@@ -331,6 +392,25 @@ onUnmounted(() => {
 
             <!-- Set Location overlay -->
             <div v-if="settingLocation" class="absolute inset-x-0 bottom-0 z-[1000] p-3 flex flex-col gap-2">
+              <!-- Address/intersection search -->
+              <div class="flex gap-1.5">
+                <input
+                  v-model="locationSearchQuery"
+                  @keydown.enter.prevent="searchLocation"
+                  type="text"
+                  placeholder="e.g. Main St and Oak Ave"
+                  class="flex-1 px-3 py-1.5 rounded-lg text-xs bg-white/95 text-on-surface placeholder:text-on-surface-variant/50 border border-outline-variant/30 focus:outline-none focus:border-primary/50 shadow-sm"
+                />
+                <button
+                  @click="searchLocation"
+                  :disabled="locationSearching || !locationSearchQuery.trim()"
+                  class="flex items-center px-2.5 py-1.5 rounded-lg bg-white/90 text-on-surface-variant hover:bg-white disabled:opacity-50 shadow-sm transition-colors"
+                  title="Jump to location"
+                >
+                  <span class="material-symbols-outlined text-sm">{{ locationSearching ? 'progress_activity' : 'search' }}</span>
+                </button>
+              </div>
+              <p v-if="locationSearchError" class="text-[10px] text-center font-medium text-white drop-shadow bg-red-600/70 rounded px-2 py-0.5">{{ locationSearchError }}</p>
               <p class="text-[10px] font-bold uppercase tracking-wide text-center text-white drop-shadow px-2 py-1 rounded bg-black/40">
                 {{ pendingLat ? 'Click to reposition · confirm when ready' : 'Click on the map to place the pin' }}
               </p>
