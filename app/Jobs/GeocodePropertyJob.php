@@ -47,7 +47,7 @@ class GeocodePropertyJob implements ShouldQueue
                 'geocoding_accuracy' => $coordinates['accuracy'],
             ]);
 
-            if (in_array($coordinates['accuracy'], ['rooftop', 'point'])) {
+            if (in_array($coordinates['accuracy'], ['rooftop', 'point', 'range_interpolation'])) {
                 $this->property->update([
                     'latitude' => $coordinates['lat'],
                     'longitude' => $coordinates['lng'],

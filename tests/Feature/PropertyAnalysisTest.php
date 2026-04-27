@@ -338,7 +338,7 @@ class PropertyAnalysisTest extends TestCase
         $this->assertEquals('rooftop', $property->geocoding_accuracy);
     }
 
-    public function test_geocode_job_does_not_store_coordinates_for_low_accuracy_result(): void
+    public function test_geocode_job_stores_coordinates_for_range_interpolation_accuracy(): void
     {
         Bus::fake();
         Log::spy();
@@ -364,10 +364,40 @@ class PropertyAnalysisTest extends TestCase
         $job->handle(app(\App\Services\PropertyAnalysisService::class));
 
         $property->refresh();
-        $this->assertNull($property->latitude);
-        $this->assertNull($property->longitude);
+        $this->assertEquals(38.2747164, $property->latitude);
+        $this->assertEquals(-77.4988546, $property->longitude);
         $this->assertEquals('geocodio', $property->geocoding_source);
         $this->assertEquals('range_interpolation', $property->geocoding_accuracy);
+        Log::shouldNotHaveReceived('warning');
+        Bus::assertBatched(fn ($batch) => $batch->jobs->count() === 3);
+    }
+
+    public function test_geocode_job_does_not_store_coordinates_for_low_accuracy_result(): void
+    {
+        Bus::fake();
+        Log::spy();
+
+        Http::fake([
+            'https://nominatim.openstreetmap.org/*' => Http::response([
+                ['lat' => '38.2747164', 'lon' => '-77.4988546'],
+            ], 200),
+            'https://api.geocod.io/*' => Http::response(['results' => []], 200),
+            'https://geocoding.geo.census.gov/*' => Http::response(['result' => ['addressMatches' => []]], 200),
+        ]);
+
+        $property = Property::factory()->create([
+            'latitude' => null,
+            'longitude' => null,
+        ]);
+
+        $job = new GeocodePropertyJob($property);
+        $job->handle(app(\App\Services\PropertyAnalysisService::class));
+
+        $property->refresh();
+        $this->assertNull($property->latitude);
+        $this->assertNull($property->longitude);
+        $this->assertEquals('nominatim', $property->geocoding_source);
+        $this->assertEquals('approximate', $property->geocoding_accuracy);
         Log::shouldHaveReceived('warning')->once();
         Bus::assertNothingBatched();
     }
