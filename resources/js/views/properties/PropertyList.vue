@@ -12,7 +12,24 @@
                         Managing {{ pagination.total }} {{ pagination.total === 1 ? 'property' : 'properties' }}
                     </p>
                 </div>
-                <div class="flex flex-wrap gap-3">
+                <div class="flex flex-wrap items-end gap-3">
+                    <label class="flex flex-col gap-2">
+                        <span class="text-xs font-bold uppercase tracking-widest text-on-surface-variant">Sort</span>
+                        <select
+                            :value="sortKey"
+                            @change="changeSort($event.target.value)"
+                            class="bg-surface-container-highest text-on-surface-variant text-sm font-semibold rounded-lg px-3 py-2 border-0 outline-none cursor-pointer hover:bg-surface-container-high transition-colors appearance-none pr-8"
+                            style="background-image: url('data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 24 24%22 fill=%22%2343474e%22><path d=%22M7 10l5 5 5-5z%22/></svg>'); background-repeat: no-repeat; background-position: right 0.4rem center; background-size: 1.2rem;"
+                        >
+                            <option
+                                v-for="option in sortOptions"
+                                :key="option.value"
+                                :value="option.value"
+                            >
+                                {{ option.label }}
+                            </option>
+                        </select>
+                    </label>
                     <router-link
                         :to="`/neighborhoods/${neighborhoodId}/dashboard`"
                         class="bg-surface-container-highest text-on-surface-variant px-4 py-2 rounded-lg font-bold text-sm flex items-center justify-center gap-2 hover:bg-surface-container-high transition-colors"
@@ -161,7 +178,16 @@ const properties = ref([]);
 const loading = ref(true);
 const currentPage = ref(1);
 const perPage = ref(10);
+const sortKey = ref('recent');
 const pagination = ref({ total: 0, count: 0, per_page: 10, current_page: 1, total_pages: 1 });
+
+const sortOptions = [
+    { value: 'recent', label: 'Newest Added', params: {} },
+    { value: 'oldest', label: 'Oldest Added', params: { orderBy: 'created_at', sortedBy: 'asc' } },
+    { value: 'address_asc', label: 'Address A-Z', params: { orderBy: 'address', sortedBy: 'asc' } },
+    { value: 'address_desc', label: 'Address Z-A', params: { orderBy: 'address', sortedBy: 'desc' } },
+    { value: 'last_sold_desc', label: 'Last Sold Date', params: { orderBy: 'last_sale_date', sortedBy: 'desc' } },
+];
 
 const pinnedProperty = computed(() => properties.value.find(p => p.is_pinned) ?? null);
 const unpinnedProperties = computed(() => properties.value.filter(p => !p.is_pinned));
@@ -186,13 +212,20 @@ const pageRange = computed(() => {
 onMounted(async () => {
     if (route.query.page) currentPage.value = Number(route.query.page);
     if (route.query.per_page) perPage.value = Number(route.query.per_page);
+    if (route.query.sort && sortOptions.some(option => option.value === route.query.sort)) {
+        sortKey.value = route.query.sort;
+    }
     await fetchProperties();
 });
 
 async function fetchProperties() {
     loading.value = true;
     try {
-        const params = { page: currentPage.value, per_page: perPage.value };
+        const params = {
+            page: currentPage.value,
+            per_page: perPage.value,
+            ...selectedSortParams(),
+        };
         const response = await api.get(`/neighborhoods/${neighborhoodId.value}/properties`, { params });
         properties.value = response.data.data;
         pagination.value = response.data.meta.pagination;
@@ -218,10 +251,22 @@ function changePerPage(value) {
     fetchProperties();
 }
 
+function changeSort(value) {
+    sortKey.value = value;
+    currentPage.value = 1;
+    syncToUrl();
+    fetchProperties();
+}
+
+function selectedSortParams() {
+    return sortOptions.find(option => option.value === sortKey.value)?.params ?? {};
+}
+
 function syncToUrl() {
     const query = {};
     if (currentPage.value > 1) query.page = currentPage.value;
     if (perPage.value !== 10) query.per_page = perPage.value;
+    if (sortKey.value !== 'recent') query.sort = sortKey.value;
     router.replace({ query });
 }
 </script>

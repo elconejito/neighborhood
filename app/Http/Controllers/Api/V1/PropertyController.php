@@ -29,13 +29,17 @@ class PropertyController extends Controller
     public function index(IndexPropertyRequest $request, Neighborhood $neighborhood): JsonResponse
     {
         $properties = Property::where('neighborhood_id', $neighborhood->id)
-            ->with('priceHistories')
+            ->with(['neighborhood', 'lastSoldHistory'])
+            ->withMax([
+                'priceHistories as last_sale_date' => fn ($query) => $query->where('type', 'sold'),
+            ], 'price_date')
             ->orderByDesc('is_pinned')
-            ->orderByDesc('created_at')
+            ->filter($request)
+            ->when($request->input('orderBy') !== 'created_at', fn ($query) => $query->orderByDesc('created_at'))
             ->paginate($request->integer('per_page', 10));
 
         return fractal($properties, PropertyTransformer::class)
-            ->parseIncludes(['neighborhood', 'price_histories'])
+            ->parseIncludes(['neighborhood'])
             ->respond();
     }
 

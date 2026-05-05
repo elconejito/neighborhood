@@ -18,7 +18,7 @@ class Property extends Model
 
     public array $filterable = ['bedrooms', 'bathrooms', 'city', 'state', 'is_pinned', 'neighborhood_id'];
 
-    public array $sortable = ['created_at', 'updated_at', 'address', 'city'];
+    public array $sortable = ['created_at', 'updated_at', 'address', 'city', 'last_sale_date'];
 
     protected $fillable = [
         'user_id',
@@ -68,6 +68,7 @@ class Property extends Model
             'fireplace' => 'boolean',
             'main_level_primary_bedroom' => 'boolean',
             'pool' => 'boolean',
+            'last_sale_date' => 'date',
         ];
     }
 
@@ -89,6 +90,13 @@ class Property extends Model
     public function priceHistories(): HasMany
     {
         return $this->hasMany(PriceHistory::class)->orderByDesc('price_date');
+    }
+
+    public function lastSoldHistory(): \Illuminate\Database\Eloquent\Relations\HasOne
+    {
+        return $this->hasOne(PriceHistory::class)
+            ->where('type', 'sold')
+            ->latestOfMany('price_date');
     }
 
     public function listingCycles(): HasMany

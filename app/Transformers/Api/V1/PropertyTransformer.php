@@ -19,6 +19,13 @@ class PropertyTransformer extends TransformerAbstract
 
     public function transform(Property $property): array
     {
+        $lastSale = $property->relationLoaded('lastSoldHistory')
+            ? $property->lastSoldHistory
+            : $property->priceHistories
+                ->where('type', 'sold')
+                ->sortByDesc('price_date')
+                ->first();
+
         return [
             'id' => (int) $property->id,
             'user_id' => (int) $property->user_id,
@@ -51,10 +58,8 @@ class PropertyTransformer extends TransformerAbstract
             'hoa' => $property->hoa,
             'listing_url' => $property->listing_url,
             'analysis' => $property->analysis,
-            'last_sale_price' => $property->priceHistories
-                ->where('type', 'sold')
-                ->sortByDesc('price_date')
-                ->first()?->price,
+            'last_sale_price' => $lastSale?->price,
+            'last_sale_date' => $property->last_sale_date?->toDateString() ?? $lastSale?->price_date?->toDateString(),
             'analyzed_at' => $property->analyzed_at ? $property->analyzed_at->toDateTimeString() : null,
             'created_at' => $property->created_at ? $property->created_at->toDateTimeString() : null,
             'updated_at' => $property->updated_at ? $property->updated_at->toDateTimeString() : null,

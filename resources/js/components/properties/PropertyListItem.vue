@@ -11,6 +11,7 @@ const props = defineProps({
 });
 
 const fmtCurrency = new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD', maximumFractionDigits: 0 });
+const fmtDate = new Intl.DateTimeFormat('en-US', { month: 'short', day: 'numeric', year: 'numeric', timeZone: 'UTC' });
 
 const nearestNeighbor = computed(() => props.property.analysis?.neighbor_distance?.nearest_houses?.[0]);
 
@@ -22,6 +23,11 @@ const neighborLabel = computed(() => {
 const lastSalePrice = computed(() => {
     if (!props.property.last_sale_price) return null;
     return fmtCurrency.format(props.property.last_sale_price);
+});
+
+const lastSaleDate = computed(() => {
+    if (!props.property.last_sale_date) return null;
+    return fmtDate.format(new Date(`${props.property.last_sale_date}T00:00:00Z`));
 });
 
 function compareToPin(val, pinVal) {
@@ -59,37 +65,41 @@ const acreageComparison = computed(() => {
         class="bg-primary-container/30 border-l-4 border-primary rounded-xl p-4 flex items-center gap-8 relative overflow-hidden"
     >
         <router-link :to="`/neighborhoods/${props.neighborhoodId}/properties/${property.id}`" class="flex items-center gap-8 grow min-w-0">
-            <div class="w-14 h-14 rounded-lg overflow-hidden shrink-0 shadow-sm bg-primary-container flex items-center justify-center">
+            <div class="hidden md:flex w-14 h-14 rounded-lg overflow-hidden shrink-0 shadow-sm bg-primary-container items-center justify-center">
                 <span class="material-symbols-outlined text-primary/50 text-2xl">home</span>
             </div>
-            <div class="grow grid grid-cols-12 gap-4 items-center">
-                <div class="col-span-3">
+            <div class="grow grid gap-4 items-center md:grid-cols-12">
+                <div class="md:col-span-2">
                     <h3 class="text-base font-bold text-primary leading-tight">{{ property.address }}</h3>
                     <p class="text-xs text-on-surface-variant">{{ property.city }}, {{ property.state }}</p>
                 </div>
-                <div class="col-span-1 text-center">
+                <div class="md:col-span-1 text-center">
                     <p class="text-[10px] font-bold text-on-surface-variant uppercase mb-1">Bed</p>
                     <p class="text-sm font-semibold">{{ property.bedrooms ?? '—' }}</p>
                 </div>
-                <div class="col-span-1 text-center">
+                <div class="md:col-span-1 text-center">
                     <p class="text-[10px] font-bold text-on-surface-variant uppercase mb-1">Bath</p>
                     <p class="text-sm font-semibold">{{ property.bathrooms ?? '—' }}</p>
                 </div>
-                <div class="col-span-1 text-center">
+                <div class="md:col-span-1 text-center">
                     <p class="text-[10px] font-bold text-on-surface-variant uppercase mb-1">Square Ft</p>
                     <p class="text-sm font-semibold">{{ property.square_feet ?? '—' }}</p>
                 </div>
-                <div class="col-span-1 text-center">
+                <div class="md:col-span-1 text-center">
                     <p class="text-[10px] font-bold text-on-surface-variant uppercase mb-1">Acreage</p>
                     <p class="text-sm font-semibold">{{ property.acreage ?? '—' }}</p>
                 </div>
-                <div class="col-span-2 text-center">
+                <div class="md:col-span-2 text-center">
                     <p class="text-[10px] font-bold text-on-surface-variant uppercase mb-1">Closest Neighbor</p>
                     <p class="text-sm font-semibold text-primary">{{ neighborLabel }}</p>
                 </div>
-                <div class="col-span-3 text-right pr-4">
+                <div class="md:col-span-2 text-center">
+                    <p class="text-[10px] font-bold text-on-surface-variant uppercase mb-1">Last Sold</p>
+                    <p class="text-sm font-semibold">{{ lastSaleDate ?? '—' }}</p>
+                </div>
+                <div class="md:col-span-2 text-right md:pr-4">
                     <p class="text-[10px] font-bold text-on-surface-variant uppercase mb-1">Last Sale Price</p>
-                    <p class="text-lg font-black text-primary">{{ lastSalePrice ?? '—' }}</p>
+                    <p class="text-base font-black text-primary md:text-lg">{{ lastSalePrice ?? '—' }}</p>
                 </div>
             </div>
         </router-link>
@@ -101,49 +111,53 @@ const acreageComparison = computed(() => {
         :to="`/neighborhoods/${props.neighborhoodId}/properties/${property.id}`"
         class="bg-surface-container-lowest border border-transparent hover:border-primary-container rounded-xl p-4 flex items-center gap-8 hover:bg-surface-container-low transition-colors group"
     >
-        <div class="w-14 h-14 bg-surface-container-highest rounded-lg overflow-hidden shrink-0 flex items-center justify-center">
+        <div class="hidden md:flex w-14 h-14 bg-surface-container-highest rounded-lg overflow-hidden shrink-0 items-center justify-center">
             <span class="material-symbols-outlined text-outline-variant">home</span>
         </div>
-        <div class="grow grid grid-cols-12 gap-4 items-center">
-            <div class="col-span-3">
+        <div class="grow grid gap-4 items-center md:grid-cols-12">
+            <div class="md:col-span-2">
                 <h3 class="text-base font-bold text-on-surface leading-tight">{{ property.address }}</h3>
                 <p class="text-xs text-on-surface-variant">{{ property.city }}, {{ property.state }}</p>
             </div>
-            <div class="col-span-1 text-center">
+            <div class="md:col-span-1 text-center">
                 <p class="text-[10px] font-bold text-on-surface-variant uppercase mb-1">Bed</p>
                 <div class="flex items-center justify-center gap-1">
                     <p class="text-sm font-semibold">{{ property.bedrooms ?? '—' }}</p>
                     <ComparisonIndicator :comparison="bedroomComparison" />
                 </div>
             </div>
-            <div class="col-span-1 text-center">
+            <div class="md:col-span-1 text-center">
                 <p class="text-[10px] font-bold text-on-surface-variant uppercase mb-1">Bath</p>
                 <div class="flex items-center justify-center gap-1">
                     <p class="text-sm font-semibold">{{ property.bathrooms ?? '—' }}</p>
                     <ComparisonIndicator :comparison="bathroomComparison" />
                 </div>
             </div>
-            <div class="col-span-1 text-center">
+            <div class="md:col-span-1 text-center">
                 <p class="text-[10px] font-bold text-on-surface-variant uppercase mb-1">Square Ft</p>
                 <div class="flex items-center justify-center gap-1">
                     <p class="text-sm font-semibold">{{ property.square_feet ?? '—' }}</p>
                     <ComparisonIndicator :comparison="sqftComparison" />
                 </div>
             </div>
-            <div class="col-span-1 text-center">
+            <div class="md:col-span-1 text-center">
                 <p class="text-[10px] font-bold text-on-surface-variant uppercase mb-1">Acreage</p>
                 <div class="flex items-center justify-center gap-1">
                     <p class="text-sm font-semibold">{{ property.acreage ?? '—' }}</p>
                     <ComparisonIndicator :comparison="acreageComparison" />
                 </div>
             </div>
-            <div class="col-span-2 text-center">
+            <div class="md:col-span-2 text-center">
                 <p class="text-[10px] font-bold text-on-surface-variant uppercase mb-1">Neighbor</p>
                 <p class="text-sm font-semibold">{{ neighborLabel }}</p>
             </div>
-            <div class="col-span-3 text-right pr-4">
+            <div class="md:col-span-2 text-center">
+                <p class="text-[10px] font-bold text-on-surface-variant uppercase mb-1">Last Sold</p>
+                <p class="text-sm font-semibold">{{ lastSaleDate ?? '—' }}</p>
+            </div>
+            <div class="md:col-span-2 text-right md:pr-4">
                 <p class="text-[10px] font-bold text-on-surface-variant uppercase mb-1">Last Sale Price</p>
-                <p class="text-lg font-black text-on-surface">{{ lastSalePrice ?? '—' }}</p>
+                <p class="text-base font-black text-on-surface md:text-lg">{{ lastSalePrice ?? '—' }}</p>
             </div>
         </div>
     </router-link>
