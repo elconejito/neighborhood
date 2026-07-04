@@ -80,6 +80,62 @@ class PropertyIndexTest extends TestCase
             ->assertJsonPath('data.1.address', '10 Alpha Ave');
     }
 
+    public function test_property_index_sorts_addresses_by_street_name_then_house_number_ascending(): void
+    {
+        $user = User::factory()->create();
+        $neighborhood = Neighborhood::factory()->create();
+
+        foreach (['10 Oak Ave', '100 Apple St', '2 Oak Ave', '5 Birch Rd', '1 Apple St'] as $address) {
+            Property::factory()->create([
+                'user_id' => $user->id,
+                'neighborhood_id' => $neighborhood->id,
+                'address' => $address,
+                'is_pinned' => false,
+            ]);
+        }
+
+        $response = $this->actingAs($user, 'api')
+            ->getJson("/api/v1/neighborhoods/{$neighborhood->id}/properties?orderBy=address&sortedBy=asc");
+
+        $response->assertOk();
+
+        $this->assertSame([
+            '1 Apple St',
+            '100 Apple St',
+            '5 Birch Rd',
+            '2 Oak Ave',
+            '10 Oak Ave',
+        ], array_column($response->json('data'), 'address'));
+    }
+
+    public function test_property_index_sorts_addresses_by_street_name_then_house_number_descending(): void
+    {
+        $user = User::factory()->create();
+        $neighborhood = Neighborhood::factory()->create();
+
+        foreach (['10 Oak Ave', '100 Apple St', '2 Oak Ave', '5 Birch Rd', '1 Apple St'] as $address) {
+            Property::factory()->create([
+                'user_id' => $user->id,
+                'neighborhood_id' => $neighborhood->id,
+                'address' => $address,
+                'is_pinned' => false,
+            ]);
+        }
+
+        $response = $this->actingAs($user, 'api')
+            ->getJson("/api/v1/neighborhoods/{$neighborhood->id}/properties?orderBy=address&sortedBy=desc");
+
+        $response->assertOk();
+
+        $this->assertSame([
+            '10 Oak Ave',
+            '2 Oak Ave',
+            '5 Birch Rd',
+            '100 Apple St',
+            '1 Apple St',
+        ], array_column($response->json('data'), 'address'));
+    }
+
     public function test_property_index_sorts_properties_without_sales_at_the_end(): void
     {
         $user = User::factory()->create();

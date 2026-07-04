@@ -123,6 +123,16 @@ class Property extends Model
         return $query->where('user_id', $user->id);
     }
 
+    public function applyAddressSort(Builder $query, string $direction): void
+    {
+        $address = $this->qualifyColumn('address');
+
+        $query
+            ->orderByRaw("LOWER(TRIM(SUBSTR(TRIM({$address}), INSTR(TRIM({$address}), ' ') + 1))) {$direction}")
+            ->orderByRaw("(TRIM({$address}) + 0) {$direction}")
+            ->orderBy($address, $direction);
+    }
+
     public function getFullAddressAttribute(): string
     {
         return "{$this->address}, {$this->city}, {$this->state} {$this->zip_code}";

@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Schema;
+use Illuminate\Support\Str;
 
 class FilterParser
 {
@@ -45,14 +46,14 @@ class FilterParser
                 $useOr = $searchJoin === 'or' && $i > 0;
 
                 match ($operator) {
-                    'in'      => $useOr
+                    'in' => $useOr
                         ? $q->orWhereIn($column, $this->parseListValue($search))
                         : $q->whereIn($column, $this->parseListValue($search)),
                     'between' => $this->applyBetween($q, $column, $search, $useOr),
-                    'like'    => $useOr
+                    'like' => $useOr
                         ? $q->orWhere($column, 'like', "%{$search}%")
                         : $q->where($column, 'like', "%{$search}%"),
-                    default   => $useOr
+                    default => $useOr
                         ? $q->orWhere($column, $operator, $search)
                         : $q->where($column, $operator, $search),
                 };
@@ -165,6 +166,14 @@ class FilterParser
         }
 
         $direction = strtolower($this->request->input('sortedBy', 'asc')) === 'desc' ? 'desc' : 'asc';
+        $customSortMethod = 'apply'.Str::studly($column).'Sort';
+
+        if (method_exists($this->model, $customSortMethod)) {
+            $this->model->{$customSortMethod}($this->query, $direction);
+
+            return;
+        }
+
         $this->query->orderBy($column, $direction);
     }
 
