@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests\Api\V1\Property;
 
+use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
 
 class StorePropertyRequest extends FormRequest
@@ -17,7 +18,7 @@ class StorePropertyRequest extends FormRequest
     /**
      * Get the validation rules that apply to the request.
      *
-     * @return array<string, \Illuminate\Contracts\Validation\ValidationRule|array<mixed>|string>
+     * @return array<string, ValidationRule|array<mixed>|string>
      */
     public function rules(): array
     {
@@ -35,7 +36,7 @@ class StorePropertyRequest extends FormRequest
             'square_feet' => ['nullable', 'integer', 'min:0'],
             'year_built' => ['nullable', 'integer', 'min:1700', 'max:'.(date('Y') + 5)],
             'garage' => ['nullable', 'integer', 'min:0'],
-            'basement' => ['nullable', 'string', 'in:Unfinished,Finished,Partial'],
+            'basement' => ['nullable', 'string', 'in:Unknown,None,Unfinished,Finished,Partial'],
             'basement_walkout' => ['nullable', 'boolean'],
             'fireplace' => ['nullable', 'boolean'],
             'main_level_primary_bedroom' => ['nullable', 'boolean'],

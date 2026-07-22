@@ -2,6 +2,7 @@
 
 namespace Tests\Feature;
 
+use App\Models\Neighborhood;
 use App\Models\Property;
 use App\Models\ReferenceHvacType;
 use App\Models\User;
@@ -17,6 +18,7 @@ class PropertyManagementTest extends TestCase
     public function test_user_can_create_property_with_new_fields(): void
     {
         $user = User::factory()->create();
+        $neighborhood = Neighborhood::factory()->create();
         $hvacType = ReferenceHvacType::create(['label' => 'Test HVAC']);
 
         $data = [
@@ -40,7 +42,8 @@ class PropertyManagementTest extends TestCase
             'hoa' => 'HOA',
         ];
 
-        $response = $this->actingAs($user, 'api')->postJson('/api/v1/properties', $data);
+        $response = $this->actingAs($user, 'api')
+            ->postJson("/api/v1/neighborhoods/{$neighborhood->id}/properties", $data);
 
         $response->assertStatus(201)
             ->assertJsonPath('data.address', '123 Test St')
@@ -68,7 +71,8 @@ class PropertyManagementTest extends TestCase
             'hoa' => 'Condo',
         ];
 
-        $response = $this->actingAs($user, 'api')->putJson("/api/v1/properties/{$property->id}", $updateData);
+        $response = $this->actingAs($user, 'api')
+            ->putJson("/api/v1/neighborhoods/{$property->neighborhood_id}/properties/{$property->id}", $updateData);
 
         $response->assertStatus(200)
             ->assertJsonPath('data.garage', 3)
@@ -83,6 +87,26 @@ class PropertyManagementTest extends TestCase
         ]);
     }
 
+    public function test_user_can_set_none_or_unknown_for_basement(): void
+    {
+        $user = User::factory()->create();
+        $neighborhood = Neighborhood::factory()->create();
+
+        foreach (['None', 'Unknown'] as $basement) {
+            $response = $this->actingAs($user, 'api')
+                ->postJson("/api/v1/neighborhoods/{$neighborhood->id}/properties", [
+                    'address' => "123 {$basement} St",
+                    'city' => 'Test City',
+                    'state' => 'WV',
+                    'zip_code' => '25401',
+                    'basement' => $basement,
+                ]);
+
+            $response->assertStatus(201)
+                ->assertJsonPath('data.basement', $basement);
+        }
+    }
+
     public function test_included_neighborhood_is_not_wrapped_in_data(): void
     {
         Config::set('fractal.default_serializer', IncludeUnwrappedDataArraySerializer::class);
@@ -90,7 +114,8 @@ class PropertyManagementTest extends TestCase
         $user = User::factory()->create();
         $property = Property::factory()->create(['user_id' => $user->id]);
 
-        $response = $this->actingAs($user, 'api')->getJson('/api/v1/properties');
+        $response = $this->actingAs($user, 'api')
+            ->getJson("/api/v1/neighborhoods/{$property->neighborhood_id}/properties");
 
         $response->assertStatus(200)
             ->assertJsonPath('data.0.neighborhood.id', $property->neighborhood->id)

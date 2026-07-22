@@ -144,7 +144,8 @@
                                 v-model="form.basement"
                                 class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-emerald-500 focus:border-emerald-500"
                             >
-                                <option :value="null">None/Unknown</option>
+                                <option value="Unknown">Unknown</option>
+                                <option value="None">None</option>
                                 <option value="Unfinished">Unfinished</option>
                                 <option value="Finished">Finished</option>
                                 <option value="Partial">Partial</option>
@@ -351,7 +352,7 @@ const form = reactive({
     square_feet: null,
     year_built: null,
     garage: 0,
-    basement: null,
+    basement: 'Unknown',
     basement_walkout: false,
     fireplace: false,
     main_level_primary_bedroom: false,

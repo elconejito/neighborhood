@@ -198,7 +198,8 @@
                             v-model="form.basement"
                             class="w-full bg-surface-container-highest border-none rounded-lg px-4 py-3 text-on-surface focus:ring-1 focus:ring-primary focus:bg-surface-container-lowest transition-all appearance-none"
                         >
-                            <option :value="null">None/Unknown</option>
+                            <option value="Unknown">Unknown</option>
+                            <option value="None">None</option>
                             <option value="Unfinished">Unfinished</option>
                             <option value="Finished">Finished</option>
                             <option value="Partial">Partial</option>
@@ -416,7 +417,7 @@ const form = reactive({
     square_feet: null,
     year_built: null,
     garage: 0,
-    basement: null,
+    basement: 'Unknown',
     basement_walkout: false,
     fireplace: false,
     main_level_primary_bedroom: false,
@@ -467,7 +468,7 @@ onMounted(async () => {
         // Fill form with property data
         Object.keys(form).forEach(key => {
             if (Object.prototype.hasOwnProperty.call(property, key)) {
-                form[key] = property[key];
+                form[key] = key === 'basement' && property[key] == null ? 'Unknown' : property[key];
             }
         });
 
