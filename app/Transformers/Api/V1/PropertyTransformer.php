@@ -26,6 +26,13 @@ class PropertyTransformer extends TransformerAbstract
                 ->sortByDesc('price_date')
                 ->first();
 
+        $lastListing = $property->relationLoaded('lastListingHistory')
+            ? $property->lastListingHistory
+            : $property->priceHistories
+                ->where('type', 'listing')
+                ->sortByDesc('price_date')
+                ->first();
+
         return [
             'id' => (int) $property->id,
             'user_id' => (int) $property->user_id,
@@ -60,6 +67,8 @@ class PropertyTransformer extends TransformerAbstract
             'analysis' => $property->analysis,
             'last_sale_price' => $lastSale?->price,
             'last_sale_date' => $property->last_sale_date?->toDateString() ?? $lastSale?->price_date?->toDateString(),
+            'last_listing_price' => $lastListing?->price,
+            'last_listing_date' => $lastListing?->price_date?->toDateString(),
             'analyzed_at' => $property->analyzed_at ? $property->analyzed_at->toDateTimeString() : null,
             'created_at' => $property->created_at ? $property->created_at->toDateTimeString() : null,
             'updated_at' => $property->updated_at ? $property->updated_at->toDateTimeString() : null,

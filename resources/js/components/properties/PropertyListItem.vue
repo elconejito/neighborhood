@@ -20,14 +20,43 @@ const neighborLabel = computed(() => {
     return formatRelativeDistance(nearestNeighbor.value.distance_meters);
 });
 
-const lastSalePrice = computed(() => {
-    if (!props.property.last_sale_price) return null;
-    return fmtCurrency.format(props.property.last_sale_price);
+function formatPrice(price) {
+    return price == null ? null : fmtCurrency.format(price);
+}
+
+function formatDate(date) {
+    return date ? fmtDate.format(new Date(`${date}T00:00:00Z`)) : null;
+}
+
+const latestMarketEvent = computed(() => {
+    if (props.property.last_sale_date) {
+        return {
+            label: 'Last Sold',
+            price: formatPrice(props.property.last_sale_price),
+            date: formatDate(props.property.last_sale_date),
+            tone: 'text-primary',
+        };
+    }
+
+    if (props.property.last_listing_date) {
+        return {
+            label: 'Last Listed',
+            price: formatPrice(props.property.last_listing_price),
+            date: formatDate(props.property.last_listing_date),
+            tone: 'text-tertiary',
+        };
+    }
+
+    return {
+        label: 'No Market History',
+        price: null,
+        date: null,
+        tone: 'text-on-surface-variant',
+    };
 });
 
-const lastSaleDate = computed(() => {
-    if (!props.property.last_sale_date) return null;
-    return fmtDate.format(new Date(`${props.property.last_sale_date}T00:00:00Z`));
+const formattedSquareFeet = computed(() => {
+    return props.property.square_feet == null ? '—' : props.property.square_feet.toLocaleString();
 });
 
 function compareToPin(val, pinVal) {
@@ -69,37 +98,28 @@ const acreageComparison = computed(() => {
                 <span class="material-symbols-outlined text-primary/50 text-2xl">home</span>
             </div>
             <div class="grow grid gap-4 items-center md:grid-cols-12">
-                <div class="md:col-span-2">
+                <div class="md:col-span-4">
                     <h3 class="text-base font-bold text-primary leading-tight">{{ property.address }}</h3>
                     <p class="text-xs text-on-surface-variant">{{ property.city }}, {{ property.state }}</p>
                 </div>
-                <div class="md:col-span-1 text-center">
-                    <p class="text-[10px] font-bold text-on-surface-variant uppercase mb-1">Bed</p>
-                    <p class="text-sm font-semibold">{{ property.bedrooms ?? '—' }}</p>
-                </div>
-                <div class="md:col-span-1 text-center">
-                    <p class="text-[10px] font-bold text-on-surface-variant uppercase mb-1">Bath</p>
-                    <p class="text-sm font-semibold">{{ property.bathrooms ?? '—' }}</p>
-                </div>
-                <div class="md:col-span-1 text-center">
-                    <p class="text-[10px] font-bold text-on-surface-variant uppercase mb-1">Square Ft</p>
-                    <p class="text-sm font-semibold">{{ property.square_feet ?? '—' }}</p>
-                </div>
-                <div class="md:col-span-1 text-center">
-                    <p class="text-[10px] font-bold text-on-surface-variant uppercase mb-1">Acreage</p>
-                    <p class="text-sm font-semibold">{{ property.acreage ?? '—' }}</p>
+                <div class="md:col-span-3 grid grid-cols-2 gap-4 text-center">
+                    <div>
+                        <p class="text-[10px] font-bold text-on-surface-variant uppercase mb-1">Beds / Baths</p>
+                        <p class="text-sm font-semibold">{{ property.bedrooms ?? '—' }} / {{ property.bathrooms ?? '—' }}</p>
+                    </div>
+                    <div>
+                        <p class="text-[10px] font-bold text-on-surface-variant uppercase mb-1">Size</p>
+                        <p class="text-sm font-semibold">{{ formattedSquareFeet }} sq ft · {{ property.acreage ?? '—' }} ac</p>
+                    </div>
                 </div>
                 <div class="md:col-span-2 text-center">
                     <p class="text-[10px] font-bold text-on-surface-variant uppercase mb-1">Closest Neighbor</p>
                     <p class="text-sm font-semibold text-primary">{{ neighborLabel }}</p>
                 </div>
-                <div class="md:col-span-2 text-center">
-                    <p class="text-[10px] font-bold text-on-surface-variant uppercase mb-1">Last Sold</p>
-                    <p class="text-sm font-semibold">{{ lastSaleDate ?? '—' }}</p>
-                </div>
-                <div class="md:col-span-2 text-right md:pr-4">
-                    <p class="text-[10px] font-bold text-on-surface-variant uppercase mb-1">Last Sale Price</p>
-                    <p class="text-base font-black text-primary md:text-lg">{{ lastSalePrice ?? '—' }}</p>
+                <div class="md:col-span-3 text-right md:pr-4">
+                    <p class="text-[10px] font-bold uppercase mb-1" :class="latestMarketEvent.tone">{{ latestMarketEvent.label }}</p>
+                    <p class="text-base font-black md:text-lg" :class="latestMarketEvent.tone">{{ latestMarketEvent.price ?? '—' }}</p>
+                    <p class="text-xs text-on-surface-variant">{{ latestMarketEvent.date ?? '—' }}</p>
                 </div>
             </div>
         </router-link>
@@ -115,49 +135,40 @@ const acreageComparison = computed(() => {
             <span class="material-symbols-outlined text-outline-variant">home</span>
         </div>
         <div class="grow grid gap-4 items-center md:grid-cols-12">
-            <div class="md:col-span-2">
+            <div class="md:col-span-4">
                 <h3 class="text-base font-bold text-on-surface leading-tight">{{ property.address }}</h3>
                 <p class="text-xs text-on-surface-variant">{{ property.city }}, {{ property.state }}</p>
             </div>
-            <div class="md:col-span-1 text-center">
-                <p class="text-[10px] font-bold text-on-surface-variant uppercase mb-1">Bed</p>
-                <div class="flex items-center justify-center gap-1">
-                    <p class="text-sm font-semibold">{{ property.bedrooms ?? '—' }}</p>
-                    <ComparisonIndicator :comparison="bedroomComparison" />
+            <div class="md:col-span-3 grid grid-cols-2 gap-4 text-center">
+                <div>
+                    <p class="text-[10px] font-bold text-on-surface-variant uppercase mb-1">Beds / Baths</p>
+                    <div class="flex items-center justify-center gap-1">
+                        <p class="text-sm font-semibold">{{ property.bedrooms ?? '—' }}</p>
+                        <ComparisonIndicator :comparison="bedroomComparison" />
+                        <span class="text-on-surface-variant">/</span>
+                        <p class="text-sm font-semibold">{{ property.bathrooms ?? '—' }}</p>
+                        <ComparisonIndicator :comparison="bathroomComparison" />
+                    </div>
                 </div>
-            </div>
-            <div class="md:col-span-1 text-center">
-                <p class="text-[10px] font-bold text-on-surface-variant uppercase mb-1">Bath</p>
-                <div class="flex items-center justify-center gap-1">
-                    <p class="text-sm font-semibold">{{ property.bathrooms ?? '—' }}</p>
-                    <ComparisonIndicator :comparison="bathroomComparison" />
-                </div>
-            </div>
-            <div class="md:col-span-1 text-center">
-                <p class="text-[10px] font-bold text-on-surface-variant uppercase mb-1">Square Ft</p>
-                <div class="flex items-center justify-center gap-1">
-                    <p class="text-sm font-semibold">{{ property.square_feet ?? '—' }}</p>
-                    <ComparisonIndicator :comparison="sqftComparison" />
-                </div>
-            </div>
-            <div class="md:col-span-1 text-center">
-                <p class="text-[10px] font-bold text-on-surface-variant uppercase mb-1">Acreage</p>
-                <div class="flex items-center justify-center gap-1">
-                    <p class="text-sm font-semibold">{{ property.acreage ?? '—' }}</p>
-                    <ComparisonIndicator :comparison="acreageComparison" />
+                <div>
+                    <p class="text-[10px] font-bold text-on-surface-variant uppercase mb-1">Size</p>
+                    <div class="flex items-center justify-center gap-1">
+                        <p class="text-sm font-semibold">{{ formattedSquareFeet }} sq ft</p>
+                        <ComparisonIndicator :comparison="sqftComparison" />
+                        <span class="text-on-surface-variant">·</span>
+                        <p class="text-sm font-semibold">{{ property.acreage ?? '—' }} ac</p>
+                        <ComparisonIndicator :comparison="acreageComparison" />
+                    </div>
                 </div>
             </div>
             <div class="md:col-span-2 text-center">
                 <p class="text-[10px] font-bold text-on-surface-variant uppercase mb-1">Neighbor</p>
                 <p class="text-sm font-semibold">{{ neighborLabel }}</p>
             </div>
-            <div class="md:col-span-2 text-center">
-                <p class="text-[10px] font-bold text-on-surface-variant uppercase mb-1">Last Sold</p>
-                <p class="text-sm font-semibold">{{ lastSaleDate ?? '—' }}</p>
-            </div>
-            <div class="md:col-span-2 text-right md:pr-4">
-                <p class="text-[10px] font-bold text-on-surface-variant uppercase mb-1">Last Sale Price</p>
-                <p class="text-base font-black text-on-surface md:text-lg">{{ lastSalePrice ?? '—' }}</p>
+            <div class="md:col-span-3 text-right md:pr-4">
+                <p class="text-[10px] font-bold uppercase mb-1" :class="latestMarketEvent.tone">{{ latestMarketEvent.label }}</p>
+                <p class="text-base font-black md:text-lg" :class="latestMarketEvent.tone">{{ latestMarketEvent.price ?? '—' }}</p>
+                <p class="text-xs text-on-surface-variant">{{ latestMarketEvent.date ?? '—' }}</p>
             </div>
         </div>
     </router-link>

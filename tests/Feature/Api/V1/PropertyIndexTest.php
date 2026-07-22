@@ -41,6 +41,40 @@ class PropertyIndexTest extends TestCase
             ->assertJsonPath('data.0.last_sale_price', '315000.00');
     }
 
+    public function test_property_index_includes_the_most_recent_listing_details(): void
+    {
+        $user = User::factory()->create();
+        $neighborhood = Neighborhood::factory()->create();
+        $property = Property::factory()->create([
+            'user_id' => $user->id,
+            'neighborhood_id' => $neighborhood->id,
+            'is_pinned' => false,
+        ]);
+
+        PriceHistory::factory()->create([
+            'property_id' => $property->id,
+            'listing_cycle_id' => null,
+            'type' => 'listing',
+            'price_date' => '2024-01-15',
+            'price' => 300000,
+        ]);
+        PriceHistory::factory()->create([
+            'property_id' => $property->id,
+            'listing_cycle_id' => null,
+            'type' => 'listing',
+            'price_date' => '2024-03-01',
+            'price' => 325000,
+        ]);
+
+        $response = $this->actingAs($user, 'api')
+            ->getJson("/api/v1/neighborhoods/{$neighborhood->id}/properties");
+
+        $response->assertOk()
+            ->assertJsonPath('data.0.last_sale_date', null)
+            ->assertJsonPath('data.0.last_listing_date', '2024-03-01')
+            ->assertJsonPath('data.0.last_listing_price', '325000.00');
+    }
+
     public function test_property_index_can_be_sorted_by_last_sale_date_descending(): void
     {
         $user = User::factory()->create();

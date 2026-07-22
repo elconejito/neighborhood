@@ -8,6 +8,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
 
 class Property extends Model
@@ -92,10 +93,17 @@ class Property extends Model
         return $this->hasMany(PriceHistory::class)->orderByDesc('price_date');
     }
 
-    public function lastSoldHistory(): \Illuminate\Database\Eloquent\Relations\HasOne
+    public function lastSoldHistory(): HasOne
     {
         return $this->hasOne(PriceHistory::class)
             ->where('type', 'sold')
+            ->latestOfMany('price_date');
+    }
+
+    public function lastListingHistory(): HasOne
+    {
+        return $this->hasOne(PriceHistory::class)
+            ->where('type', 'listing')
             ->latestOfMany('price_date');
     }
 
