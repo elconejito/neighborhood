@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Database\Factories\ListingCycleFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -9,7 +10,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class ListingCycle extends Model
 {
-    /** @use HasFactory<\Database\Factories\ListingCycleFactory> */
+    /** @use HasFactory<ListingCycleFactory> */
     use HasFactory;
 
     protected $fillable = [
@@ -38,6 +39,37 @@ class ListingCycle extends Model
     public function priceHistories(): HasMany
     {
         return $this->hasMany(PriceHistory::class)->orderBy('price_date');
+    }
+
+    public function syncFromPriceHistories(): void
+    {
+        $histories = $this->priceHistories()
+            ->orderBy('price_date')
+            ->orderBy('id')
+            ->get();
+
+        $listingEvent = $histories->firstWhere('type', 'listing');
+        $lastEvent = $histories->last();
+
+        $attributes = [
+            'status' => 'listed',
+            'list_price' => $listingEvent?->price,
+            'listed_at' => $listingEvent?->price_date,
+            'sold_price' => null,
+            'sold_at' => null,
+            'off_market_at' => null,
+        ];
+
+        if ($lastEvent?->type === 'sold') {
+            $attributes['status'] = 'sold';
+            $attributes['sold_price'] = $lastEvent->price;
+            $attributes['sold_at'] = $lastEvent->price_date;
+        } elseif ($lastEvent?->type === 'off_market') {
+            $attributes['status'] = 'off_market';
+            $attributes['off_market_at'] = $lastEvent->price_date;
+        }
+
+        $this->update($attributes);
     }
 
     public function getPriceDifference(): ?float

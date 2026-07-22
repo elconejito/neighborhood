@@ -107,6 +107,21 @@ class Property extends Model
             ->latestOfMany('price_date');
     }
 
+    public function lastListingCycle(): HasOne
+    {
+        return $this->hasOne(ListingCycle::class)
+            ->whereNotNull('listed_at')
+            ->latestOfMany('listed_at');
+    }
+
+    public function lastSoldCycle(): HasOne
+    {
+        return $this->hasOne(ListingCycle::class)
+            ->where('status', 'sold')
+            ->whereNotNull('sold_at')
+            ->latestOfMany('sold_at');
+    }
+
     public function listingCycles(): HasMany
     {
         return $this->hasMany(ListingCycle::class)->orderByDesc('listed_at');

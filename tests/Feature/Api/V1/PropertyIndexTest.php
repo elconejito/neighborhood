@@ -2,6 +2,7 @@
 
 namespace Tests\Feature\Api\V1;
 
+use App\Models\ListingCycle;
 use App\Models\Neighborhood;
 use App\Models\PriceHistory;
 use App\Models\Property;
@@ -73,6 +74,37 @@ class PropertyIndexTest extends TestCase
             ->assertJsonPath('data.0.last_sale_date', null)
             ->assertJsonPath('data.0.last_listing_date', '2024-03-01')
             ->assertJsonPath('data.0.last_listing_price', '325000.00');
+    }
+
+    public function test_property_index_falls_back_to_the_most_recent_legacy_listing_cycle(): void
+    {
+        $user = User::factory()->create();
+        $neighborhood = Neighborhood::factory()->create();
+        $property = Property::factory()->create([
+            'user_id' => $user->id,
+            'neighborhood_id' => $neighborhood->id,
+            'is_pinned' => false,
+        ]);
+
+        ListingCycle::factory()->create([
+            'property_id' => $property->id,
+            'status' => 'off_market',
+            'list_price' => 300000,
+            'listed_at' => '2024-01-15',
+        ]);
+        ListingCycle::factory()->create([
+            'property_id' => $property->id,
+            'status' => 'listed',
+            'list_price' => 335000,
+            'listed_at' => '2024-04-01',
+        ]);
+
+        $response = $this->actingAs($user, 'api')
+            ->getJson("/api/v1/neighborhoods/{$neighborhood->id}/properties");
+
+        $response->assertOk()
+            ->assertJsonPath('data.0.last_listing_date', '2024-04-01')
+            ->assertJsonPath('data.0.last_listing_price', '335000.00');
     }
 
     public function test_property_index_can_be_sorted_by_last_sale_date_descending(): void

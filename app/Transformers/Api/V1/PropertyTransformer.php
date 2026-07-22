@@ -33,6 +33,25 @@ class PropertyTransformer extends TransformerAbstract
                 ->sortByDesc('price_date')
                 ->first();
 
+        $lastSoldCycle = $property->lastSoldCycle;
+        $lastListingCycle = $property->lastListingCycle;
+
+        $lastSalePrice = $lastSale?->price;
+        $lastSaleDate = $property->last_sale_date ?? $lastSale?->price_date;
+
+        if ($lastSoldCycle?->sold_at && (! $lastSaleDate || $lastSoldCycle->sold_at->isAfter($lastSaleDate))) {
+            $lastSalePrice = $lastSoldCycle->sold_price;
+            $lastSaleDate = $lastSoldCycle->sold_at;
+        }
+
+        $lastListingPrice = $lastListing?->price;
+        $lastListingDate = $lastListing?->price_date;
+
+        if ($lastListingCycle?->listed_at && (! $lastListingDate || $lastListingCycle->listed_at->isAfter($lastListingDate))) {
+            $lastListingPrice = $lastListingCycle->list_price;
+            $lastListingDate = $lastListingCycle->listed_at;
+        }
+
         return [
             'id' => (int) $property->id,
             'user_id' => (int) $property->user_id,
@@ -65,10 +84,10 @@ class PropertyTransformer extends TransformerAbstract
             'hoa' => $property->hoa,
             'listing_url' => $property->listing_url,
             'analysis' => $property->analysis,
-            'last_sale_price' => $lastSale?->price,
-            'last_sale_date' => $property->last_sale_date?->toDateString() ?? $lastSale?->price_date?->toDateString(),
-            'last_listing_price' => $lastListing?->price,
-            'last_listing_date' => $lastListing?->price_date?->toDateString(),
+            'last_sale_price' => $lastSalePrice,
+            'last_sale_date' => $lastSaleDate?->toDateString(),
+            'last_listing_price' => $lastListingPrice,
+            'last_listing_date' => $lastListingDate?->toDateString(),
             'analyzed_at' => $property->analyzed_at ? $property->analyzed_at->toDateTimeString() : null,
             'created_at' => $property->created_at ? $property->created_at->toDateTimeString() : null,
             'updated_at' => $property->updated_at ? $property->updated_at->toDateTimeString() : null,

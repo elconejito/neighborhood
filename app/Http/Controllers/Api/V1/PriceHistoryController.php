@@ -16,8 +16,8 @@ class PriceHistoryController extends Controller
         abort_if($listingCycle->property->user_id !== $request->user()->id, 403);
 
         $validated = $request->validate([
-            'type'       => 'required|in:listing,reduction,increase,sold,off_market',
-            'price'      => 'required|numeric|min:0',
+            'type' => 'required|in:listing,reduction,increase,sold,off_market',
+            'price' => 'required|numeric|min:0',
             'price_date' => 'required|date',
         ]);
 
@@ -25,6 +25,8 @@ class PriceHistoryController extends Controller
             ...$validated,
             'property_id' => $listingCycle->property_id,
         ]);
+
+        $listingCycle->syncFromPriceHistories();
 
         return fractal()->item($history, PriceHistoryTransformer::class)->respond(201);
     }
@@ -34,12 +36,13 @@ class PriceHistoryController extends Controller
         abort_if($priceHistory->listingCycle->property->user_id !== $request->user()->id, 403);
 
         $validated = $request->validate([
-            'type'       => 'sometimes|in:listing,reduction,increase,sold,off_market',
-            'price'      => 'sometimes|numeric|min:0',
+            'type' => 'sometimes|in:listing,reduction,increase,sold,off_market',
+            'price' => 'sometimes|numeric|min:0',
             'price_date' => 'sometimes|date',
         ]);
 
         $priceHistory->update($validated);
+        $priceHistory->listingCycle->syncFromPriceHistories();
 
         return fractal()->item($priceHistory->fresh(), PriceHistoryTransformer::class)->respond();
     }
@@ -48,7 +51,10 @@ class PriceHistoryController extends Controller
     {
         abort_if($priceHistory->listingCycle->property->user_id !== $request->user()->id, 403);
 
+        $listingCycle = $priceHistory->listingCycle;
+
         $priceHistory->delete();
+        $listingCycle->syncFromPriceHistories();
 
         return response()->json(['data' => ['message' => 'Price event deleted']]);
     }

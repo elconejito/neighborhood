@@ -29,7 +29,7 @@ class PropertyController extends Controller
     public function index(IndexPropertyRequest $request, Neighborhood $neighborhood): JsonResponse
     {
         $properties = Property::where('neighborhood_id', $neighborhood->id)
-            ->with(['neighborhood', 'lastSoldHistory', 'lastListingHistory'])
+            ->with(['neighborhood', 'lastSoldHistory', 'lastListingHistory', 'lastSoldCycle', 'lastListingCycle'])
             ->withMax([
                 'priceHistories as last_sale_date' => fn ($query) => $query->where('type', 'sold'),
             ], 'price_date')
