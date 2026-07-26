@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests\Api\V1\Property;
 
+use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
 
 class IndexPropertyRequest extends FormRequest
@@ -17,18 +18,19 @@ class IndexPropertyRequest extends FormRequest
     /**
      * Get the validation rules that apply to the request.
      *
-     * @return array<string, \Illuminate\Contracts\Validation\ValidationRule|array<mixed>|string>
+     * @return array<string, ValidationRule|array<mixed>|string>
      */
     public function rules(): array
     {
         return [
-            'search'       => ['sometimes', 'string', 'max:255'],
+            'search' => ['sometimes', 'string', 'max:255'],
             'searchFields' => ['sometimes', 'string', 'regex:/^[\w,.:;]+$/'],
-            'searchJoin'   => ['sometimes', 'string', 'in:and,or'],
-            'filter'       => ['sometimes', 'string', 'regex:/^[\w;,]+$/'],
-            'orderBy'      => ['sometimes', 'string', 'alpha_dash', 'max:64'],
-            'sortedBy'     => ['sometimes', 'string', 'in:asc,desc'],
-            'per_page'     => ['sometimes', 'integer', 'in:10,25,50'],
+            'searchJoin' => ['sometimes', 'string', 'in:and,or'],
+            'filter' => ['sometimes', 'string', 'regex:/^[\w;,]+$/'],
+            'orderBy' => ['sometimes', 'string', 'alpha_dash', 'max:64'],
+            'sortedBy' => ['sometimes', 'string', 'in:asc,desc'],
+            'sale_status' => ['sometimes', 'string', 'in:sold,unsold'],
+            'per_page' => ['sometimes', 'integer', 'in:10,25,50'],
         ];
     }
 }

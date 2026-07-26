@@ -46,11 +46,16 @@ class PropertyTransformer extends TransformerAbstract
 
         $lastListingPrice = $lastListing?->price;
         $lastListingDate = $lastListing?->price_date;
+        $lastListingEventType = $lastListing?->type;
 
         if ($lastListingCycle?->listed_at && (! $lastListingDate || $lastListingCycle->listed_at->isAfter($lastListingDate))) {
             $lastListingPrice = $lastListingCycle->list_price;
             $lastListingDate = $lastListingCycle->listed_at;
+            $lastListingEventType = 'listing';
         }
+
+        $marketPrice = $lastSalePrice ?? $lastListingPrice;
+        $marketActivityDate = $lastSaleDate ?? $lastListingDate;
 
         return [
             'id' => (int) $property->id,
@@ -88,6 +93,9 @@ class PropertyTransformer extends TransformerAbstract
             'last_sale_date' => $lastSaleDate?->toDateString(),
             'last_listing_price' => $lastListingPrice,
             'last_listing_date' => $lastListingDate?->toDateString(),
+            'last_listing_event_type' => $lastListingEventType,
+            'market_price' => $marketPrice,
+            'market_activity_date' => $marketActivityDate?->toDateString(),
             'analyzed_at' => $property->analyzed_at ? $property->analyzed_at->toDateTimeString() : null,
             'created_at' => $property->created_at ? $property->created_at->toDateTimeString() : null,
             'updated_at' => $property->updated_at ? $property->updated_at->toDateTimeString() : null,

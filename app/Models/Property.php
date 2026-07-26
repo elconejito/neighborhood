@@ -19,7 +19,15 @@ class Property extends Model
 
     public array $filterable = ['bedrooms', 'bathrooms', 'city', 'state', 'is_pinned', 'neighborhood_id'];
 
-    public array $sortable = ['created_at', 'updated_at', 'address', 'city', 'last_sale_date'];
+    public array $sortable = [
+        'created_at',
+        'updated_at',
+        'address',
+        'city',
+        'last_sale_date',
+        'market_price',
+        'market_activity_date',
+    ];
 
     protected $fillable = [
         'user_id',
@@ -70,6 +78,9 @@ class Property extends Model
             'main_level_primary_bedroom' => 'boolean',
             'pool' => 'boolean',
             'last_sale_date' => 'date',
+            'last_listing_date' => 'date',
+            'market_price' => 'decimal:2',
+            'market_activity_date' => 'date',
         ];
     }
 
@@ -103,7 +114,7 @@ class Property extends Model
     public function lastListingHistory(): HasOne
     {
         return $this->hasOne(PriceHistory::class)
-            ->where('type', 'listing')
+            ->whereIn('type', ['listing', 'reduction', 'increase'])
             ->latestOfMany('price_date');
     }
 
@@ -144,6 +155,102 @@ class Property extends Model
         }
 
         return $query->where('user_id', $user->id);
+    }
+
+    public function scopeWithMarketSummary(Builder $query): Builder
+    {
+        $propertyId = $this->qualifyColumn($this->getKeyName());
+
+        $lastSalePrice = PriceHistory::query()
+            ->select('price')
+            ->whereColumn('property_id', $propertyId)
+            ->where('type', 'sold')
+            ->orderByDesc('price_date')
+            ->orderByDesc('id')
+            ->limit(1);
+
+        $lastSaleDate = PriceHistory::query()
+            ->select('price_date')
+            ->whereColumn('property_id', $propertyId)
+            ->where('type', 'sold')
+            ->orderByDesc('price_date')
+            ->orderByDesc('id')
+            ->limit(1);
+
+        $lastListingPrice = PriceHistory::query()
+            ->select('price')
+            ->whereColumn('property_id', $propertyId)
+            ->whereIn('type', ['listing', 'reduction', 'increase'])
+            ->orderByDesc('price_date')
+            ->orderByDesc('id')
+            ->limit(1);
+
+        $lastListingDate = PriceHistory::query()
+            ->select('price_date')
+            ->whereColumn('property_id', $propertyId)
+            ->whereIn('type', ['listing', 'reduction', 'increase'])
+            ->orderByDesc('price_date')
+            ->orderByDesc('id')
+            ->limit(1);
+
+        $lastListingEventType = PriceHistory::query()
+            ->select('type')
+            ->whereColumn('property_id', $propertyId)
+            ->whereIn('type', ['listing', 'reduction', 'increase'])
+            ->orderByDesc('price_date')
+            ->orderByDesc('id')
+            ->limit(1);
+
+        return $query
+            ->select($this->qualifyColumn('*'))
+            ->addSelect([
+                'last_sale_price' => clone $lastSalePrice,
+                'last_sale_date' => clone $lastSaleDate,
+                'last_listing_price' => clone $lastListingPrice,
+                'last_listing_date' => clone $lastListingDate,
+                'last_listing_event_type' => $lastListingEventType,
+            ])
+            ->selectRaw(
+                "COALESCE(({$lastSalePrice->toSql()}), ({$lastListingPrice->toSql()})) as market_price",
+                [...$lastSalePrice->getBindings(), ...$lastListingPrice->getBindings()],
+            )
+            ->selectRaw(
+                "COALESCE(({$lastSaleDate->toSql()}), ({$lastListingDate->toSql()})) as market_activity_date",
+                [...$lastSaleDate->getBindings(), ...$lastListingDate->getBindings()],
+            );
+    }
+
+    public function scopeWhereSaleStatus(Builder $query, ?string $saleStatus): Builder
+    {
+        if ($saleStatus === 'sold') {
+            return $query->where(function (Builder $query): void {
+                $query
+                    ->whereHas('priceHistories', fn (Builder $query) => $query->where('type', 'sold'))
+                    ->orWhereHas('listingCycles', fn (Builder $query) => $query->where('status', 'sold'));
+            });
+        }
+
+        if ($saleStatus === 'unsold') {
+            return $query
+                ->whereDoesntHave('priceHistories', fn (Builder $query) => $query->where('type', 'sold'))
+                ->whereDoesntHave('listingCycles', fn (Builder $query) => $query->where('status', 'sold'));
+        }
+
+        return $query;
+    }
+
+    public function applyMarketPriceSort(Builder $query, string $direction): void
+    {
+        $query
+            ->orderByRaw('market_price IS NULL')
+            ->orderBy('market_price', $direction);
+    }
+
+    public function applyMarketActivityDateSort(Builder $query, string $direction): void
+    {
+        $query
+            ->orderByRaw('market_activity_date IS NULL')
+            ->orderBy('market_activity_date', $direction);
     }
 
     public function applyAddressSort(Builder $query, string $direction): void

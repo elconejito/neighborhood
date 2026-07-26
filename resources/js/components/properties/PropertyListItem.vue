@@ -39,8 +39,14 @@ const latestMarketEvent = computed(() => {
     }
 
     if (props.property.last_listing_date) {
+        const listingLabels = {
+            reduction: 'Last Price Drop',
+            increase: 'Last Price Increase',
+            listing: 'Last Listed',
+        };
+
         return {
-            label: 'Last Listed',
+            label: listingLabels[props.property.last_listing_event_type] ?? 'Last Listed',
             price: formatPrice(props.property.last_listing_price),
             date: formatDate(props.property.last_listing_date),
             tone: 'text-tertiary',

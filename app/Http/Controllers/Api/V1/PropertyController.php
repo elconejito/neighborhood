@@ -29,10 +29,9 @@ class PropertyController extends Controller
     public function index(IndexPropertyRequest $request, Neighborhood $neighborhood): JsonResponse
     {
         $properties = Property::where('neighborhood_id', $neighborhood->id)
+            ->withMarketSummary()
             ->with(['neighborhood', 'lastSoldHistory', 'lastListingHistory', 'lastSoldCycle', 'lastListingCycle'])
-            ->withMax([
-                'priceHistories as last_sale_date' => fn ($query) => $query->where('type', 'sold'),
-            ], 'price_date')
+            ->whereSaleStatus($request->input('sale_status'))
             ->orderByDesc('is_pinned')
             ->filter($request)
             ->when($request->input('orderBy') !== 'created_at', fn ($query) => $query->orderByDesc('created_at'))
