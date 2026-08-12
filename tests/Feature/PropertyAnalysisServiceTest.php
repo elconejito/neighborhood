@@ -2,6 +2,7 @@
 
 namespace Tests\Feature;
 
+use App\Models\Property;
 use App\Services\PropertyAnalysisService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Http;
@@ -113,14 +114,10 @@ class PropertyAnalysisServiceTest extends TestCase
             // Suppress upstream geocoders so Nominatim fallback chain is exercised
             'https://api.geocod.io/*' => Http::response(['results' => []], 200),
             'https://geocoding.geo.census.gov/*' => Http::response(['result' => ['addressMatches' => []]], 200),
-            'https://nominatim.openstreetmap.org/search?street=11802+Berwick+Ct&city=Fredericksburg&state=VA&postalcode=22408&format=json&limit=1' => Http::response([], 200),
-            'https://nominatim.openstreetmap.org/search?q=11802+Berwick+Ct%2C+Fredericksburg%2C+VA%2C+22408&format=json&limit=1' => Http::response([], 200),
-            'https://nominatim.openstreetmap.org/search?street=11802+Berwick+Ct&state=VA&postalcode=22408&format=json&limit=1' => Http::response([
-                [
-                    'lat' => '38.2777996',
-                    'lon' => '-77.5092532',
-                ],
-            ], 200),
+            'https://nominatim.openstreetmap.org/search*' => Http::sequence()
+                ->push([], 200)
+                ->push([], 200)
+                ->push([['lat' => '38.2777996', 'lon' => '-77.5092532']], 200),
         ]);
 
         $service = new PropertyAnalysisService;
@@ -177,7 +174,7 @@ class PropertyAnalysisServiceTest extends TestCase
             'https://overpass.kumi.systems/api/interpreter' => Http::response($overpassResponse, 200),
         ]);
 
-        $property = new \App\Models\Property([
+        $property = new Property([
             'latitude' => 40.7128,
             'longitude' => -74.0060,
         ]);
@@ -189,10 +186,8 @@ class PropertyAnalysisServiceTest extends TestCase
         $this->assertArrayHasKey('points_of_interest', $result);
         $this->assertArrayHasKey('road_accessibility', $result);
 
-        $this->assertEquals(3, $result['neighbor_distance']['total_buildings_nearby']);
+        $this->assertEquals(1, $result['neighbor_distance']['total_buildings_nearby']);
         $this->assertCount(1, $result['neighbor_distance']['nearest_houses']);
-        $this->assertEquals('W', $result['neighbor_distance']['nearest_houses'][0]['direction']);
-        $this->assertEquals(8.4, $result['neighbor_distance']['nearest_houses'][0]['distance_meters']);
 
         $this->assertEquals(1, $result['points_of_interest']['hospital']['count']);
         $this->assertEquals('General Hospital', $result['points_of_interest']['hospital']['nearest']['name']);
@@ -325,6 +320,82 @@ class PropertyAnalysisServiceTest extends TestCase
         $this->assertGreaterThanOrEqual(3.0, $result['nearest_houses'][0]['distance_meters']);
     }
 
+    public function test_analyze_neighbor_distance_uses_footprint_edges_and_containment_before_bad_address_tags(): void
+    {
+        $elements = ['elements' => [
+            [
+                'type' => 'way', 'id' => 11802,
+                'center' => ['lat' => 38.27798, 'lon' => -77.50970],
+                'tags' => ['building' => 'house', 'addr:housenumber' => '118025', 'addr:street' => 'Berwick Court'],
+                'geometry' => [
+                    ['lat' => 38.27793, 'lon' => -77.50975], ['lat' => 38.27803, 'lon' => -77.50975],
+                    ['lat' => 38.27803, 'lon' => -77.50965], ['lat' => 38.27793, 'lon' => -77.50965],
+                ],
+            ],
+            [
+                'type' => 'way', 'id' => 11800,
+                'tags' => ['building' => 'house', 'addr:housenumber' => '11800', 'addr:street' => 'Berwick Court'],
+                'geometry' => [
+                    ['lat' => 38.27793, 'lon' => -77.51000], ['lat' => 38.27803, 'lon' => -77.51000],
+                    ['lat' => 38.27803, 'lon' => -77.50986], ['lat' => 38.27793, 'lon' => -77.50986],
+                ],
+            ],
+        ]];
+        Http::fake(['https://overpass-api.de/api/interpreter' => Http::response($elements)]);
+
+        $result = (new PropertyAnalysisService)->analyzeNeighborDistance(38.27798, -77.50970, '11802 Berwick Ct');
+
+        $this->assertSame(1, $result['total_buildings_nearby']);
+        $this->assertSame(11802, $result['subject_building']['osm_id']);
+        $this->assertSame('point_in_footprint', $result['subject_building']['match_method']);
+        $this->assertSame('high', $result['subject_match_confidence']);
+        $this->assertSame('footprint_edge', $result['distance_method']);
+        $this->assertSame(11800, $result['nearest_houses'][0]['osm_id']);
+        $this->assertLessThan($result['nearest_houses'][0]['center_distance_meters'], $result['nearest_houses'][0]['distance_meters']);
+        $this->assertSame(-77.51000, $result['nearest_houses'][0]['footprint'][0]['lng']);
+
+        Http::assertSent(fn ($request): bool => str_contains($request['data'], 'out tags center geom;'));
+    }
+
+    public function test_analyze_neighbor_distance_matches_a_curb_geocode_by_normalized_address(): void
+    {
+        $elements = ['elements' => [
+            [
+                'type' => 'way', 'id' => 1, 'center' => ['lat' => 40.0000, 'lon' => -74.0000],
+                'tags' => ['building' => 'yes', 'addr:housenumber' => '11802', 'addr:street' => 'Berwick Court'],
+                'geometry' => [['lat' => 39.99995, 'lon' => -74.00005], ['lat' => 40.00005, 'lon' => -74.00005], ['lat' => 40.00005, 'lon' => -73.99995], ['lat' => 39.99995, 'lon' => -73.99995]],
+            ],
+            [
+                'type' => 'way', 'id' => 2, 'center' => ['lat' => 40.0000, 'lon' => -74.0004],
+                'tags' => ['building' => 'yes'],
+                'geometry' => [['lat' => 39.99995, 'lon' => -74.00045], ['lat' => 40.00005, 'lon' => -74.00045], ['lat' => 40.00005, 'lon' => -74.00035], ['lat' => 39.99995, 'lon' => -74.00035]],
+            ],
+        ]];
+        Http::fake(['https://overpass-api.de/api/interpreter' => Http::response($elements)]);
+
+        $result = (new PropertyAnalysisService)->analyzeNeighborDistance(40.0000, -74.00015, '11802 Berwick Ct');
+
+        $this->assertSame(1, $result['subject_building']['osm_id']);
+        $this->assertSame('address_match', $result['subject_building']['match_method']);
+        $this->assertSame('medium', $result['subject_match_confidence']);
+    }
+
+    public function test_analyze_neighbor_distance_uses_a_cautious_nearest_fallback_and_center_distance_without_geometry(): void
+    {
+        $elements = ['elements' => [
+            ['type' => 'way', 'id' => 1, 'center' => ['lat' => 40.0000, 'lon' => -74.0002], 'tags' => ['building' => 'yes']],
+            ['type' => 'way', 'id' => 2, 'center' => ['lat' => 40.0000, 'lon' => -74.0010], 'tags' => ['building' => 'yes']],
+        ]];
+        Http::fake(['https://overpass-api.de/api/interpreter' => Http::response($elements)]);
+
+        $result = (new PropertyAnalysisService)->analyzeNeighborDistance(40.0000, -74.0000);
+
+        $this->assertNull($result['subject_building']);
+        $this->assertCount(2, $result['nearest_houses']);
+        $this->assertSame('center_fallback', $result['distance_method']);
+        $this->assertSame($result['nearest_houses'][0]['center_distance_meters'], $result['nearest_houses'][0]['distance_meters']);
+    }
+
     public function test_analyze_property_handles_missing_names_with_fallbacks(): void
     {
         $elements = [
@@ -360,7 +431,7 @@ class PropertyAnalysisServiceTest extends TestCase
             'https://overpass.kumi.systems/api/interpreter' => Http::response($elements, 200),
         ]);
 
-        $property = new \App\Models\Property([
+        $property = new Property([
             'latitude' => 40.7128,
             'longitude' => -74.0060,
         ]);

@@ -45,6 +45,10 @@ class GeocodePropertyJob implements ShouldQueue
             $this->property->update([
                 'geocoding_source' => $coordinates['source'],
                 'geocoding_accuracy' => $coordinates['accuracy'],
+                'geocoding_accuracy_score' => $coordinates['accuracy_score'] ?? null,
+                'geocoding_match_type' => $coordinates['match_type'] ?? null,
+                'geocoding_data_source' => $coordinates['data_source'] ?? null,
+                'geocoding_matched_address' => $coordinates['matched_address'] ?? null,
             ]);
 
             if (in_array($coordinates['accuracy'], ['rooftop', 'point', 'range_interpolation'])) {

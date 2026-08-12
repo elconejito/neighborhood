@@ -31,6 +31,22 @@ const nearestHouses = computed(() => neighborDistance.value?.nearest_houses ?? [
 const nearestHouse = computed(() => nearestHouses.value[0] ?? null);
 const centerLat = computed(() => result.value?.latitude ?? null);
 const centerLng = computed(() => result.value?.longitude ?? null);
+const subjectBuilding = computed(() => neighborDistance.value?.subject_building ?? null);
+const mapLat = computed(() => subjectBuilding.value?.lat ?? centerLat.value);
+const mapLng = computed(() => subjectBuilding.value?.lng ?? centerLng.value);
+const subjectFootprint = computed(() => subjectBuilding.value?.footprint ?? neighborDistance.value?.subject_footprint ?? null);
+const geocoding = computed(() => result.value?.geocoding ?? null);
+const subjectMatchConfidence = computed(() => neighborDistance.value?.subject_match_confidence ?? null);
+const distanceMethod = computed(() => neighborDistance.value?.distance_method ?? null);
+const primaryDistanceLabel = computed(() => distanceMethod.value === 'footprint_edge' ? 'Building-to-building (wall-to-wall)' : 'Nearest neighbor distance');
+
+function distanceMeters(house) {
+    return house?.building_distance_meters ?? house?.wall_to_wall_distance_meters ?? house?.distance_meters;
+}
+
+function centerDistanceMeters(house) {
+    return house?.center_to_center_distance_meters ?? house?.center_distance_meters ?? null;
+}
 
 // ── Map ────────────────────────────────────────────────────────────────────────
 
@@ -38,6 +54,7 @@ const mapContainer = ref(null);
 const activeView = ref('street');
 let map = null;
 let markersLayer = null;
+let footprintsLayer = null;
 
 // ── Set Location ───────────────────────────────────────────────────────────────
 
@@ -179,11 +196,27 @@ function switchLayer(view) {
     tileLayers[view].addTo(map);
 }
 
+function addFootprint(footprint, options) {
+    if (!footprint || !footprintsLayer) return;
+    if (Array.isArray(footprint) && footprint.every(point => point?.lat != null && point?.lng != null)) {
+        L.polygon(footprint.map(point => [point.lat, point.lng]), { ...options, interactive: false }).addTo(footprintsLayer);
+        return;
+    }
+
+    const geometry = footprint.geometry ?? footprint;
+    if (!geometry?.type || !geometry?.coordinates) return;
+    try {
+        L.geoJSON(geometry, { style: options, interactive: false }).addTo(footprintsLayer);
+    } catch {
+        // Footprints are supplemental map detail; markers remain usable if one is malformed.
+    }
+}
+
 function buildMap() {
-    if (!mapContainer.value || !centerLat.value || !centerLng.value) return;
+    if (!mapContainer.value || !mapLat.value || !mapLng.value) return;
 
     map = L.map(mapContainer.value, {
-        center: [centerLat.value, centerLng.value],
+        center: [mapLat.value, mapLng.value],
         zoom: 17,
         zoomControl: true,
         attributionControl: true,
@@ -192,6 +225,8 @@ function buildMap() {
     tileLayers[activeView.value].addTo(map);
 
     markersLayer = L.layerGroup().addTo(map);
+    footprintsLayer = L.featureGroup().addTo(map);
+    addFootprint(subjectFootprint.value, { color: '#455f88', weight: 2, fillColor: '#455f88', fillOpacity: 0.12 });
 
     // Center marker
     const centerIcon = L.divIcon({
@@ -200,12 +235,13 @@ function buildMap() {
         iconSize: [22, 22],
         iconAnchor: [11, 11],
     });
-    L.marker([centerLat.value, centerLng.value], { icon: centerIcon, zIndexOffset: 1000 }).addTo(markersLayer);
+    L.marker([mapLat.value, mapLng.value], { icon: centerIcon, zIndexOffset: 1000 }).addTo(markersLayer);
 
     // Neighbor markers
     for (const house of nearestHouses.value) {
         if (!house.lat || !house.lng) continue;
-        const dist = formatRelativeDistance(house.distance_meters, 'ft');
+        const dist = formatRelativeDistance(distanceMeters(house), 'ft');
+        addFootprint(house.footprint ?? house.building_footprint ?? null, { color: '#788aa7', weight: 1.5, fillColor: '#788aa7', fillOpacity: 0.05 });
         const icon = L.divIcon({
             className: '',
             html: `<div style="display:flex;flex-direction:column;align-items:center;gap:2px;">
@@ -220,12 +256,13 @@ function buildMap() {
 
     map.invalidateSize();
 
-    const points = [
-        [centerLat.value, centerLng.value],
-        ...nearestHouses.value.filter(h => h.lat && h.lng).map(h => [h.lat, h.lng]),
-    ];
-    if (points.length > 1) {
-        map.fitBounds(points, { padding: [48, 48] });
+    const bounds = L.latLngBounds([[mapLat.value, mapLng.value]]);
+    for (const house of nearestHouses.value) {
+        if (house.lat && house.lng) bounds.extend([house.lat, house.lng]);
+    }
+    if (footprintsLayer.getLayers().length) bounds.extend(footprintsLayer.getBounds());
+    if (bounds.isValid() && (nearestHouses.value.length > 0 || footprintsLayer.getLayers().length > 0)) {
+        map.fitBounds(bounds, { padding: [48, 48] });
     }
 }
 
@@ -235,6 +272,7 @@ function destroyMap() {
         map.remove();
         map = null;
         markersLayer = null;
+        footprintsLayer = null;
         locationMarker = null;
     }
 }
@@ -411,6 +449,13 @@ function reset() {
                     <p class="text-sm font-semibold text-on-surface-variant">
                         {{ form.address }}, {{ form.city }}, {{ form.state }} {{ form.zip_code }}
                     </p>
+                    <p v-if="geocoding || subjectMatchConfidence || subjectFootprint" class="text-[10px] text-on-surface-variant">
+                        <span v-if="geocoding?.accuracy_type">Geocode: {{ geocoding.accuracy_type }}</span>
+                        <span v-if="geocoding?.accuracy_score != null"> ({{ geocoding.accuracy_score }})</span>
+                        <span v-if="geocoding && (subjectMatchConfidence || subjectFootprint)"> · </span>
+                        <span v-if="subjectMatchConfidence">Footprint match: {{ subjectMatchConfidence }}</span>
+                        <span v-else-if="subjectFootprint">Footprint matched</span>
+                    </p>
 
                     <div v-if="nearestHouses.length" class="space-y-4">
                         <!-- Map + Neighbor List -->
@@ -504,14 +549,27 @@ function reset() {
                                     <div
                                         v-for="(house, index) in nearestHouses"
                                         :key="index"
-                                        class="flex justify-between items-center text-sm border-b border-surface-container-high pb-1.5"
+                                        class="border-b border-surface-container-high pb-1.5"
                                     >
-                                        <span class="font-mono font-semibold text-on-surface">{{ formatRelativeDistance(house.distance_meters, 'ft') }}</span>
-                                        <span class="text-xs text-on-surface-variant font-medium">{{ house.direction }}</span>
+                                        <div class="flex justify-between items-center text-sm">
+                                            <span class="font-mono font-semibold text-on-surface">{{ formatRelativeDistance(distanceMeters(house), 'ft') }}</span>
+                                            <span class="text-xs text-on-surface-variant font-medium">{{ house.direction }}</span>
+                                        </div>
+                                        <p v-if="centerDistanceMeters(house) !== null" class="mt-0.5 text-[9px] text-on-surface-variant">Center-to-center: {{ formatRelativeDistance(centerDistanceMeters(house), 'ft') }}</p>
                                     </div>
                                 </div>
                             </div>
                         </div>
+
+                        <p class="text-xs text-on-surface-variant">
+                            <span class="font-semibold text-on-surface">{{ primaryDistanceLabel }}:</span>
+                            {{ formatRelativeDistance(distanceMeters(nearestHouse)) }} · {{ nearestHouse.direction }}
+                            <template v-if="centerDistanceMeters(nearestHouse) !== null"> · Center-to-center: {{ formatRelativeDistance(centerDistanceMeters(nearestHouse)) }}</template>
+                        </p>
+                        <p class="text-[10px] text-on-surface-variant">
+                            <template v-if="distanceMethod === 'footprint_edge'">Primary distances are building-to-building (wall-to-wall).</template>
+                            <template v-else>Distances use the available map points.</template>
+                        </p>
 
                     </div>
                     <p v-else class="text-sm text-on-surface-variant">No neighbor data found for this location.</p>

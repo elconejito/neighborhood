@@ -59,11 +59,20 @@ class PropertyDistanceCheckTest extends TestCase
                     'state' => 'WV',
                     'postalcode' => '25301',
                 ])
-                ->andReturn(['lat' => 38.3498, 'lng' => -81.6326]);
+                ->andReturn([
+                    'lat' => 38.3498,
+                    'lng' => -81.6326,
+                    'source' => 'geocodio',
+                    'accuracy' => 'rooftop',
+                    'accuracy_score' => 1.0,
+                    'match_type' => 'building_centroid',
+                    'data_source' => 'Kanawha County',
+                    'matched_address' => '123 Main St, Charleston, WV 25301',
+                ]);
 
             $mock->shouldReceive('analyzeNeighborDistance')
                 ->once()
-                ->with(38.3498, -81.6326)
+                ->with(38.3498, -81.6326, '123 Main St')
                 ->andReturn($this->mockNeighborDistance);
         });
 
@@ -72,6 +81,8 @@ class PropertyDistanceCheckTest extends TestCase
         $response->assertStatus(200)
             ->assertJsonPath('data.latitude', 38.3498)
             ->assertJsonPath('data.longitude', -81.6326)
+            ->assertJsonPath('data.geocoding.accuracy_score', 1)
+            ->assertJsonPath('data.geocoding.match_type', 'building_centroid')
             ->assertJsonPath('data.neighbor_distance.isolation_score', 'suburban')
             ->assertJsonPath('data.neighbor_distance.total_buildings_nearby', 42);
     }

@@ -29,7 +29,7 @@ class PropertyAnalysisService
         $lat = $property->latitude;
         $lng = $property->longitude;
 
-        $neighborDistance = $this->analyzeNeighborDistance($lat, $lng);
+        $neighborDistance = $this->analyzeNeighborDistance($lat, $lng, $property->address);
         usleep(250000); // 250ms delay between requests
 
         $pointsOfInterest = $this->analyzePointsOfInterest($lat, $lng);
@@ -131,6 +131,10 @@ class PropertyAnalysisService
                     'lng' => (float) $location['lng'],
                     'source' => 'geocodio',
                     'accuracy' => $results[0]['accuracy_type'] ?? 'unknown',
+                    'accuracy_score' => $results[0]['accuracy'] ?? null,
+                    'match_type' => $results[0]['match_type'] ?? null,
+                    'data_source' => $results[0]['source'] ?? null,
+                    'matched_address' => $results[0]['formatted_address'] ?? null,
                 ];
             }
         } catch (Exception $e) {
@@ -243,7 +247,7 @@ class PropertyAnalysisService
         return null;
     }
 
-    public function analyzeNeighborDistance(float $lat, float $lng): array
+    public function analyzeNeighborDistance(float $lat, float $lng, ?string $address = null): array
     {
         $radiusMeters = 1609;
 
@@ -253,77 +257,406 @@ class PropertyAnalysisService
 (
   way["building"](around:{$radiusMeters},{$lat},{$lng});
 );
-out center;
+out tags center geom;
 QUERY;
 
         try {
             $data = $this->queryOverpass($query, 35);
 
             if ($data !== null) {
-                $buildings = $data['elements'] ?? [];
-
-                $distances = [];
-                foreach ($buildings as $building) {
-                    if (isset($building['center'])) {
-                        $distance = $this->haversineDistance(
-                            $lat, $lng,
-                            $building['center']['lat'],
-                            $building['center']['lon']
-                        );
-                        if ($distance < $this->minimumNeighborDistanceMeters) {
-                            continue;
-                        }
-                        $distances[] = $distance;
-                    }
-                }
-
-                sort($distances);
-                $nearestDistances = array_slice($distances, 0, 10);
+                $buildings = array_values(array_filter(
+                    $data['elements'] ?? [],
+                    fn (array $building): bool => ($building['type'] ?? null) === 'way' && isset($building['tags']['building']) && (isset($building['center']) || $this->buildingGeometry($building) !== [])
+                ));
+                $subjectBuilding = $this->findSubjectBuilding($buildings, $lat, $lng, $address);
+                $subjectGeometry = $subjectBuilding ? $this->buildingGeometry($subjectBuilding) : [];
+                $subjectCenter = $subjectBuilding
+                    ? $this->buildingCenter($subjectBuilding) ?? ['lat' => $lat, 'lon' => $lng]
+                    : ['lat' => $lat, 'lon' => $lng];
 
                 $nearestHouses = [];
                 foreach ($buildings as $building) {
-                    if (isset($building['center'])) {
-                        $dist = $this->haversineDistance(
-                            $lat, $lng,
-                            $building['center']['lat'],
-                            $building['center']['lon']
-                        );
-                        if ($dist < $this->minimumNeighborDistanceMeters) {
-                            continue;
-                        }
-                        $direction = $this->calculateDirection(
-                            $lat, $lng,
-                            $building['center']['lat'],
-                            $building['center']['lon']
-                        );
-                        $nearestHouses[] = [
-                            'distance_meters' => $dist,
-                            'direction' => $direction,
-                            'lat' => $building['center']['lat'],
-                            'lng' => $building['center']['lon'],
-                        ];
+                    if ($subjectBuilding && ($building['id'] ?? null) === ($subjectBuilding['id'] ?? null)) {
+                        continue;
                     }
+
+                    $center = $this->buildingCenter($building);
+                    if (! $center) {
+                        continue;
+                    }
+
+                    $geometry = $this->buildingGeometry($building);
+                    $centerDistance = $this->haversineDistance(
+                        $subjectCenter['lat'], $subjectCenter['lon'], $center['lat'], $center['lon']
+                    );
+                    $usesFootprintDistance = $subjectGeometry !== [] && $geometry !== [];
+                    $distance = $usesFootprintDistance
+                        ? $this->minimumFootprintDistance($subjectGeometry, $geometry)
+                        : $centerDistance;
+
+                    // Preserve the legacy safeguard when there is no reliable subject match.
+                    if (! $subjectBuilding && $distance < $this->minimumNeighborDistanceMeters) {
+                        continue;
+                    }
+
+                    $nearestHouses[] = [
+                        'osm_id' => $building['id'] ?? null,
+                        'distance_meters' => $distance,
+                        'distance_method' => $usesFootprintDistance ? 'footprint_edge' : 'center_fallback',
+                        'center_distance_meters' => $centerDistance,
+                        'direction' => $this->calculateDirection(
+                            $subjectCenter['lat'], $subjectCenter['lon'], $center['lat'], $center['lon']
+                        ),
+                        'lat' => $center['lat'],
+                        'lng' => $center['lon'],
+                        'footprint' => $this->mapFootprint($geometry),
+                        'address' => $this->buildingAddress($building),
+                    ];
                 }
 
-                usort($nearestHouses, fn ($a, $b) => $a['distance_meters'] <=> $b['distance_meters']);
+                usort($nearestHouses, fn (array $a, array $b): int => $a['distance_meters'] <=> $b['distance_meters']);
                 $nearestHouses = array_slice($nearestHouses, 0, 10);
+                $nearestDistances = array_column($nearestHouses, 'distance_meters');
 
                 return [
-                    'total_buildings_nearby' => count($buildings),
+                    'total_buildings_nearby' => count($buildings) - ($subjectBuilding ? 1 : 0),
                     'nearest_neighbor_meters' => $nearestDistances[0] ?? null,
                     'average_distance_meters' => count($nearestDistances) > 0
                         ? round(array_sum($nearestDistances) / count($nearestDistances), 1)
                         : null,
                     'nearest_10_distances' => $nearestDistances,
                     'nearest_houses' => $nearestHouses,
+                    'subject_building' => $subjectBuilding ? [
+                        'osm_id' => $subjectBuilding['id'] ?? null,
+                        'lat' => $subjectCenter['lat'],
+                        'lng' => $subjectCenter['lon'],
+                        'footprint' => $this->mapFootprint($subjectGeometry),
+                        'match_method' => $this->subjectMatchMethod($subjectBuilding, $buildings, $lat, $lng, $address),
+                        'distance_from_input_meters' => $subjectGeometry !== []
+                            ? $this->distanceFromPointToFootprint($lat, $lng, $subjectGeometry)
+                            : $this->haversineDistance($lat, $lng, $subjectCenter['lat'], $subjectCenter['lon']),
+                        'address' => $this->buildingAddress($subjectBuilding),
+                    ] : null,
+                    'distance_method' => $nearestHouses[0]['distance_method'] ?? 'center_fallback',
+                    'subject_match_confidence' => $this->subjectMatchConfidence($subjectBuilding, $buildings, $lat, $lng, $address),
                     'isolation_score' => $this->calculateIsolationScore($nearestDistances),
                 ];
             }
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             Log::error('Neighbor distance analysis failed: '.$e->getMessage());
         }
 
         return ['error' => 'Analysis failed'];
+    }
+
+    /**
+     * @param  array<int, array<string, mixed>>  $buildings
+     * @return array<string, mixed>|null
+     */
+    protected function findSubjectBuilding(array $buildings, float $lat, float $lng, ?string $address): ?array
+    {
+        foreach ($buildings as $building) {
+            $geometry = $this->buildingGeometry($building);
+            if ($geometry !== [] && $this->pointIsInPolygon($lat, $lng, $geometry)) {
+                return $building;
+            }
+        }
+
+        $addressMatches = array_values(array_filter(
+            $buildings,
+            fn (array $building): bool => $address !== null && $this->addressesMatch($address, $this->buildingAddress($building))
+        ));
+        if (count($addressMatches) === 1) {
+            return $addressMatches[0];
+        }
+
+        $nearestBuilding = null;
+        $nearestDistance = PHP_FLOAT_MAX;
+        $secondNearestDistance = PHP_FLOAT_MAX;
+        foreach ($buildings as $building) {
+            $geometry = $this->buildingGeometry($building);
+            $distance = $geometry !== []
+                ? $this->distanceFromPointToFootprint($lat, $lng, $geometry)
+                : $this->distanceToBuildingCenter($lat, $lng, $building);
+
+            if ($distance < $nearestDistance) {
+                $secondNearestDistance = $nearestDistance;
+                $nearestDistance = $distance;
+                $nearestBuilding = $building;
+            } elseif ($distance < $secondNearestDistance) {
+                $secondNearestDistance = $distance;
+            }
+        }
+
+        if ($nearestBuilding && $this->buildingGeometry($nearestBuilding) === []) {
+            return $nearestDistance <= $this->minimumNeighborDistanceMeters ? $nearestBuilding : null;
+        }
+
+        return $nearestDistance <= 30 && ($nearestDistance <= 10 || $secondNearestDistance - $nearestDistance >= 5)
+            ? $nearestBuilding
+            : null;
+    }
+
+    /**
+     * @param  array<string, mixed>|null  $subjectBuilding
+     * @param  array<int, array<string, mixed>>  $buildings
+     */
+    protected function subjectMatchMethod(?array $subjectBuilding, array $buildings, float $lat, float $lng, ?string $address): ?string
+    {
+        if (! $subjectBuilding) {
+            return null;
+        }
+
+        if ($this->pointIsInPolygon($lat, $lng, $this->buildingGeometry($subjectBuilding))) {
+            return 'point_in_footprint';
+        }
+
+        if ($address !== null && $this->addressesMatch($address, $this->buildingAddress($subjectBuilding))) {
+            return 'address_match';
+        }
+
+        return 'nearest_footprint';
+    }
+
+    /**
+     * @param  array<string, mixed>|null  $subjectBuilding
+     * @param  array<int, array<string, mixed>>  $buildings
+     */
+    protected function subjectMatchConfidence(?array $subjectBuilding, array $buildings, float $lat, float $lng, ?string $address): ?string
+    {
+        return match ($this->subjectMatchMethod($subjectBuilding, $buildings, $lat, $lng, $address)) {
+            'point_in_footprint' => 'high',
+            'address_match' => 'medium',
+            'nearest_footprint' => 'low',
+            default => 'none',
+        };
+    }
+
+    /** @param array<string, mixed> $building */
+    protected function buildingAddress(array $building): ?string
+    {
+        $tags = $building['tags'] ?? [];
+        $number = $tags['addr:housenumber'] ?? null;
+        if (! $number) {
+            return null;
+        }
+
+        return trim($number.' '.($tags['addr:street'] ?? ''));
+    }
+
+    protected function addressesMatch(string $propertyAddress, ?string $buildingAddress): bool
+    {
+        if (! $buildingAddress) {
+            return false;
+        }
+
+        $propertyNumber = $this->addressNumber($propertyAddress);
+        $buildingNumber = $this->addressNumber($buildingAddress);
+        if (! $propertyNumber || $propertyNumber !== $buildingNumber) {
+            return false;
+        }
+
+        $propertyStreet = $this->normalizedStreet($propertyAddress);
+        $buildingStreet = $this->normalizedStreet($buildingAddress);
+
+        return $propertyStreet !== '' && $buildingStreet !== '' && $propertyStreet === $buildingStreet;
+    }
+
+    protected function addressNumber(string $address): ?string
+    {
+        preg_match('/^\s*([0-9]+[A-Za-z-]*)/', $address, $matches);
+
+        return $matches[1] ?? null;
+    }
+
+    protected function normalizedStreet(string $address): string
+    {
+        $withoutNumber = preg_replace('/^\s*[0-9]+[A-Za-z-]*\s*/', '', $address) ?? '';
+        $street = strtolower(trim($withoutNumber));
+        $street = preg_replace('/\b(street|st|avenue|ave|road|rd|court|ct|drive|dr|lane|ln|boulevard|blvd)\.?\b/', '', $street) ?? '';
+
+        return preg_replace('/[^a-z0-9]/', '', $street) ?? '';
+    }
+
+    /** @param array<string, mixed> $building */
+    protected function buildingGeometry(array $building): array
+    {
+        $geometry = $building['geometry'] ?? [];
+
+        return array_values(array_filter($geometry, fn (mixed $point): bool => isset($point['lat'], $point['lon'])));
+    }
+
+    /**
+     * @param  array<string, mixed>  $building
+     * @return array{lat: float, lon: float}|null
+     */
+    protected function buildingCenter(array $building): ?array
+    {
+        if (isset($building['center']['lat'], $building['center']['lon'])) {
+            return [
+                'lat' => (float) $building['center']['lat'],
+                'lon' => (float) $building['center']['lon'],
+            ];
+        }
+
+        $geometry = $this->buildingGeometry($building);
+        if ($geometry === []) {
+            return null;
+        }
+
+        $latitudes = array_column($geometry, 'lat');
+        $longitudes = array_column($geometry, 'lon');
+
+        return [
+            'lat' => ((float) min($latitudes) + (float) max($latitudes)) / 2,
+            'lon' => ((float) min($longitudes) + (float) max($longitudes)) / 2,
+        ];
+    }
+
+    /**
+     * @param  array<int, array{lat: float|int, lon: float|int}>  $geometry
+     * @return array<int, array{lat: float, lng: float}>
+     */
+    protected function mapFootprint(array $geometry): array
+    {
+        return array_map(fn (array $point): array => [
+            'lat' => (float) $point['lat'],
+            'lng' => (float) $point['lon'],
+        ], $geometry);
+    }
+
+    /** @param array<string, mixed> $building */
+    protected function distanceToBuildingCenter(float $lat, float $lng, array $building): float
+    {
+        $center = $this->buildingCenter($building);
+        if (! $center) {
+            return PHP_FLOAT_MAX;
+        }
+
+        return $this->haversineDistance($lat, $lng, $center['lat'], $center['lon']);
+    }
+
+    /** @param array<int, array{lat: float|int, lon: float|int}> $polygon */
+    protected function pointIsInPolygon(float $lat, float $lng, array $polygon): bool
+    {
+        if (count($polygon) < 3) {
+            return false;
+        }
+
+        $inside = false;
+        $previous = count($polygon) - 1;
+        foreach ($polygon as $current => $point) {
+            $previousPoint = $polygon[$previous];
+            if ((($point['lat'] > $lat) !== ($previousPoint['lat'] > $lat)) &&
+                ($lng < (($previousPoint['lon'] - $point['lon']) * ($lat - $point['lat']) / ($previousPoint['lat'] - $point['lat']) + $point['lon']))) {
+                $inside = ! $inside;
+            }
+            $previous = $current;
+        }
+
+        return $inside;
+    }
+
+    /** @param array<int, array{lat: float|int, lon: float|int}> $polygon */
+    protected function distanceFromPointToFootprint(float $lat, float $lng, array $polygon): float
+    {
+        if ($polygon === []) {
+            return PHP_FLOAT_MAX;
+        }
+        if ($this->pointIsInPolygon($lat, $lng, $polygon)) {
+            return 0.0;
+        }
+
+        $minimum = PHP_FLOAT_MAX;
+        foreach ($this->polygonSegments($polygon) as [$start, $end]) {
+            $minimum = min($minimum, $this->pointToSegmentDistance($lat, $lng, $start, $end));
+        }
+
+        return round($minimum, 1);
+    }
+
+    /** @param array<int, array{lat: float|int, lon: float|int}> $first @param array<int, array{lat: float|int, lon: float|int}> $second */
+    protected function minimumFootprintDistance(array $first, array $second): float
+    {
+        if ($this->pointIsInPolygon($first[0]['lat'], $first[0]['lon'], $second) || $this->pointIsInPolygon($second[0]['lat'], $second[0]['lon'], $first)) {
+            return 0.0;
+        }
+
+        $minimum = PHP_FLOAT_MAX;
+        foreach ($this->polygonSegments($first) as [$firstStart, $firstEnd]) {
+            foreach ($this->polygonSegments($second) as [$secondStart, $secondEnd]) {
+                $minimum = min($minimum, $this->segmentDistance($firstStart, $firstEnd, $secondStart, $secondEnd));
+            }
+        }
+
+        return round($minimum, 1);
+    }
+
+    /** @param array<int, array{lat: float|int, lon: float|int}> $polygon @return array<int, array{0: array{lat: float|int, lon: float|int}, 1: array{lat: float|int, lon: float|int}}> */
+    protected function polygonSegments(array $polygon): array
+    {
+        if (count($polygon) < 2) {
+            return [];
+        }
+
+        $segments = [];
+        foreach ($polygon as $index => $point) {
+            $segments[] = [$point, $polygon[($index + 1) % count($polygon)]];
+        }
+
+        return $segments;
+    }
+
+    /** @param array{lat: float|int, lon: float|int} $point @param array{lat: float|int, lon: float|int} $start @param array{lat: float|int, lon: float|int} $end */
+    protected function pointToSegmentDistance(float $lat, float $lng, array $start, array $end): float
+    {
+        [$pointX, $pointY] = $this->toLocalMeters($lat, $lng, $lat);
+        [$startX, $startY] = $this->toLocalMeters($start['lat'], $start['lon'], $lat);
+        [$endX, $endY] = $this->toLocalMeters($end['lat'], $end['lon'], $lat);
+        $deltaX = $endX - $startX;
+        $deltaY = $endY - $startY;
+        $lengthSquared = $deltaX ** 2 + $deltaY ** 2;
+        $fraction = $lengthSquared === 0.0 ? 0.0 : max(0.0, min(1.0, (($pointX - $startX) * $deltaX + ($pointY - $startY) * $deltaY) / $lengthSquared));
+
+        return hypot($pointX - ($startX + $fraction * $deltaX), $pointY - ($startY + $fraction * $deltaY));
+    }
+
+    /** @param array{lat: float|int, lon: float|int} $firstStart @param array{lat: float|int, lon: float|int} $firstEnd @param array{lat: float|int, lon: float|int} $secondStart @param array{lat: float|int, lon: float|int} $secondEnd */
+    protected function segmentDistance(array $firstStart, array $firstEnd, array $secondStart, array $secondEnd): float
+    {
+        $latitude = ($firstStart['lat'] + $firstEnd['lat'] + $secondStart['lat'] + $secondEnd['lat']) / 4;
+        [$firstStartX, $firstStartY] = $this->toLocalMeters($firstStart['lat'], $firstStart['lon'], $latitude);
+        [$firstEndX, $firstEndY] = $this->toLocalMeters($firstEnd['lat'], $firstEnd['lon'], $latitude);
+        [$secondStartX, $secondStartY] = $this->toLocalMeters($secondStart['lat'], $secondStart['lon'], $latitude);
+        [$secondEndX, $secondEndY] = $this->toLocalMeters($secondEnd['lat'], $secondEnd['lon'], $latitude);
+
+        if ($this->segmentsIntersect($firstStartX, $firstStartY, $firstEndX, $firstEndY, $secondStartX, $secondStartY, $secondEndX, $secondEndY)) {
+            return 0.0;
+        }
+
+        return min(
+            $this->pointToSegmentDistance($firstStart['lat'], $firstStart['lon'], $secondStart, $secondEnd),
+            $this->pointToSegmentDistance($firstEnd['lat'], $firstEnd['lon'], $secondStart, $secondEnd),
+            $this->pointToSegmentDistance($secondStart['lat'], $secondStart['lon'], $firstStart, $firstEnd),
+            $this->pointToSegmentDistance($secondEnd['lat'], $secondEnd['lon'], $firstStart, $firstEnd),
+        );
+    }
+
+    protected function segmentsIntersect(float $ax, float $ay, float $bx, float $by, float $cx, float $cy, float $dx, float $dy): bool
+    {
+        $cross = fn (float $px, float $py, float $qx, float $qy, float $rx, float $ry): float => ($qx - $px) * ($ry - $py) - ($qy - $py) * ($rx - $px);
+        $first = $cross($ax, $ay, $bx, $by, $cx, $cy);
+        $second = $cross($ax, $ay, $bx, $by, $dx, $dy);
+        $third = $cross($cx, $cy, $dx, $dy, $ax, $ay);
+        $fourth = $cross($cx, $cy, $dx, $dy, $bx, $by);
+
+        return (($first > 0 && $second < 0) || ($first < 0 && $second > 0)) && (($third > 0 && $fourth < 0) || ($third < 0 && $fourth > 0));
+    }
+
+    /** @return array{0: float, 1: float} */
+    protected function toLocalMeters(float $lat, float $lng, float $referenceLat): array
+    {
+        return [deg2rad($lng) * 6371000 * cos(deg2rad($referenceLat)), deg2rad($lat) * 6371000];
     }
 
     public function analyzePointsOfInterest(float $lat, float $lng): array
@@ -411,7 +744,7 @@ QUERY;
 
                 return $results;
             }
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             Log::error('POI analysis failed: '.$e->getMessage());
         }
 
@@ -508,7 +841,7 @@ QUERY;
                         'nearest_road' => $nearestRoad,
                     ];
                 }
-            } catch (\Exception $e) {
+            } catch (Exception $e) {
                 Log::error("Road analysis failed for {$type}: ".$e->getMessage());
                 $results[$type] = ['error' => 'Analysis failed'];
             }

@@ -61,6 +61,10 @@ class Property extends Model
         'analyzed_at',
         'geocoding_source',
         'geocoding_accuracy',
+        'geocoding_accuracy_score',
+        'geocoding_match_type',
+        'geocoding_data_source',
+        'geocoding_matched_address',
     ];
 
     protected function casts(): array
@@ -73,6 +77,7 @@ class Property extends Model
             'analysis' => 'array',
             'analyzed_at' => 'datetime',
             'is_pinned' => 'boolean',
+            'geocoding_accuracy_score' => 'float',
             'basement_walkout' => 'boolean',
             'fireplace' => 'boolean',
             'main_level_primary_bedroom' => 'boolean',

@@ -137,6 +137,10 @@ class PropertyController extends Controller
             'longitude' => $request->float('longitude'),
             'geocoding_source' => 'manual',
             'geocoding_accuracy' => 'manual',
+            'geocoding_accuracy_score' => null,
+            'geocoding_match_type' => null,
+            'geocoding_data_source' => null,
+            'geocoding_matched_address' => null,
         ]);
 
         AnalyzePropertyJob::dispatch($property->fresh());
@@ -153,6 +157,10 @@ class PropertyController extends Controller
             'longitude' => null,
             'geocoding_source' => null,
             'geocoding_accuracy' => null,
+            'geocoding_accuracy_score' => null,
+            'geocoding_match_type' => null,
+            'geocoding_data_source' => null,
+            'geocoding_matched_address' => null,
         ]);
 
         GeocodePropertyJob::dispatch($property->fresh(), [AnalyzeNeighborDistanceJob::class]);
@@ -184,12 +192,24 @@ class PropertyController extends Controller
             }
         }
 
-        $neighborDistance = $this->analysisService->analyzeNeighborDistance($coords['lat'], $coords['lng']);
+        $neighborDistance = $this->analysisService->analyzeNeighborDistance(
+            $coords['lat'],
+            $coords['lng'],
+            $request->string('address')->toString(),
+        );
 
         return response()->json([
             'data' => [
                 'latitude' => $coords['lat'],
                 'longitude' => $coords['lng'],
+                'geocoding' => [
+                    'source' => $coords['source'] ?? 'manual',
+                    'accuracy_type' => $coords['accuracy'] ?? 'manual',
+                    'accuracy_score' => $coords['accuracy_score'] ?? null,
+                    'match_type' => $coords['match_type'] ?? null,
+                    'data_source' => $coords['data_source'] ?? null,
+                    'matched_address' => $coords['matched_address'] ?? null,
+                ],
                 'neighbor_distance' => $neighborDistance,
             ],
         ]);

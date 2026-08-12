@@ -29,7 +29,11 @@ class AnalyzeNeighborDistanceJob implements ShouldQueue
             return;
         }
 
-        $result = $analysisService->analyzeNeighborDistance($this->property->latitude, $this->property->longitude);
+        $result = $analysisService->analyzeNeighborDistance(
+            $this->property->latitude,
+            $this->property->longitude,
+            $this->property->address,
+        );
 
         $analysis = $this->property->analysis ?? [];
         $analysis['neighbor_distance'] = $result;

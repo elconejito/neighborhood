@@ -9,6 +9,7 @@ use App\Jobs\AnalyzeRoadAccessibilityJob;
 use App\Jobs\GeocodePropertyJob;
 use App\Models\Property;
 use App\Models\User;
+use App\Services\PropertyAnalysisService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Bus;
 use Illuminate\Support\Facades\Http;
@@ -256,7 +257,7 @@ class PropertyAnalysisTest extends TestCase
         ]);
 
         $job = new GeocodePropertyJob($property, [AnalyzeNeighborDistanceJob::class]);
-        $job->handle(app(\App\Services\PropertyAnalysisService::class));
+        $job->handle(app(PropertyAnalysisService::class));
 
         Bus::assertBatched(function ($batch) {
             return $batch->jobs->count() === 1
@@ -295,7 +296,7 @@ class PropertyAnalysisTest extends TestCase
         ]);
 
         $job = new GeocodePropertyJob($property);
-        $job->handle(app(\App\Services\PropertyAnalysisService::class));
+        $job->handle(app(PropertyAnalysisService::class));
 
         Bus::assertBatched(function ($batch) {
             return $batch->jobs->count() === 3 &&
@@ -315,7 +316,10 @@ class PropertyAnalysisTest extends TestCase
                     [
                         'formatted_address' => '12128 Kingswood Blvd, Fredericksburg, VA 22408',
                         'location' => ['lat' => 38.2737142, 'lng' => -77.5011839],
+                        'accuracy' => 1,
                         'accuracy_type' => 'rooftop',
+                        'match_type' => 'building_centroid',
+                        'source' => 'Spotsylvania',
                     ],
                 ],
             ], 200),
@@ -329,13 +333,17 @@ class PropertyAnalysisTest extends TestCase
         ]);
 
         $job = new GeocodePropertyJob($property);
-        $job->handle(app(\App\Services\PropertyAnalysisService::class));
+        $job->handle(app(PropertyAnalysisService::class));
 
         $property->refresh();
         $this->assertEquals(38.2737142, $property->latitude);
         $this->assertEquals(-77.5011839, $property->longitude);
         $this->assertEquals('geocodio', $property->geocoding_source);
         $this->assertEquals('rooftop', $property->geocoding_accuracy);
+        $this->assertEquals(1.0, $property->geocoding_accuracy_score);
+        $this->assertEquals('building_centroid', $property->geocoding_match_type);
+        $this->assertEquals('Spotsylvania', $property->geocoding_data_source);
+        $this->assertEquals('12128 Kingswood Blvd, Fredericksburg, VA 22408', $property->geocoding_matched_address);
     }
 
     public function test_geocode_job_stores_coordinates_for_range_interpolation_accuracy(): void
@@ -361,7 +369,7 @@ class PropertyAnalysisTest extends TestCase
         ]);
 
         $job = new GeocodePropertyJob($property);
-        $job->handle(app(\App\Services\PropertyAnalysisService::class));
+        $job->handle(app(PropertyAnalysisService::class));
 
         $property->refresh();
         $this->assertEquals(38.2747164, $property->latitude);
@@ -391,7 +399,7 @@ class PropertyAnalysisTest extends TestCase
         ]);
 
         $job = new GeocodePropertyJob($property);
-        $job->handle(app(\App\Services\PropertyAnalysisService::class));
+        $job->handle(app(PropertyAnalysisService::class));
 
         $property->refresh();
         $this->assertNull($property->latitude);
@@ -425,7 +433,7 @@ class PropertyAnalysisTest extends TestCase
         ]);
 
         $job = new GeocodePropertyJob($property);
-        $job->handle(app(\App\Services\PropertyAnalysisService::class));
+        $job->handle(app(PropertyAnalysisService::class));
 
         Log::shouldNotHaveReceived('warning');
     }
@@ -446,7 +454,7 @@ class PropertyAnalysisTest extends TestCase
         ]);
 
         $job = new AnalyzeNeighborDistanceJob($property);
-        $job->handle(app(\App\Services\PropertyAnalysisService::class));
+        $job->handle(app(PropertyAnalysisService::class));
 
         $property->refresh();
         $this->assertNotNull($property->analysis['neighbor_distance']);
