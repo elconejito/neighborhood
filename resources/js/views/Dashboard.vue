@@ -1,8 +1,8 @@
 <template>
     <div class="min-h-screen bg-surface">
-        <main class="max-w-screen-2xl mx-auto px-8 py-12">
+        <main class="max-w-screen-2xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-12">
             <!-- Header -->
-            <section class="mb-16 flex items-start justify-between gap-4">
+            <section class="mb-12 lg:mb-16 flex flex-col lg:flex-row lg:items-start lg:justify-between gap-6">
                 <div>
                     <router-link
                         v-if="neighborhoodId"
@@ -11,23 +11,23 @@
                     >
                         <span class="material-symbols-outlined text-sm">arrow_back</span> Neighborhoods
                     </router-link>
-                    <h1 class="text-5xl font-extrabold text-primary tracking-tight mb-2">
+                    <h1 class="text-3xl sm:text-4xl lg:text-5xl font-extrabold text-primary tracking-tight mb-2">
                         {{ neighborhoodId ? (stats.neighborhood_name || 'Neighborhood Dashboard') : 'Dashboard' }}
                     </h1>
                     <p class="text-on-surface-variant text-lg">Performance metrics for the last 12 months.</p>
                 </div>
-                <div class="flex flex-wrap gap-3 mt-2 shrink-0">
+                <div class="w-full lg:w-auto flex flex-col sm:flex-row gap-3 lg:mt-2 shrink-0">
                     <router-link
                         v-if="neighborhoodId"
                         :to="`/neighborhoods/${neighborhoodId}/properties`"
-                        class="flex items-center gap-2 px-5 py-2.5 rounded-lg text-sm font-semibold bg-surface-container-highest text-on-surface-variant hover:bg-surface-container-high transition-colors"
+                        class="w-full sm:w-auto justify-center flex items-center gap-2 px-5 py-2.5 rounded-lg text-sm font-semibold bg-surface-container-highest text-on-surface-variant hover:bg-surface-container-high transition-colors"
                     >
                         <span class="material-symbols-outlined text-base">home_work</span>
                         View Properties
                     </router-link>
                     <button
                         @click="showDistanceCheck = true"
-                        class="flex items-center gap-2 px-5 py-2.5 rounded-lg text-sm font-semibold bg-primary text-on-primary hover:bg-primary/90 transition-colors"
+                        class="w-full sm:w-auto justify-center flex items-center gap-2 px-5 py-2.5 rounded-lg text-sm font-semibold bg-primary text-on-primary hover:bg-primary/90 transition-colors"
                     >
                         <span class="material-symbols-outlined text-base">social_distance</span>
                         Distance Check
@@ -45,10 +45,10 @@
             <template v-else>
                 <!-- Market Trends & Analytics -->
                 <section>
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 lg:gap-8">
                         <!-- Average Sale Price -->
-                        <div class="bg-surface-container-lowest p-8 rounded-[2rem] shadow-sm border border-outline-variant/30">
-                            <div class="flex items-center justify-between mb-8">
+                        <div class="min-w-0 bg-surface-container-lowest p-4 sm:p-6 lg:p-8 rounded-[2rem] shadow-sm border border-outline-variant/30">
+                            <div class="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between mb-6 lg:mb-8">
                                 <h3 class="font-bold text-primary flex items-center gap-2">
                                     <span class="material-symbols-outlined text-primary/70">show_chart</span>
                                     Average Sale Price
@@ -64,12 +64,15 @@
                                     :series="avgPriceSeries"
                                 />
                             </div>
+                            <p v-if="hasAvgSalePrices" class="mt-4 text-xs text-on-surface-variant">
+                                {{ avgPriceSampleContext }}
+                            </p>
                             <p v-else class="h-60 flex items-center justify-center text-sm text-on-surface-variant">No sale data yet.</p>
                         </div>
 
                         <!-- Days on Market by Month -->
-                        <div class="bg-surface-container-lowest p-8 rounded-[2rem] shadow-sm border border-outline-variant/30">
-                            <div class="flex items-center justify-between mb-8">
+                        <div class="min-w-0 bg-surface-container-lowest p-4 sm:p-6 lg:p-8 rounded-[2rem] shadow-sm border border-outline-variant/30">
+                            <div class="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between mb-6 lg:mb-8">
                                 <h3 class="font-bold text-primary flex items-center gap-2">
                                     <span class="material-symbols-outlined text-primary/70">show_chart</span>
                                     Days on Market by Month
@@ -85,12 +88,15 @@
                                     :series="domSeries"
                                 />
                             </div>
+                            <p v-if="hasDomData" class="mt-4 text-xs text-on-surface-variant">
+                                {{ domSampleContext }}
+                            </p>
                             <p v-else class="h-60 flex items-center justify-center text-sm text-on-surface-variant">No sold listing data yet.</p>
                         </div>
 
                         <!-- Sales Volume -->
-                        <div class="bg-surface-container-lowest p-8 rounded-[2rem] shadow-sm border border-outline-variant/30">
-                            <div class="flex items-center justify-between mb-8">
+                        <div class="min-w-0 bg-surface-container-lowest p-4 sm:p-6 lg:p-8 rounded-[2rem] shadow-sm border border-outline-variant/30">
+                            <div class="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between mb-6 lg:mb-8">
                                 <h3 class="font-bold text-primary flex items-center gap-2">
                                     <span class="material-symbols-outlined text-primary/70">bar_chart</span>
                                     Sales Volume
@@ -164,9 +170,19 @@ const monthLabels = computed(() => {
     return monthlyAvgSalePrices.value.map((item) => item.month);
 });
 
-const hasAvgSalePrices = computed(() => monthlyAvgSalePrices.value.some((item) => Number(item.avg_price) > 0));
-const hasDomData = computed(() => monthlyDom.value.some((item) => Number(item.avg_days) > 0));
+const hasAvgSalePrices = computed(() => monthlyAvgSalePrices.value.some((item) => toNullableNumber(item.avg_price) !== null));
+const hasDomData = computed(() => monthlyDom.value.some((item) => toNullableNumber(item.avg_days) !== null));
 const hasSalesData = computed(() => monthlySales.value.some((item) => Number(item.count) > 0));
+
+const avgPriceSampleContext = computed(() => formatSampleContext(
+    monthlyAvgSalePrices.value,
+    'sale',
+));
+
+const domSampleContext = computed(() => formatSampleContext(
+    monthlyDom.value,
+    'closed listing',
+));
 
 const chartBaseOptions = computed(() => ({
     chart: {
@@ -181,9 +197,16 @@ const chartBaseOptions = computed(() => ({
         strokeDashArray: 3,
     },
     xaxis: {
-        categories: monthLabels.value,
+        type: 'numeric',
+        min: 0,
+        max: Math.max(monthLabels.value.length - 1, 0),
+        tickAmount: Math.max(monthLabels.value.length - 1, 1),
         labels: {
             rotate: 0,
+            hideOverlappingLabels: true,
+            showDuplicates: false,
+            trim: false,
+            formatter: (value) => formatMonthAxisLabel(value),
             style: {
                 colors: '#6b7280',
                 fontSize: '10px',
@@ -203,15 +226,34 @@ const chartBaseOptions = computed(() => ({
         },
     },
     legend: { show: false },
+    responsive: [{
+        breakpoint: 640,
+        options: {
+            xaxis: {
+                labels: {
+                    rotate: -45,
+                    rotateAlways: true,
+                    offsetY: 4,
+                    formatter: (value) => formatMonthAxisLabel(value),
+                    style: {
+                        fontSize: '9px',
+                    },
+                },
+            },
+        },
+    }],
     tooltip: {
         theme: 'light',
-        x: { show: true },
+        x: {
+            show: true,
+            formatter: (value) => formatMonthAxisLabel(value),
+        },
     },
 }));
 
 const avgPriceSeries = computed(() => [{
     name: 'Average Sale Price',
-    data: monthlyAvgSalePrices.value.map((item) => Number(item.avg_price) || 0),
+    data: toObservedPoints(monthlyAvgSalePrices.value, 'avg_price'),
 }]);
 
 const avgPriceChartOptions = computed(() => ({
@@ -228,13 +270,8 @@ const avgPriceChartOptions = computed(() => ({
         hover: { size: 6 },
     },
     fill: {
-        type: 'gradient',
-        gradient: {
-            shadeIntensity: 1,
-            opacityFrom: 0.2,
-            opacityTo: 0.04,
-            stops: [0, 90, 100],
-        },
+        type: 'solid',
+        opacity: 0.88,
     },
     yaxis: {
         ...chartBaseOptions.value.yaxis,
@@ -254,7 +291,7 @@ const avgPriceChartOptions = computed(() => ({
 
 const domSeries = computed(() => [{
     name: 'Days on Market',
-    data: monthlyDom.value.map((item) => Number(item.avg_days) || 0),
+    data: toObservedPoints(monthlyDom.value, 'avg_days'),
 }]);
 
 const domChartOptions = computed(() => ({
@@ -271,13 +308,8 @@ const domChartOptions = computed(() => ({
         hover: { size: 6 },
     },
     fill: {
-        type: 'gradient',
-        gradient: {
-            shadeIntensity: 1,
-            opacityFrom: 0.2,
-            opacityTo: 0.04,
-            stops: [0, 90, 100],
-        },
+        type: 'solid',
+        opacity: 0.88,
     },
     yaxis: {
         ...chartBaseOptions.value.yaxis,
@@ -290,7 +322,7 @@ const domChartOptions = computed(() => ({
     tooltip: {
         ...chartBaseOptions.value.tooltip,
         y: {
-            formatter: (value) => `${Math.round(value)} Days`,
+            formatter: (value) => formatDays(value),
         },
     },
 }));
@@ -331,50 +363,108 @@ const salesChartOptions = computed(() => ({
     },
 }));
 
-const salesTrendIcon = computed(() => {
-    const counts = monthlySales.value.map((item) => Number(item.count) || 0);
+const salesTrend = computed(() => {
+    const months = monthlySales.value;
+    const completeMonths = months.slice(0, -1);
+    const latestThree = completeMonths.slice(-3);
+    const priorThree = completeMonths.slice(-6, -3);
+    const latestThreeCount = sumSales(latestThree);
+    const priorThreeCount = sumSales(priorThree);
+    const totalSales = sumSales(months);
 
-    if (counts.length < 2) {
-        return 'horizontal_rule';
+    if (completeMonths.length < 6 || latestThreeCount + priorThreeCount < 3) {
+        return {
+            icon: 'horizontal_rule',
+            label: formatSalesSummary(totalSales),
+        };
     }
 
-    const first = counts[0];
-    const last = counts[counts.length - 1];
-
-    if (last > first) {
-        return 'trending_up';
+    if (latestThreeCount > priorThreeCount) {
+        return {
+            icon: 'trending_up',
+            label: `More sales: ${latestThreeCount} in the latest 3 complete months vs ${priorThreeCount} in the prior 3`,
+        };
     }
 
-    if (last < first) {
-        return 'trending_down';
+    if (latestThreeCount < priorThreeCount) {
+        return {
+            icon: 'trending_down',
+            label: `Fewer sales: ${latestThreeCount} in the latest 3 complete months vs ${priorThreeCount} in the prior 3`,
+        };
     }
 
-    return 'horizontal_rule';
+    return {
+        icon: 'horizontal_rule',
+        label: `Same sales: ${latestThreeCount} in each 3-month period`,
+    };
 });
 
-const salesTrendLabel = computed(() => {
-    const counts = monthlySales.value.map((item) => Number(item.count) || 0);
+const salesTrendIcon = computed(() => salesTrend.value.icon);
+const salesTrendLabel = computed(() => salesTrend.value.label);
 
-    if (counts.length < 2) {
-        return 'No trend data yet';
+function toNullableNumber(value) {
+    if (value === null || value === undefined || value === '') {
+        return null;
     }
 
-    const first = counts[0];
-    const last = counts[counts.length - 1];
+    const number = Number(value);
 
-    if (last > first) {
-        return 'Sales volume trending up';
+    return Number.isFinite(number) && number >= 0 ? number : null;
+}
+
+function toObservedPoints(items, valueKey) {
+    return items.reduce((points, item, index) => {
+        const value = toNullableNumber(item[valueKey]);
+
+        if (value !== null) {
+            points.push({
+                x: index,
+                y: value,
+            });
+        }
+
+        return points;
+    }, []);
+}
+
+function formatMonthAxisLabel(value) {
+    const index = Math.round(Number(value));
+
+    return monthLabels.value[index] || '';
+}
+
+function formatSampleContext(items, noun) {
+    const samples = items.reduce((total, item) => {
+        const sampleSize = Number(item.sample_size);
+
+        return total + (Number.isFinite(sampleSize) && sampleSize > 0 ? sampleSize : 0);
+    }, 0);
+    const observedMonths = items.filter((item) => toNullableNumber(item.avg_price ?? item.avg_days) !== null).length;
+
+    if (samples === 0) {
+        return '';
     }
 
-    if (last < first) {
-        return 'Sales volume trending down';
+    const sampleLabel = `${samples} ${noun}${samples === 1 ? '' : 's'}`;
+    const monthLabel = observedMonths === 1 ? '1 month' : `${observedMonths} months`;
+
+    return `Based on ${sampleLabel} across ${monthLabel}; months without observations have no dots.`;
+}
+
+function sumSales(items) {
+    return items.reduce((total, item) => total + (Number(item.count) || 0), 0);
+}
+
+function formatSalesSummary(totalSales) {
+    if (totalSales === 0) {
+        return 'No sales in the last 12 months';
     }
 
-    return 'Sales volume stable';
-});
+    return `${totalSales} sale${totalSales === 1 ? '' : 's'} in the last 12 months`;
+}
 
 function formatPrice(price) {
-    if (!price) {
+    if (price === null || price === undefined || !Number.isFinite(Number(price))) {
         return '—';
     }
 
@@ -386,8 +476,8 @@ function formatPrice(price) {
 }
 
 function formatCompactPrice(price) {
-    if (!price) {
-        return '$0';
+    if (price === null || price === undefined || !Number.isFinite(Number(price))) {
+        return '—';
     }
 
     return new Intl.NumberFormat('en-US', {
@@ -396,6 +486,14 @@ function formatCompactPrice(price) {
         notation: 'compact',
         maximumFractionDigits: 1,
     }).format(price);
+}
+
+function formatDays(days) {
+    if (days === null || days === undefined || !Number.isFinite(Number(days))) {
+        return 'No observations';
+    }
+
+    return `${Math.round(days)} Days`;
 }
 
 async function loadStats() {

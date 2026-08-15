@@ -88,14 +88,21 @@ class DashboardController extends Controller
         $rawPrices = PriceHistory::where('type', 'sold')
             ->where('price_date', '>=', $twelveMonthsAgo->toDateString())
             ->whereHas('property', $propertyScope)
-            ->selectRaw("{$format} as month, ROUND(AVG(price)) as avg_price")
+            ->selectRaw("{$format} as month, ROUND(AVG(price)) as avg_price, COUNT(*) as sample_size")
             ->groupBy('month')
-            ->pluck('avg_price', 'month');
+            ->get()
+            ->keyBy('month');
 
-        $monthlyAvgSalePrices = $monthKeys->map(fn ($m) => [
-            'month' => Carbon::createFromFormat('Y-m', $m)->format('M'),
-            'avg_price' => (int) $rawPrices->get($m, 0),
-        ])->values();
+        $monthlyAvgSalePrices = $monthKeys->map(function ($month) use ($rawPrices) {
+            $observation = $rawPrices->get($month);
+
+            return [
+                'month' => Carbon::createFromFormat('Y-m', $month)->format('M'),
+                'month_key' => $month,
+                'avg_price' => $observation ? (int) $observation->avg_price : null,
+                'sample_size' => $observation ? (int) $observation->sample_size : 0,
+            ];
+        })->values();
 
         // 2. Days on market by month
         $domFormat = config('database.default') === 'sqlite' ? "strftime('%Y-%m', listing_cycles.sold_at)" : "DATE_FORMAT(listing_cycles.sold_at, '%Y-%m')";
@@ -119,14 +126,21 @@ class DashboardController extends Controller
             : 'DATEDIFF(listing_cycles.sold_at, listing_cycles.listed_at)';
 
         $rawDom = $domQuery
-            ->selectRaw("{$domFormat} as month, ROUND(AVG({$diff})) as avg_days")
+            ->selectRaw("{$domFormat} as month, ROUND(AVG({$diff})) as avg_days, COUNT(*) as sample_size")
             ->groupBy('month')
-            ->pluck('avg_days', 'month');
+            ->get()
+            ->keyBy('month');
 
-        $monthlyDaysOnMarket = $monthKeys->map(fn ($m) => [
-            'month' => Carbon::createFromFormat('Y-m', $m)->format('M'),
-            'avg_days' => (int) $rawDom->get($m, 0),
-        ])->values();
+        $monthlyDaysOnMarket = $monthKeys->map(function ($month) use ($rawDom) {
+            $observation = $rawDom->get($month);
+
+            return [
+                'month' => Carbon::createFromFormat('Y-m', $month)->format('M'),
+                'month_key' => $month,
+                'avg_days' => $observation ? (int) $observation->avg_days : null,
+                'sample_size' => $observation ? (int) $observation->sample_size : 0,
+            ];
+        })->values();
 
         // 3. Monthly sold counts (absorption rate proxy)
         $rawCounts = PriceHistory::where('type', 'sold')
@@ -138,6 +152,7 @@ class DashboardController extends Controller
 
         $monthlySoldCounts = $monthKeys->map(fn ($m) => [
             'month' => Carbon::createFromFormat('Y-m', $m)->format('M'),
+            'month_key' => $m,
             'count' => (int) $rawCounts->get($m, 0),
         ])->values();
 
