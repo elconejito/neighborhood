@@ -28,17 +28,58 @@ class PropertyController extends Controller
 
     public function index(IndexPropertyRequest $request, Neighborhood $neighborhood): JsonResponse
     {
+        $target = Property::where('neighborhood_id', $neighborhood->id)
+            ->where('is_pinned', true)
+            ->withMarketSummary()
+            ->with(['neighborhood', 'lastSoldHistory', 'lastListingHistory', 'lastSoldCycle', 'lastListingCycle'])
+            ->first();
+
         $properties = Property::where('neighborhood_id', $neighborhood->id)
             ->withMarketSummary()
             ->with(['neighborhood', 'lastSoldHistory', 'lastListingHistory', 'lastSoldCycle', 'lastListingCycle'])
+            ->when($target, fn ($query) => $query->whereKeyNot($target->id))
             ->whereSaleStatus($request->input('sale_status'))
-            ->orderByDesc('is_pinned')
             ->filter($request)
-            ->when($request->input('orderBy') !== 'created_at', fn ($query) => $query->orderByDesc('created_at'))
+            ->when(
+                $request->input('orderBy') === 'similarity' && $target,
+                fn ($query) => $target->applySimilaritySort($query, $target),
+            )
+            ->when(
+                $request->input('orderBy') === 'price_gap' && $target?->market_price !== null,
+                fn ($query) => $target->applyMarketPriceGapSort(
+                    $query,
+                    (float) $target->market_price,
+                    $request->input('sortedBy', 'asc'),
+                ),
+            )
+            ->when(
+                $request->input('orderBy') === 'price_gap' && $target?->market_price === null,
+                fn ($query) => (new Property)->applyMarketActivityDateSort($query, 'desc'),
+            )
+            ->when(
+                $request->input('orderBy') !== 'created_at'
+                    && $request->input('orderBy') !== 'price_gap'
+                    && ($request->input('orderBy') !== 'similarity' || ! $target),
+                fn ($query) => $query->orderByDesc('created_at'),
+            )
             ->paginate($request->integer('per_page', 10));
+
+        $targetData = $target ? (new PropertyTransformer)->transform($target) : null;
+
+        if ($targetData !== null) {
+            $filterRequest = $request->duplicate();
+            $filterRequest->query->remove('orderBy');
+            $filterRequest->query->remove('sortedBy');
+
+            $targetData['matches_current_filter'] = Property::whereKey($target->id)
+                ->whereSaleStatus($request->input('sale_status'))
+                ->filter($filterRequest)
+                ->exists();
+        }
 
         return fractal($properties, PropertyTransformer::class)
             ->parseIncludes(['neighborhood'])
+            ->addMeta(['target' => $targetData])
             ->respond();
     }
 

@@ -54,8 +54,13 @@ class PropertyTransformer extends TransformerAbstract
             $lastListingEventType = 'listing';
         }
 
-        $marketPrice = $lastSalePrice ?? $lastListingPrice;
-        $marketActivityDate = $lastSaleDate ?? $lastListingDate;
+        $isSaleMarketEvent = $lastSaleDate && (! $lastListingDate || ! $lastListingDate->isAfter($lastSaleDate));
+        $marketPrice = $isSaleMarketEvent ? $lastSalePrice : $lastListingPrice;
+        $marketActivityDate = $isSaleMarketEvent ? $lastSaleDate : $lastListingDate;
+        $pricePerSquareFoot = $marketPrice !== null && $property->square_feet > 0
+            ? (float) $marketPrice / $property->square_feet
+            : null;
+        $closestNeighborDistance = data_get($property->analysis, 'neighbor_distance.nearest_houses.0.distance_meters');
 
         return [
             'id' => (int) $property->id,
@@ -100,6 +105,9 @@ class PropertyTransformer extends TransformerAbstract
             'last_listing_event_type' => $lastListingEventType,
             'market_price' => $marketPrice,
             'market_activity_date' => $marketActivityDate?->toDateString(),
+            'price_event_type' => $isSaleMarketEvent ? 'sold' : $lastListingEventType,
+            'price_per_square_foot' => $pricePerSquareFoot,
+            'closest_neighbor_distance_meters' => is_numeric($closestNeighborDistance) ? (float) $closestNeighborDistance : null,
             'analyzed_at' => $property->analyzed_at ? $property->analyzed_at->toDateTimeString() : null,
             'created_at' => $property->created_at ? $property->created_at->toDateTimeString() : null,
             'updated_at' => $property->updated_at ? $property->updated_at->toDateTimeString() : null,

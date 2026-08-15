@@ -216,12 +216,40 @@ class Property extends Model
                 'last_listing_event_type' => $lastListingEventType,
             ])
             ->selectRaw(
-                "COALESCE(({$lastSalePrice->toSql()}), ({$lastListingPrice->toSql()})) as market_price",
-                [...$lastSalePrice->getBindings(), ...$lastListingPrice->getBindings()],
+                "CASE
+                    WHEN ({$lastSaleDate->toSql()}) IS NULL THEN ({$lastListingPrice->toSql()})
+                    WHEN ({$lastListingDate->toSql()}) IS NULL THEN ({$lastSalePrice->toSql()})
+                    WHEN ({$lastListingDate->toSql()}) > ({$lastSaleDate->toSql()}) THEN ({$lastListingPrice->toSql()})
+                    ELSE ({$lastSalePrice->toSql()})
+                END as market_price",
+                [
+                    ...$lastSaleDate->getBindings(),
+                    ...$lastListingPrice->getBindings(),
+                    ...$lastListingDate->getBindings(),
+                    ...$lastSalePrice->getBindings(),
+                    ...$lastListingDate->getBindings(),
+                    ...$lastSaleDate->getBindings(),
+                    ...$lastListingPrice->getBindings(),
+                    ...$lastSalePrice->getBindings(),
+                ],
             )
             ->selectRaw(
-                "COALESCE(({$lastSaleDate->toSql()}), ({$lastListingDate->toSql()})) as market_activity_date",
-                [...$lastSaleDate->getBindings(), ...$lastListingDate->getBindings()],
+                "CASE
+                    WHEN ({$lastSaleDate->toSql()}) IS NULL THEN ({$lastListingDate->toSql()})
+                    WHEN ({$lastListingDate->toSql()}) IS NULL THEN ({$lastSaleDate->toSql()})
+                    WHEN ({$lastListingDate->toSql()}) > ({$lastSaleDate->toSql()}) THEN ({$lastListingDate->toSql()})
+                    ELSE ({$lastSaleDate->toSql()})
+                END as market_activity_date",
+                [
+                    ...$lastSaleDate->getBindings(),
+                    ...$lastListingDate->getBindings(),
+                    ...$lastListingDate->getBindings(),
+                    ...$lastSaleDate->getBindings(),
+                    ...$lastListingDate->getBindings(),
+                    ...$lastSaleDate->getBindings(),
+                    ...$lastListingDate->getBindings(),
+                    ...$lastSaleDate->getBindings(),
+                ],
             );
     }
 
@@ -258,6 +286,17 @@ class Property extends Model
             ->orderBy('market_activity_date', $direction);
     }
 
+    public function applyMarketPriceGapSort(Builder $query, float $targetMarketPrice, string $direction): void
+    {
+        $direction = strtolower($direction) === 'desc' ? 'desc' : 'asc';
+
+        $query
+            ->orderByRaw('market_price IS NULL')
+            ->orderByRaw("ABS(market_price - ?) {$direction}", [$targetMarketPrice]);
+
+        $this->applyMarketActivityDateSort($query, 'desc');
+    }
+
     public function applyAddressSort(Builder $query, string $direction): void
     {
         $address = $this->qualifyColumn('address');
@@ -266,6 +305,56 @@ class Property extends Model
             ->orderByRaw("LOWER(TRIM(SUBSTR(TRIM({$address}), INSTR(TRIM({$address}), ' ') + 1))) {$direction}")
             ->orderByRaw("(TRIM({$address}) + 0) {$direction}")
             ->orderBy($address, $direction);
+    }
+
+    /**
+     * Sort properties by their normalized difference from a pinned target.
+     *
+     * Rows with fewer than three comparable attributes are ordered after rows
+     * with enough data, so incomplete records cannot receive an artificially
+     * favorable similarity ranking.
+     */
+    public function applySimilaritySort(Builder $query, Property $target): void
+    {
+        $axes = [
+            'bedrooms' => 2,
+            'bathrooms' => 1.5,
+            'square_feet' => 1200,
+            'acreage' => 0.30,
+            'year_built' => 20,
+        ];
+
+        $validAxisClauses = [];
+        $validAxisBindings = [];
+        $termClauses = [];
+        $termBindings = [];
+
+        foreach ($axes as $attribute => $normalizer) {
+            $column = $this->qualifyColumn($attribute);
+            $targetValue = $target->getAttribute($attribute);
+            $normalizerSql = number_format($normalizer, 6, '.', '');
+
+            $validAxisClauses[] = "CASE WHEN {$column} IS NOT NULL AND ? IS NOT NULL THEN 1 ELSE 0 END";
+            $validAxisBindings[] = $targetValue;
+
+            $termClauses[] = "CASE WHEN {$column} IS NULL OR ? IS NULL THEN 0 ELSE ABS({$column} - ?) / {$normalizerSql} END";
+            $termBindings[] = $targetValue;
+            $termBindings[] = $targetValue;
+        }
+
+        $validAxisSql = implode(' + ', $validAxisClauses);
+        $termSql = implode(' + ', $termClauses);
+
+        $query->selectRaw("{$validAxisSql} as similarity_valid_axes", $validAxisBindings);
+        $query->selectRaw(
+            "CASE WHEN ({$validAxisSql}) = 0 THEN NULL ELSE (({$termSql}) / ({$validAxisSql}) * 5 + (5 - ({$validAxisSql})) * 0.25) END as similarity_score",
+            [...$validAxisBindings, ...$termBindings, ...$validAxisBindings, ...$validAxisBindings],
+        );
+        $query
+            ->orderByRaw('similarity_valid_axes < 3')
+            ->orderBy('similarity_score');
+
+        $this->applyMarketActivityDateSort($query, 'desc');
     }
 
     public function getFullAddressAttribute(): string
