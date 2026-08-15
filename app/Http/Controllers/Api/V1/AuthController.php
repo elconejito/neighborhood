@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api\V1;
 use App\Http\Controllers\Controller;
 use App\Models\User;
 use App\Transformers\Api\V1\UserTransformer;
+use Illuminate\Auth\AuthenticationException;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -12,6 +13,7 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Password;
 use Illuminate\Support\Str;
 use Illuminate\Validation\Rules\Password as PasswordRule;
+use PHPOpenSourceSaver\JWTAuth\Exceptions\JWTException;
 
 class AuthController extends Controller
 {
@@ -79,7 +81,17 @@ class AuthController extends Controller
 
     public function refresh(): JsonResponse
     {
-        return $this->respondWithToken(auth('api')->refresh());
+        try {
+            $token = auth('api')->refresh();
+
+            auth('api')->setToken($token);
+
+            return $this->respondWithToken($token);
+        } catch (AuthenticationException|JWTException) {
+            return response()->json([
+                'message' => 'Session has expired. Please log in again.',
+            ], 401);
+        }
     }
 
     public function me(): JsonResponse
