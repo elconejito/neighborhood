@@ -40,7 +40,7 @@ class PropertySeederTest extends TestCase
         Http::assertSent(function ($request) {
             return str_starts_with($request->url(), 'https://overpass-api.de/api/interpreter?')
                 && str_contains($request->url(), '22407')
-                && $request->hasHeader('User-Agent', 'neighborhood@syde.app');
+                && $request->hasHeader('User-Agent', 'neighborhood-seeder/1.0 (contact: neighborhood@syde.app)');
         });
     }
 }
