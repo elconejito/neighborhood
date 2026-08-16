@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Accept Invitation | Neighborhood</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@200;300;400;500;600;700;800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            colors: {
+              "on-tertiary-container": "#625b4f",
+              "on-secondary-container": "#435368",
+              "surface-container-low": "#f1f4f6",
+              "tertiary-fixed-dim": "#efe4d4",
+              "secondary-container": "#d3e4fe",
+              "error-container": "#fe8983",
+              "error": "#9f403d",
+              "on-tertiary": "#fff8f0",
+              "tertiary-container": "#fdf2e2",
+              "surface-container-high": "#e3e9ec",
+              "surface": "#f8f9fa",
+              "primary-fixed-dim": "#bfd5ff",
+              "on-primary": "#f6f7ff",
+              "secondary-fixed": "#d3e4fe",
+              "on-secondary-fixed": "#314055",
+              "inverse-on-surface": "#9b9d9e",
+              "on-background": "#2b3437",
+              "secondary-fixed-dim": "#c5d6f0",
+              "surface-bright": "#f8f9fa",
+              "on-primary-container": "#38527b",
+              "on-error": "#fff7f6",
+              "on-surface-variant": "#586064",
+              "primary-dim": "#39537c",
+              "surface-container-highest": "#dbe4e7",
+              "outline-variant": "#abb3b7",
+              "tertiary-fixed": "#fdf2e2",
+              "error-dim": "#4e0309",
+              "surface-dim": "#d1dce0",
+              "background": "#f8f9fa",
+              "primary-fixed": "#d6e3ff",
+              "on-tertiary-fixed": "#4f493d",
+              "tertiary-dim": "#595246",
+              "surface-container-lowest": "#ffffff",
+              "on-secondary-fixed-variant": "#4d5d73",
+              "surface-container": "#eaeff1",
+              "on-tertiary-fixed-variant": "#6d6559",
+              "tertiary": "#655e52",
+              "on-secondary": "#f7f9ff",
+              "inverse-primary": "#b3cdfd",
+              "primary": "#455f88",
+              "secondary-dim": "#44546a",
+              "surface-variant": "#dbe4e7",
+              "surface-tint": "#455f88",
+              "secondary": "#506076",
+              "inverse-surface": "#0c0f10",
+              "outline": "#737c7f",
+              "on-surface": "#2b3437",
+              "on-primary-fixed": "#254067",
+              "on-error-container": "#752121",
+              "primary-container": "#d6e3ff",
+              "on-primary-fixed-variant": "#425c85"
+            },
+            fontFamily: {
+              "headline": ["Manrope"],
+              "body": ["Manrope"],
+              "label": ["Manrope"]
+            },
+            borderRadius: {"DEFAULT": "0.125rem", "lg": "0.25rem", "xl": "0.5rem", "full": "0.75rem"},
+          },
+        },
+      }
+    </script>
+<style>
+        body { font-family: 'Manrope', sans-serif; }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+    </style>
+</head>
+<body class="bg-surface text-on-surface antialiased min-h-screen flex flex-col">
+<!-- Main Content Wrapper -->
+<main class="flex-grow flex items-center justify-center px-8 py-16">
+<div class="w-full max-w-xl overflow-hidden rounded-xl shadow-2xl bg-surface-container-lowest">
+<!-- Form Side -->
+<div class="p-8 md:p-12 flex flex-col justify-center">
+<div class="mb-10">
+<div class="flex justify-center mb-8">
+<span class="text-primary text-xl font-extrabold tracking-tighter">Neighborhood</span>
+</div>
+<div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-secondary-container text-on-secondary-container text-xs font-bold tracking-wider uppercase mb-6">
+<span class="material-symbols-outlined text-sm" data-icon="mail">mail</span>
+                        Invitation Received
+                    </div>
+<h2 class="text-3xl font-bold text-on-surface tracking-tight leading-tight mb-3">
+                        You've been invited to join <span class="text-primary">Evergreen Heights</span>'s Neighborhood Ledger
+                    </h2>
+<p class="text-on-surface-variant font-medium">
+                        Complete your profile to gain access to the property portfolio.
+                    </p>
+</div>
+<form class="space-y-5">
+<!-- Name Field -->
+<div class="space-y-1.5">
+<label class="text-xs font-bold text-on-surface-variant uppercase tracking-widest ml-1" for="full-name">Full Name</label>
+<div class="relative group">
+<span class="absolute left-4 top-1/2 -translate-y-1/2 material-symbols-outlined text-outline text-lg group-focus-within:text-primary transition-colors">person</span>
+<input class="w-full pl-12 pr-4 py-3.5 bg-surface-container-highest border-none rounded-lg focus:ring-1 focus:ring-primary focus:bg-surface-container-lowest transition-all text-on-surface placeholder:text-outline-variant font-medium" id="full-name" placeholder="Alex Sterling" type="text"/>
+</div>
+</div>
+<!-- Email Field (Prefilled Simulation) -->
+<div class="space-y-1.5">
+<label class="text-xs font-bold text-on-surface-variant uppercase tracking-widest ml-1" for="email">Email Address</label>
+<div class="relative">
+<span class="absolute left-4 top-1/2 -translate-y-1/2 material-symbols-outlined text-outline text-lg">alternate_email</span>
+<input class="w-full pl-12 pr-4 py-3.5 bg-surface-container text-on-surface-variant rounded-lg border-none font-medium cursor-not-allowed" id="email" readonly="" type="email" value="alex.sterling@estate-partners.com"/>
+</div>
+<p class="text-[10px] text-outline italic ml-1">This email was authorized by your administrator.</p>
+</div>
+<!-- Password Field -->
+<div class="space-y-1.5">
+<label class="text-xs font-bold text-on-surface-variant uppercase tracking-widest ml-1" for="password">Create Password</label>
+<div class="relative group">
+<span class="absolute left-4 top-1/2 -translate-y-1/2 material-symbols-outlined text-outline text-lg group-focus-within:text-primary transition-colors">lock</span>
+<input class="w-full pl-12 pr-4 py-3.5 bg-surface-container-highest border-none rounded-lg focus:ring-1 focus:ring-primary focus:bg-surface-container-lowest transition-all text-on-surface placeholder:text-outline-variant font-medium" id="password" placeholder="••••••••" type="password"/>
+</div>
+</div>
+<!-- CTA Actions -->
+<div class="pt-4 space-y-4">
+<button class="w-full py-4 bg-gradient-to-br from-primary to-primary-dim text-on-primary font-bold rounded-lg shadow-lg shadow-primary/20 hover:shadow-xl hover:shadow-primary/30 transition-all active:scale-[0.98]" type="submit">
+                            Accept Invitation and Create Account
+                        </button>
+<div class="flex items-center gap-4 py-2">
+<div class="h-[1px] flex-grow bg-surface-container-high"></div>
+<span class="text-xs font-bold text-outline uppercase tracking-widest">or</span>
+<div class="h-[1px] flex-grow bg-surface-container-high"></div>
+</div>
+<button class="w-full py-4 bg-surface-container-highest text-on-surface font-bold rounded-lg hover:bg-surface-dim transition-colors active:scale-[0.98]" type="button">
+                            Sign In to Accept
+                        </button>
+</div>
+</form>
+<footer class="mt-12 text-center">
+<p class="text-xs text-on-surface-variant font-medium">
+                        By joining, you agree to our 
+                        <a class="text-primary hover:underline underline-offset-4" href="#">Terms of Service</a> and 
+                        <a class="text-primary hover:underline underline-offset-4" href="#">Privacy Protocol</a>.
+                    </p>
+</footer>
+</div>
+</div>
+</main>
+<!-- Simple Footer for Legal/Help -->
+<footer class="px-8 py-6 flex flex-col md:flex-row justify-between items-center text-[10px] text-outline font-bold uppercase tracking-widest gap-4">
+<div>© 2024 Neighborhood — All Rights Reserved</div>
+<div class="flex gap-6">
+<a class="hover:text-primary transition-colors" href="#">Support Center</a>
+<a class="hover:text-primary transition-colors" href="#">Security Standards</a>
+</div>
+</footer>
+</body></html>

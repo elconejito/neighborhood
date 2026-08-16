@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Login | Neighborhood</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@200;300;400;500;600;700;800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            colors: {
+              "on-tertiary-fixed-variant": "#6d6559",
+              "surface": "#f8f9fa",
+              "error-dim": "#4e0309",
+              "primary-fixed-dim": "#bfd5ff",
+              "on-secondary-fixed-variant": "#4d5d73",
+              "tertiary-container": "#fdf2e2",
+              "inverse-primary": "#b3cdfd",
+              "error-container": "#fe8983",
+              "on-tertiary-container": "#625b4f",
+              "secondary": "#506076",
+              "primary-dim": "#39537c",
+              "tertiary": "#655e52",
+              "on-primary-fixed-variant": "#425c85",
+              "on-primary": "#f6f7ff",
+              "surface-dim": "#d1dce0",
+              "tertiary-fixed-dim": "#efe4d4",
+              "on-surface-variant": "#586064",
+              "surface-variant": "#dbe4e7",
+              "on-secondary-fixed": "#314055",
+              "secondary-dim": "#44546a",
+              "on-background": "#2b3437",
+              "tertiary-fixed": "#fdf2e2",
+              "primary": "#455f88",
+              "on-secondary-container": "#435368",
+              "secondary-fixed": "#d3e4fe",
+              "primary-container": "#d6e3ff",
+              "surface-tint": "#455f88",
+              "on-tertiary-fixed": "#4f493d",
+              "surface-container-low": "#f1f4f6",
+              "on-error-container": "#752121",
+              "primary-fixed": "#d6e3ff",
+              "inverse-surface": "#0c0f10",
+              "secondary-container": "#d3e4fe",
+              "on-secondary": "#f7f9ff",
+              "outline": "#737c7f",
+              "on-tertiary": "#fff8f0",
+              "surface-container-highest": "#dbe4e7",
+              "background": "#f8f9fa",
+              "secondary-fixed-dim": "#c5d6f0",
+              "on-primary-container": "#38527b",
+              "inverse-on-surface": "#9b9d9e",
+              "on-primary-fixed": "#254067",
+              "surface-container-high": "#e3e9ec",
+              "surface-bright": "#f8f9fa",
+              "tertiary-dim": "#595246",
+              "outline-variant": "#abb3b7",
+              "on-surface": "#2b3437",
+              "on-error": "#fff7f6",
+              "error": "#9f403d",
+              "surface-container-lowest": "#ffffff",
+              "surface-container": "#eaeff1"
+            },
+            fontFamily: {
+              "headline": ["Manrope"],
+              "body": ["Manrope"],
+              "label": ["Manrope"]
+            },
+            borderRadius: {"DEFAULT": "0.125rem", "lg": "0.25rem", "xl": "0.5rem", "full": "0.75rem"},
+          },
+        },
+      }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 300, 'GRAD' 0, 'opsz' 24;
+        }
+        body {
+            font-family: 'Manrope', sans-serif;
+            -webkit-font-smoothing: antialiased;
+        }
+        .luxury-gradient {
+            background: linear-gradient(145deg, #455f88 0%, #39537c 100%);
+        }
+        .ghost-border:focus-within {
+            outline: 1px solid rgba(69, 95, 136, 0.4);
+        }
+    </style>
+</head>
+<body class="bg-surface text-on-surface min-h-screen flex flex-col">
+<main class="flex-grow flex items-center justify-center px-8">
+<div class="w-full max-w-[440px]">
+<!-- Branding Header -->
+<div class="mb-12 text-center">
+<h1 class="text-blue-900 font-headline font-extrabold tracking-tighter text-3xl mb-2">Sign In</h1>
+<p class="text-on-surface-variant font-medium tracking-tight">Access your private property ledger</p>
+</div>
+<!-- Login Card -->
+<div class="bg-surface-container-lowest p-10 rounded-xl shadow-[0_12px_40px_rgba(43,52,55,0.05)]">
+<form class="space-y-6">
+<!-- Email Field -->
+<div class="space-y-2">
+<label class="block text-on-surface-variant text-sm font-medium tracking-tight" for="email">Email Address</label>
+<div class="relative ghost-border rounded">
+<input class="w-full bg-surface-container-highest border-none rounded px-4 py-3.5 text-on-surface placeholder:text-outline/50 focus:bg-surface-container-lowest focus:ring-0 transition-colors" id="email" placeholder="name@neighborhood.com" type="email"/>
+</div>
+</div>
+<!-- Password Field -->
+<div class="space-y-2">
+<div class="flex justify-between items-center">
+<label class="block text-on-surface-variant text-sm font-medium tracking-tight" for="password">Password</label>
+<a class="text-primary text-xs font-semibold hover:opacity-80 transition-opacity" href="#">Forgot Password?</a>
+</div>
+<div class="relative ghost-border rounded">
+<input class="w-full bg-surface-container-highest border-none rounded px-4 py-3.5 text-on-surface placeholder:text-outline/50 focus:bg-surface-container-lowest focus:ring-0 transition-colors" id="password" placeholder="••••••••" type="password"/>
+</div>
+</div>
+<!-- Login CTA -->
+<button class="w-full luxury-gradient text-on-primary py-4 rounded-lg font-bold tracking-tight shadow-md hover:shadow-lg active:scale-[0.98] transition-all" type="submit">
+                        Sign In to Portfolio
+                    </button>
+<!-- Divider -->
+<div class="flex items-center gap-4 text-outline/30 py-2">
+<div class="h-px flex-grow bg-surface-container-high"></div>
+<span class="text-[10px] uppercase font-bold tracking-widest text-outline">or</span>
+<div class="h-px flex-grow bg-surface-container-high"></div>
+</div>
+<!-- Social Logins -->
+<div class="grid grid-cols-1 gap-3">
+<button class="w-full flex items-center justify-center gap-3 bg-surface-container-lowest border border-outline-variant text-on-surface-variant py-3 rounded-lg text-sm font-semibold hover:bg-surface-container-low transition-colors" type="button">
+<svg class="w-5 h-5" viewbox="0 0 24 24">
+<path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="currentColor"></path>
+<path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="currentColor"></path>
+<path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="currentColor"></path>
+<path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="currentColor"></path>
+</svg>
+                            Sign in with Google
+                        </button>
+<button class="w-full flex items-center justify-center gap-3 bg-inverse-surface text-inverse-on-surface py-3 rounded-lg text-sm font-semibold hover:opacity-90 transition-opacity" type="button">
+<svg class="w-5 h-5" viewbox="0 0 24 24">
+<path d="M17.05 20.28c-.96 0-2.04-.6-3.23-.6s-2.27.6-3.23.6c-2.09 0-4.44-1.28-5.51-3.14-2.13-3.72-.54-9.25 1.52-12.23 1.03-1.48 2.61-2.42 4.15-2.42 1.18 0 2.29.41 3.23.41.94 0 2.05-.41 3.23-.41 1.45 0 3.03.94 4.06 2.42-3.27 1.91-2.73 6.46.26 7.68-.69 1.63-1.61 3.25-2.84 4.67-1.12 1.28-2.23 2.62-3.64 2.62zm-3.23-17.66c0-1.23.41-2.42 1.23-3.23.82-.82 2.01-1.23 3.23-1.23.11 1.23-.3 2.42-1.12 3.23-.82.82-2.12 1.23-3.34 1.23z" fill="currentColor"></path>
+</svg>
+                            Sign in with Apple
+                        </button>
+</div>
+</form>
+<div class="mt-10 pt-8 border-t border-surface-container-high text-center">
+<p class="text-on-surface-variant text-sm mb-4">New to Neighborhood?</p>
+<button class="w-full bg-surface-container-high text-on-surface py-3 rounded font-semibold text-sm hover:bg-surface-dim transition-colors">
+                        Create an Account
+                    </button>
+</div>
+</div>
+<!-- Soft Decorative Element (Asymmetric) -->
+<div class="mt-12 flex justify-center items-center gap-8 opacity-40">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-sm" data-icon="verified_user">verified_user</span>
+<span class="text-[10px] uppercase tracking-[0.2em] font-bold">Secure Access</span>
+</div>
+<div class="w-1 h-1 bg-outline rounded-full"></div>
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-sm" data-icon="lock">lock</span>
+<span class="text-[10px] uppercase tracking-[0.2em] font-bold">Encrypted Ledger</span>
+</div>
+</div>
+</div>
+</main>
+<!-- Background Decoration -->
+<div class="fixed top-0 right-0 -z-10 w-1/2 h-screen overflow-hidden pointer-events-none opacity-20">
+<div class="absolute -top-24 -right-24 w-[600px] h-[600px] rounded-full bg-primary-container blur-3xl"></div>
+</div>
+<div class="fixed bottom-0 left-0 -z-10 w-1/3 h-1/2 overflow-hidden pointer-events-none opacity-10">
+<div class="absolute -bottom-24 -left-24 w-[400px] h-[400px] rounded-full bg-secondary-container blur-3xl"></div>
+</div>
+<!-- Footer Meta -->
+<footer class="p-8 text-center">
+<p class="text-[10px] text-outline uppercase tracking-widest font-medium">© 2024 Neighborhood · Private Tier Access Only</p>
+</footer>
+</body></html>

@@ -1,0 +1,346 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Neighborhood Management | Neighborhood</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@200;300;400;500;600;700;800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            colors: {
+              "on-tertiary-fixed-variant": "#6d6559",
+              "surface": "#f8f9fa",
+              "error-dim": "#4e0309",
+              "primary-fixed-dim": "#bfd5ff",
+              "on-secondary-fixed-variant": "#4d5d73",
+              "tertiary-container": "#fdf2e2",
+              "inverse-primary": "#b3cdfd",
+              "error-container": "#fe8983",
+              "on-tertiary-container": "#625b4f",
+              "secondary": "#506076",
+              "primary-dim": "#39537c",
+              "tertiary": "#655e52",
+              "on-primary-fixed-variant": "#425c85",
+              "on-primary": "#f6f7ff",
+              "surface-dim": "#d1dce0",
+              "tertiary-fixed-dim": "#efe4d4",
+              "on-surface-variant": "#586064",
+              "surface-variant": "#dbe4e7",
+              "on-secondary-fixed": "#314055",
+              "secondary-dim": "#44546a",
+              "on-background": "#2b3437",
+              "tertiary-fixed": "#fdf2e2",
+              "primary": "#455f88",
+              "on-secondary-container": "#435368",
+              "secondary-fixed": "#d3e4fe",
+              "primary-container": "#d6e3ff",
+              "surface-tint": "#455f88",
+              "on-tertiary-fixed": "#4f493d",
+              "surface-container-low": "#f1f4f6",
+              "on-error-container": "#752121",
+              "primary-fixed": "#d6e3ff",
+              "inverse-surface": "#0c0f10",
+              "secondary-container": "#d3e4fe",
+              "on-secondary": "#f7f9ff",
+              "outline": "#737c7f",
+              "on-tertiary": "#fff8f0",
+              "surface-container-highest": "#dbe4e7",
+              "background": "#f8f9fa",
+              "secondary-fixed-dim": "#c5d6f0",
+              "on-primary-container": "#38527b",
+              "inverse-on-surface": "#9b9d9e",
+              "on-primary-fixed": "#254067",
+              "surface-container-high": "#e3e9ec",
+              "surface-bright": "#f8f9fa",
+              "tertiary-dim": "#595246",
+              "outline-variant": "#abb3b7",
+              "on-surface": "#2b3437",
+              "on-error": "#fff7f6",
+              "error": "#9f403d",
+              "surface-container-lowest": "#ffffff",
+              "surface-container": "#eaeff1"
+            },
+            fontFamily: {
+              "headline": ["Manrope"],
+              "body": ["Manrope"],
+              "label": ["Manrope"]
+            },
+            borderRadius: {"DEFAULT": "0.125rem", "lg": "0.25rem", "xl": "0.5rem", "full": "0.75rem"},
+          },
+        },
+      }
+    </script>
+<style>
+        body { font-family: 'Manrope', sans-serif; }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .glass-panel {
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+        }
+        .premium-gradient {
+            background: linear-gradient(145deg, #455f88 0%, #39537c 100%);
+        }
+    </style>
+</head>
+<body class="bg-surface text-on-surface selection:bg-primary-container selection:text-on-primary-container">
+<!-- TopAppBar -->
+<nav class="fixed top-0 w-full z-50 bg-white/80 dark:bg-slate-900/80 backdrop-blur-md shadow-sm dark:shadow-none flex justify-between items-center px-8 h-16 w-full">
+<div class="flex items-center gap-8">
+<span class="text-xl font-bold tracking-tighter text-blue-900 dark:text-blue-50">Neighborhood</span>
+<div class="hidden md:flex items-center gap-6 font-manrope tracking-tight font-medium">
+<a class="text-slate-500 dark:text-slate-400 font-medium hover:text-blue-700 dark:hover:text-blue-200 transition-colors" href="#">Dashboard</a>
+<a class="text-slate-500 dark:text-slate-400 font-medium hover:text-blue-700 dark:hover:text-blue-200 transition-colors" href="#">Properties</a>
+<a class="text-blue-800 dark:text-blue-300 font-bold border-b-2 border-blue-800 hover:text-blue-700 dark:hover:text-blue-200 transition-colors" href="#">Neighborhoods</a>
+<a class="text-slate-500 dark:text-slate-400 font-medium hover:text-blue-700 dark:hover:text-blue-200 transition-colors" href="#">Team</a>
+<a class="text-slate-500 dark:text-slate-400 font-medium hover:text-blue-700 dark:hover:text-blue-200 transition-colors" href="#">Settings</a>
+</div>
+</div>
+<div class="flex items-center gap-4">
+<button class="material-symbols-outlined text-on-surface-variant scale-95 active:opacity-80 transition-all" data-icon="notifications">notifications</button>
+<button class="material-symbols-outlined text-on-surface-variant scale-95 active:opacity-80 transition-all" data-icon="account_circle">account_circle</button>
+</div>
+</nav>
+<!-- Sidebar (Hidden on Mobile) -->
+<aside class="hidden lg:flex flex-col h-screen w-64 fixed left-0 top-0 z-40 bg-slate-50 dark:bg-slate-950 p-4 space-y-2 font-manrope text-sm pt-20">
+<div class="mb-6 px-4">
+<div class="text-lg font-bold text-blue-950 dark:text-white">The Ledger</div>
+<div class="text-xs text-on-surface-variant opacity-70">Premium Tier</div>
+</div>
+<nav class="flex-1 space-y-1">
+<a class="flex items-center gap-3 px-4 py-3 text-slate-600 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-slate-800 transition-all translate-x-1 transition-transform" href="#">
+<span class="material-symbols-outlined" data-icon="dashboard">dashboard</span>
+                Dashboard
+            </a>
+<a class="flex items-center gap-3 px-4 py-3 text-slate-600 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-slate-800 transition-all translate-x-1 transition-transform" href="#">
+<span class="material-symbols-outlined" data-icon="domain">domain</span>
+                Properties
+            </a>
+<a class="flex items-center gap-3 px-4 py-3 bg-blue-100/50 dark:bg-blue-900/30 text-blue-900 dark:text-blue-100 rounded-lg translate-x-1 transition-transform" href="#">
+<span class="material-symbols-outlined" data-icon="map">map</span>
+                Neighborhoods
+            </a>
+<a class="flex items-center gap-3 px-4 py-3 text-slate-600 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-slate-800 transition-all translate-x-1 transition-transform" href="#">
+<span class="material-symbols-outlined" data-icon="group">group</span>
+                Team
+            </a>
+<a class="flex items-center gap-3 px-4 py-3 text-slate-600 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-slate-800 transition-all translate-x-1 transition-transform" href="#">
+<span class="material-symbols-outlined" data-icon="settings">settings</span>
+                Settings
+            </a>
+</nav>
+<div class="pt-4 mt-auto border-t border-slate-200 dark:border-slate-800 space-y-1">
+<a class="flex items-center gap-3 px-4 py-3 text-slate-600 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-slate-800 transition-all" href="#">
+<span class="material-symbols-outlined" data-icon="help">help</span>
+                Support
+            </a>
+<a class="flex items-center gap-3 px-4 py-3 text-slate-600 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-slate-800 transition-all" href="#">
+<span class="material-symbols-outlined" data-icon="logout">logout</span>
+                Logout
+            </a>
+</div>
+</aside>
+<!-- Main Content Canvas -->
+<main class="lg:ml-64 pt-24 px-6 md:px-12 pb-12">
+<!-- Header Section -->
+<header class="flex flex-col md:flex-row md:items-end justify-between mb-12 gap-6">
+<div>
+<h1 class="text-4xl md:text-5xl font-headline font-extrabold tracking-tight text-on-surface mb-2">Tracked Neighborhoods</h1>
+<p class="text-on-surface-variant font-medium">Monitoring high-yield residential corridors and emerging markets.</p>
+</div>
+<button class="premium-gradient text-on-primary px-6 py-3 rounded shadow-lg hover:opacity-90 transition-all flex items-center gap-2 font-semibold">
+<span class="material-symbols-outlined" data-icon="add">add</span>
+                Create Neighborhood
+            </button>
+</header>
+<!-- Neighborhood List -->
+<div class="space-y-8">
+<h2 class="text-xs font-bold text-on-surface-variant tracking-[0.2em] uppercase">Detailed Portfolio View</h2>
+<!-- List Item 1 -->
+<div class="group bg-surface-container-lowest p-6 rounded-lg transition-all hover:bg-white border-l-4 border-primary">
+<div class="grid grid-cols-1 md:grid-cols-12 items-center gap-6">
+<div class="md:col-span-1">
+<div class="w-12 h-12 rounded bg-surface-container-high flex items-center justify-center overflow-hidden">
+<img alt="" class="w-full h-full object-cover" data-alt="Aerial view of a clean modern residential neighborhood" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBcepuha7DhSCgbFSp4aOSPJ634gzaRxHPoOA3eNy7eR7vmporW8pPh5fLqAJ71sneF_nbOhJe1f4b_Y0oI_72J5QHHfTmbyFgYBi-Pt18Q0dNpF6xP76WLIgTzA9JN3AwC2xxfp9_IP-e5H0PC964P6xBWk1n9kzO_RPOlxJZcSFm5F_jT2Gh5oL_SA5Gai3oTBdXrpkhmC4IF5On-_r5ZsZ7XnE5vaieOoEL5MUNXVwwYf1HcXQjXRM9Ays9DTDaPpC-l9dxhvkY"/>
+</div>
+</div>
+<div class="md:col-span-3">
+<h3 class="text-xl font-headline font-bold text-on-surface">Pacific Palisades</h3>
+<p class="text-sm text-on-surface-variant">Coastal Residential Zone 4</p>
+</div>
+<div class="md:col-span-2">
+<div class="text-xs text-on-surface-variant uppercase tracking-wider font-bold mb-1">Properties</div>
+<div class="text-lg font-semibold text-primary">24 Units</div>
+</div>
+<div class="md:col-span-2">
+<div class="text-xs text-on-surface-variant uppercase tracking-wider font-bold mb-1">Avg. Price</div>
+<div class="text-lg font-semibold text-on-surface">$3,250,000</div>
+</div>
+<div class="md:col-span-2">
+<div class="text-xs text-on-surface-variant uppercase tracking-wider font-bold mb-1">Growth</div>
+<div class="flex items-center gap-1 text-primary font-bold">
+<span class="material-symbols-outlined text-sm" data-icon="north_east">north_east</span>
+                            12.4%
+                        </div>
+</div>
+<div class="md:col-span-2 flex justify-end gap-2">
+<button class="p-2 hover:bg-surface-container-high rounded transition-colors text-on-surface-variant">
+<span class="material-symbols-outlined" data-icon="edit">edit</span>
+</button>
+<button class="p-2 hover:bg-surface-container-high rounded transition-colors text-on-surface-variant">
+<span class="material-symbols-outlined" data-icon="visibility">visibility</span>
+</button>
+<button class="p-2 hover:bg-error/10 hover:text-error rounded transition-colors text-on-surface-variant">
+<span class="material-symbols-outlined" data-icon="delete">delete</span>
+</button>
+</div>
+</div>
+</div>
+<!-- List Item 2 -->
+<div class="group bg-surface-container-lowest p-6 rounded-lg transition-all hover:bg-white border-l-4 border-secondary">
+<div class="grid grid-cols-1 md:grid-cols-12 items-center gap-6">
+<div class="md:col-span-1">
+<div class="w-12 h-12 rounded bg-surface-container-high flex items-center justify-center overflow-hidden">
+<img alt="" class="w-full h-full object-cover" data-alt="Luxury suburban housing estate development view" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCB9Dmkmg4iE5-rMWYeZ33lmDLAGPF9_ARVVGqLJTmNR5Nmj9la0OU0dSs36G5Utj43C_B-RUOlgPWh7peg7pll2gB7ZVn6WXfwaoG4jFf_lR9Z76CjJctVyx6PvLEP2oVkPLMmi6Z9kFi-EF94RrhrEWRBixTC0nGTlT1O1uJiyDscAfCtqKvMdHSfN808TpZXt8pjj7rz5Ng_Gsre6SyzPLvF4vEYIbMgYMhsr5pi4y_YafOgEIrRWQjIZin4RipT_pVzHpa_6X8"/>
+</div>
+</div>
+<div class="md:col-span-3">
+<h3 class="text-xl font-headline font-bold text-on-surface">Silver Lake Central</h3>
+<p class="text-sm text-on-surface-variant">Mid-City Infill Sector</p>
+</div>
+<div class="md:col-span-2">
+<div class="text-xs text-on-surface-variant uppercase tracking-wider font-bold mb-1">Properties</div>
+<div class="text-lg font-semibold text-primary">18 Units</div>
+</div>
+<div class="md:col-span-2">
+<div class="text-xs text-on-surface-variant uppercase tracking-wider font-bold mb-1">Avg. Price</div>
+<div class="text-lg font-semibold text-on-surface">$1,180,000</div>
+</div>
+<div class="md:col-span-2">
+<div class="text-xs text-on-surface-variant uppercase tracking-wider font-bold mb-1">Growth</div>
+<div class="flex items-center gap-1 text-primary font-bold">
+<span class="material-symbols-outlined text-sm" data-icon="north_east">north_east</span>
+                            8.2%
+                        </div>
+</div>
+<div class="md:col-span-2 flex justify-end gap-2">
+<button class="p-2 hover:bg-surface-container-high rounded transition-colors text-on-surface-variant">
+<span class="material-symbols-outlined" data-icon="edit">edit</span>
+</button>
+<button class="p-2 hover:bg-surface-container-high rounded transition-colors text-on-surface-variant">
+<span class="material-symbols-outlined" data-icon="visibility">visibility</span>
+</button>
+<button class="p-2 hover:bg-error/10 hover:text-error rounded transition-colors text-on-surface-variant">
+<span class="material-symbols-outlined" data-icon="delete">delete</span>
+</button>
+</div>
+</div>
+</div>
+<!-- List Item 3 -->
+<div class="group bg-surface-container-lowest p-6 rounded-lg transition-all hover:bg-white border-l-4 border-error/50">
+<div class="grid grid-cols-1 md:grid-cols-12 items-center gap-6">
+<div class="md:col-span-1">
+<div class="w-12 h-12 rounded bg-surface-container-high flex items-center justify-center overflow-hidden">
+<img alt="" class="w-full h-full object-cover" data-alt="Dense urban city skyline with brick buildings" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAIjR718kH0E6rvbr21nXrDR-hLCiSUKFZ8nQvpXVe13x260fQ8JMBB0XsTeAHv_D0CzuyM978Xtsr88YKVfbU_xC_pNbWJ26LNKYLhy4iIa8mz2-0Zcw-a-wR_aU7RM8jzK6deKMBVFOjfy4l9dNiA6Lmc0yYiHe5K0DBnkZstVn1PsD8HCPkaNcGd60U0_aloPL-AZXf35_b8yuf0wMWYU-cP2ZMNrc01mLwNUSjxi8eqjmLtw_HToM_H21276RVF2phSvtk8s1g"/>
+</div>
+</div>
+<div class="md:col-span-3">
+<h3 class="text-xl font-headline font-bold text-on-surface">Arts District North</h3>
+<p class="text-sm text-on-surface-variant">Commercial/Residential Hybrid</p>
+</div>
+<div class="md:col-span-2">
+<div class="text-xs text-on-surface-variant uppercase tracking-wider font-bold mb-1">Properties</div>
+<div class="text-lg font-semibold text-primary">6 Units</div>
+</div>
+<div class="md:col-span-2">
+<div class="text-xs text-on-surface-variant uppercase tracking-wider font-bold mb-1">Avg. Price</div>
+<div class="text-lg font-semibold text-on-surface">$2,400,000</div>
+</div>
+<div class="md:col-span-2">
+<div class="text-xs text-on-surface-variant uppercase tracking-wider font-bold mb-1">Growth</div>
+<div class="flex items-center gap-1 text-error font-bold">
+<span class="material-symbols-outlined text-sm" data-icon="south_east">south_east</span>
+                            -1.5%
+                        </div>
+</div>
+<div class="md:col-span-2 flex justify-end gap-2">
+<button class="p-2 hover:bg-surface-container-high rounded transition-colors text-on-surface-variant">
+<span class="material-symbols-outlined" data-icon="edit">edit</span>
+</button>
+<button class="p-2 hover:bg-surface-container-high rounded transition-colors text-on-surface-variant">
+<span class="material-symbols-outlined" data-icon="visibility">visibility</span>
+</button>
+<button class="p-2 hover:bg-error/10 hover:text-error rounded transition-colors text-on-surface-variant">
+<span class="material-symbols-outlined" data-icon="delete">delete</span>
+</button>
+</div>
+</div>
+</div>
+<!-- List Item 4 -->
+<div class="group bg-surface-container-lowest p-6 rounded-lg transition-all hover:bg-white border-l-4 border-primary/40">
+<div class="grid grid-cols-1 md:grid-cols-12 items-center gap-6">
+<div class="md:col-span-1">
+<div class="w-12 h-12 rounded bg-surface-container-high flex items-center justify-center overflow-hidden">
+<img alt="" class="w-full h-full object-cover" data-alt="Modern geometric apartment complex facade" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCjNL3ZsOXmuvaKTWatdu37ja1exsaoloTitAiFGfVrQ7JXNMvQ1H4_iL4pbwh7n48uXxK-ntO_F9S-MGnhe-m3bwS942Pado5lOA5OuU5rF6wLSRgfdLA4yKzJ_S24ZzfRSRs2B6Oh7tBnvKGu1JxDPLbFqV_o-T5L-ycLpVJG5qlGi-K1k-idkPzh9LXArz8OF465XfXVRsWgW8nQcZDJMycnODPUrJ1qFsfhZsPn7WHRSIPKmHySfvj0akwQYhf07O3qBcY2RBU"/>
+</div>
+</div>
+<div class="md:col-span-3">
+<h3 class="text-xl font-headline font-bold text-on-surface">Beverly Crest</h3>
+<p class="text-sm text-on-surface-variant">High-Elevation Estate Segment</p>
+</div>
+<div class="md:col-span-2">
+<div class="text-xs text-on-surface-variant uppercase tracking-wider font-bold mb-1">Properties</div>
+<div class="text-lg font-semibold text-primary">36 Units</div>
+</div>
+<div class="md:col-span-2">
+<div class="text-xs text-on-surface-variant uppercase tracking-wider font-bold mb-1">Avg. Price</div>
+<div class="text-lg font-semibold text-on-surface">$5,450,000</div>
+</div>
+<div class="md:col-span-2">
+<div class="text-xs text-on-surface-variant uppercase tracking-wider font-bold mb-1">Growth</div>
+<div class="flex items-center gap-1 text-primary font-bold">
+<span class="material-symbols-outlined text-sm" data-icon="north_east">north_east</span>
+                            4.7%
+                        </div>
+</div>
+<div class="md:col-span-2 flex justify-end gap-2">
+<button class="p-2 hover:bg-surface-container-high rounded transition-colors text-on-surface-variant">
+<span class="material-symbols-outlined" data-icon="edit">edit</span>
+</button>
+<button class="p-2 hover:bg-surface-container-high rounded transition-colors text-on-surface-variant">
+<span class="material-symbols-outlined" data-icon="visibility">visibility</span>
+</button>
+<button class="p-2 hover:bg-error/10 hover:text-error rounded transition-colors text-on-surface-variant">
+<span class="material-symbols-outlined" data-icon="delete">delete</span>
+</button>
+</div>
+</div>
+</div>
+</div>
+</main>
+<!-- BottomNavBar (Mobile Only) -->
+<nav class="md:hidden fixed bottom-0 left-0 right-0 h-16 bg-white/90 backdrop-blur-lg flex justify-around items-center z-50 border-t border-slate-100">
+<button class="flex flex-col items-center gap-1 text-slate-400">
+<span class="material-symbols-outlined" data-icon="dashboard">dashboard</span>
+<span class="text-[10px] font-bold">DASHBOARD</span>
+</button>
+<button class="flex flex-col items-center gap-1 text-slate-400">
+<span class="material-symbols-outlined" data-icon="domain">domain</span>
+<span class="text-[10px] font-bold">PROPERTIES</span>
+</button>
+<button class="flex flex-col items-center gap-1 text-blue-900">
+<span class="material-symbols-outlined" data-icon="map" data-weight="fill" style="font-variation-settings: 'FILL' 1;">map</span>
+<span class="text-[10px] font-bold">NEIGHBORHOODS</span>
+</button>
+<button class="flex flex-col items-center gap-1 text-slate-400">
+<span class="material-symbols-outlined" data-icon="account_circle">account_circle</span>
+<span class="text-[10px] font-bold">PROFILE</span>
+</button>
+</nav>
+</body></html>

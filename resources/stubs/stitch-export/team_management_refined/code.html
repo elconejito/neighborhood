@@ -1,0 +1,323 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Team Management - Neighborhood</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@200;300;400;500;600;700;800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            colors: {
+              "on-tertiary-fixed-variant": "#6d6559",
+              "surface": "#f8f9fa",
+              "error-dim": "#4e0309",
+              "primary-fixed-dim": "#bfd5ff",
+              "on-secondary-fixed-variant": "#4d5d73",
+              "tertiary-container": "#fdf2e2",
+              "inverse-primary": "#b3cdfd",
+              "error-container": "#fe8983",
+              "on-tertiary-container": "#625b4f",
+              "secondary": "#506076",
+              "primary-dim": "#39537c",
+              "tertiary": "#655e52",
+              "on-primary-fixed-variant": "#425c85",
+              "on-primary": "#f6f7ff",
+              "surface-dim": "#d1dce0",
+              "tertiary-fixed-dim": "#efe4d4",
+              "on-surface-variant": "#586064",
+              "surface-variant": "#dbe4e7",
+              "on-secondary-fixed": "#314055",
+              "secondary-dim": "#44546a",
+              "on-background": "#2b3437",
+              "tertiary-fixed": "#fdf2e2",
+              "primary": "#455f88",
+              "on-secondary-container": "#435368",
+              "secondary-fixed": "#d3e4fe",
+              "primary-container": "#d6e3ff",
+              "surface-tint": "#455f88",
+              "on-tertiary-fixed": "#4f493d",
+              "surface-container-low": "#f1f4f6",
+              "on-error-container": "#752121",
+              "primary-fixed": "#d6e3ff",
+              "inverse-surface": "#0c0f10",
+              "secondary-container": "#d3e4fe",
+              "on-secondary": "#f7f9ff",
+              "outline": "#737c7f",
+              "on-tertiary": "#fff8f0",
+              "surface-container-highest": "#dbe4e7",
+              "background": "#f8f9fa",
+              "secondary-fixed-dim": "#c5d6f0",
+              "on-primary-container": "#38527b",
+              "inverse-on-surface": "#9b9d9e",
+              "on-primary-fixed": "#254067",
+              "surface-container-high": "#e3e9ec",
+              "surface-bright": "#f8f9fa",
+              "tertiary-dim": "#595246",
+              "outline-variant": "#abb3b7",
+              "on-surface": "#2b3437",
+              "on-error": "#fff7f6",
+              "error": "#9f403d",
+              "surface-container-lowest": "#ffffff",
+              "surface-container": "#eaeff1"
+            },
+            fontFamily: {
+              "headline": ["Manrope"],
+              "body": ["Manrope"],
+              "label": ["Manrope"]
+            },
+            borderRadius: {"DEFAULT": "0.125rem", "lg": "0.25rem", "xl": "0.5rem", "full": "0.75rem"},
+          },
+        },
+      }
+    </script>
+<style>
+        body { font-family: 'Manrope', sans-serif; }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+    </style>
+</head>
+<body class="bg-surface text-on-surface selection:bg-primary-container">
+<!-- Top Navigation Shell -->
+<header class="fixed top-0 w-full z-50 bg-white/80 backdrop-blur-md shadow-sm flex justify-between items-center px-8 h-16 w-full">
+<div class="flex items-center gap-2">
+<span class="text-xl font-bold tracking-tighter text-blue-900">Neighborhood</span>
+</div>
+<nav class="hidden md:flex items-center gap-8 font-manrope tracking-tight font-medium">
+<a class="text-slate-500 hover:text-blue-700 transition-colors" href="#">Dashboard</a>
+<a class="text-slate-500 hover:text-blue-700 transition-colors" href="#">Properties</a>
+<a class="text-slate-500 hover:text-blue-700 transition-colors" href="#">Neighborhoods</a>
+<a class="text-blue-800 font-bold border-b-2 border-blue-800" href="#">Team</a>
+<a class="text-slate-500 hover:text-blue-700 transition-colors" href="#">Settings</a>
+</nav>
+<div class="flex items-center gap-4">
+<button class="material-symbols-outlined text-slate-600 scale-95 active:opacity-80 transition-all" data-icon="notifications">notifications</button>
+<button class="material-symbols-outlined text-slate-600 scale-95 active:opacity-80 transition-all" data-icon="account_circle">account_circle</button>
+</div>
+</header>
+<!-- Sidebar Navigation -->
+<aside class="h-screen w-64 fixed left-0 top-0 z-40 bg-slate-50 hidden lg:flex flex-col h-full p-4 space-y-2 pt-20">
+<div class="px-4 py-6 mb-4">
+<h2 class="font-bold text-lg text-blue-950">The Ledger</h2>
+<p class="text-xs text-on-surface-variant font-manrope">Premium Tier</p>
+</div>
+<nav class="space-y-1">
+<a class="flex items-center gap-3 px-4 py-3 text-slate-600 hover:bg-slate-200 transition-all" href="#">
+<span class="material-symbols-outlined text-blue-800" data-icon="dashboard">dashboard</span>
+<span class="font-manrope text-sm">Dashboard</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-slate-600 hover:bg-slate-200 transition-all" href="#">
+<span class="material-symbols-outlined text-blue-800" data-icon="domain">domain</span>
+<span class="font-manrope text-sm">Properties</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-slate-600 hover:bg-slate-200 transition-all" href="#">
+<span class="material-symbols-outlined text-blue-800" data-icon="map">map</span>
+<span class="font-manrope text-sm">Neighborhoods</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 bg-blue-100/50 text-blue-900 rounded-lg translate-x-1 transition-transform" href="#">
+<span class="material-symbols-outlined text-blue-800" data-icon="group" style="font-variation-settings: 'FILL' 1;">group</span>
+<span class="font-manrope text-sm font-semibold">Team</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-slate-600 hover:bg-slate-200 transition-all" href="#">
+<span class="material-symbols-outlined text-blue-800" data-icon="settings">settings</span>
+<span class="font-manrope text-sm">Settings</span>
+</a>
+</nav>
+<div class="mt-auto border-t border-slate-100 pt-4 space-y-1">
+<a class="flex items-center gap-3 px-4 py-3 text-slate-600 hover:bg-slate-200 transition-all" href="#">
+<span class="material-symbols-outlined text-blue-800" data-icon="help">help</span>
+<span class="font-manrope text-sm">Support</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-slate-600 hover:bg-slate-200 transition-all" href="#">
+<span class="material-symbols-outlined text-blue-800" data-icon="logout">logout</span>
+<span class="font-manrope text-sm">Logout</span>
+</a>
+</div>
+</aside>
+<!-- Main Canvas -->
+<main class="lg:ml-64 pt-24 pb-12 px-8 min-h-screen">
+<div class="max-w-6xl mx-auto space-y-10">
+<!-- Combined Invite and Permissions Section -->
+<section class="grid grid-cols-1 lg:grid-cols-5 gap-8">
+<div class="lg:col-span-3 space-y-8">
+<div class="bg-surface-container-low p-8 rounded-xl h-full flex flex-col justify-center">
+<h3 class="text-2xl font-bold tracking-tighter text-on-surface mb-6">Invite Member</h3>
+<div class="space-y-6">
+<div class="w-full">
+<label class="block text-xs font-bold text-on-surface-variant uppercase tracking-widest mb-3">Professional Email Address</label>
+<input class="w-full bg-surface-container-highest border-none focus:ring-1 focus:ring-primary rounded-lg h-12 px-4 text-on-surface placeholder:text-outline-variant transition-all" placeholder="e.g. manager@neighborhood.com" type="email"/>
+</div>
+<div class="w-full">
+<label class="block text-xs font-bold text-on-surface-variant uppercase tracking-widest mb-3">Initial Access Role</label>
+<select class="w-full bg-surface-container-highest border-none focus:ring-1 focus:ring-primary rounded-lg h-12 px-4 text-on-surface appearance-none transition-all cursor-pointer">
+<option>Property Manager</option>
+<option>Financial Analyst</option>
+<option>Guest Viewer</option>
+</select>
+</div>
+<button class="w-full h-12 bg-primary text-white font-bold text-sm rounded-lg hover:bg-primary-dim transition-all shadow-md">
+                Send Invite
+            </button>
+</div>
+</div>
+</div>
+<div class="lg:col-span-2 bg-surface-container-lowest p-8 rounded-xl shadow-sm space-y-6 border border-primary/5">
+<h4 class="font-bold text-on-surface uppercase text-xs tracking-[0.2em]">Permissions Matrix</h4>
+<div class="space-y-4">
+<div class="flex items-center gap-4 p-4 hover:bg-surface transition-colors rounded-lg group">
+<div class="w-10 h-10 rounded-lg bg-primary/5 flex items-center justify-center group-hover:bg-primary transition-colors">
+<span class="material-symbols-outlined text-primary group-hover:text-on-primary" data-icon="visibility">visibility</span>
+</div>
+<div class="flex-1">
+<p class="text-sm font-bold">View Valuations</p>
+<p class="text-xs text-on-surface-variant">Ability to see total portfolio value and equity splits.</p>
+</div>
+</div>
+<div class="flex items-center gap-4 p-4 hover:bg-surface transition-colors rounded-lg group">
+<div class="w-10 h-10 rounded-lg bg-primary/5 flex items-center justify-center group-hover:bg-primary transition-colors">
+<span class="material-symbols-outlined text-primary group-hover:text-on-primary" data-icon="edit_note">edit_note</span>
+</div>
+<div class="flex-1">
+<p class="text-sm font-bold">Manage Properties</p>
+<p class="text-xs text-on-surface-variant">Create, delete or update property listings and details.</p>
+</div>
+</div>
+<div class="flex items-center gap-4 p-4 hover:bg-surface transition-colors rounded-lg group">
+<div class="w-10 h-10 rounded-lg bg-primary/5 flex items-center justify-center group-hover:bg-primary transition-colors">
+<span class="material-symbols-outlined text-primary group-hover:text-on-primary" data-icon="share">share</span>
+</div>
+<div class="flex-1">
+<p class="text-sm font-bold">Invite Others</p>
+<p class="text-xs text-on-surface-variant">Grant access to new team members for your estate.</p>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- Team Directory -->
+<section class="space-y-6">
+<div class="flex justify-between items-center border-b border-surface-container-high pb-4">
+<h3 class="text-xl font-bold tracking-tight text-on-surface">Active Members (8)</h3>
+<div class="flex gap-4">
+<div class="relative">
+<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-outline-variant text-lg" data-icon="search">search</span>
+<input class="bg-surface-container-low border-none rounded-full h-10 pl-10 pr-4 text-sm focus:ring-1 focus:ring-primary w-64 transition-all" placeholder="Search team..." type="text"/>
+</div>
+</div>
+</div>
+<div class="grid grid-cols-1 gap-5">
+<!-- Member Card 1 -->
+<div class="bg-surface-container-lowest p-6 rounded-xl shadow-sm flex flex-wrap items-center justify-between gap-6 hover:shadow-md transition-shadow">
+<div class="flex items-center gap-4">
+<div class="w-12 h-12 rounded-full overflow-hidden bg-secondary-container flex items-center justify-center">
+<img alt="Team Member Avatar" class="w-full h-full object-cover" data-alt="Portrait of a male real estate professional" src="https://lh3.googleusercontent.com/aida-public/AB6AXuASK0XLkYsyKF5AlitkSpLfE367GyJyWPQLMe7Ikp8zfyg951fy3EEIKi46Rz6e82aHMXpDAsrCxOwSQzIgRfOPoG7JQVFx9Z6OwrKGclNQbQhq4NbIS3_1lgieldxIoz8TbjRgWLzBsikLhVNjRi8omp8BaoZC-MCnEt1knZbb71chZhDNBtfbtS5TQqsLgv9IlWd3PUG_TzM6FGdzZMqF4Hu2dpOZaMNHMYABpuG6iztPST9Qj3xucWwQ-wmpfX0oiy4kUBWm0Gg"/>
+</div>
+<div>
+<h4 class="font-bold text-on-surface">Julian Vance</h4>
+<p class="text-xs text-on-surface-variant">julian.v@neighborhood.com</p>
+</div>
+</div>
+<div class="flex flex-wrap gap-8 items-center">
+<div class="text-center md:text-left">
+<span class="block text-[10px] font-bold text-outline-variant uppercase tracking-widest mb-1">Role</span>
+<span class="text-sm font-semibold px-3 py-1 bg-primary/10 text-primary rounded-full">Portfolio Lead</span>
+</div>
+<div class="text-center md:text-left">
+<span class="block text-[10px] font-bold text-outline-variant uppercase tracking-widest mb-1">Access</span>
+<span class="text-sm font-medium text-on-surface">6 Neighborhoods</span>
+</div>
+<div class="text-center md:text-left">
+<span class="block text-[10px] font-bold text-outline-variant uppercase tracking-widest mb-1">Last Active</span>
+<span class="text-sm text-on-surface-variant italic">24m ago</span>
+</div>
+</div>
+<div class="flex items-center gap-2">
+<button class="p-2 hover:bg-surface-container text-on-surface-variant rounded transition-colors"><span class="material-symbols-outlined" data-icon="edit">edit</span></button>
+<button class="p-2 hover:bg-error-container/20 text-error rounded transition-colors"><span class="material-symbols-outlined" data-icon="delete_outline">delete_outline</span></button>
+</div>
+</div>
+<!-- Member Card 2 -->
+<div class="bg-surface-container-lowest p-6 rounded-xl shadow-sm flex flex-wrap items-center justify-between gap-6 hover:shadow-md transition-shadow">
+<div class="flex items-center gap-4">
+<div class="w-12 h-12 rounded-full overflow-hidden bg-tertiary-container flex items-center justify-center">
+<img alt="Team Member Avatar" class="w-full h-full object-cover" data-alt="Professional woman portrait for business profile" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDDiSq1Pe1no3be3Whh1BocSpgWSa28vsF1CxZr92fCrKtoONnA7VnLnJlhMh-4fbBwAazwnQ9pU62p43oHY3ptirBTcCYQWUl8UmVeFAKAPwa6vGNNPUUJkZk6xNgTnT-d9k7JANGXxL37Ow1N8llYhAxk82F_KfiVn8LV727HVZNKNPCEQ2GA_flewiqufJ11FqhUS-LJtNNjmbZmG7ZKxmq-G4slegymk1a_HBrnXddO7O0zYZETrcfSbLvs5_LH27zkvphOFZ0"/>
+</div>
+<div>
+<h4 class="font-bold text-on-surface">Elena Rodriguez</h4>
+<p class="text-xs text-on-surface-variant">elena.r@neighborhood.com</p>
+</div>
+</div>
+<div class="flex flex-wrap gap-8 items-center">
+<div class="text-center md:text-left">
+<span class="block text-[10px] font-bold text-outline-variant uppercase tracking-widest mb-1">Role</span>
+<span class="text-sm font-semibold px-3 py-1 bg-secondary-container text-on-secondary-container rounded-full">Financial Analyst</span>
+</div>
+<div class="text-center md:text-left">
+<span class="block text-[10px] font-bold text-outline-variant uppercase tracking-widest mb-1">Access</span>
+<span class="text-sm font-medium text-on-surface">Global View</span>
+</div>
+<div class="text-center md:text-left">
+<span class="block text-[10px] font-bold text-outline-variant uppercase tracking-widest mb-1">Last Active</span>
+<span class="text-sm text-on-surface-variant italic">2h ago</span>
+</div>
+</div>
+<div class="flex items-center gap-2">
+<button class="p-2 hover:bg-surface-container text-on-surface-variant rounded transition-colors"><span class="material-symbols-outlined" data-icon="edit">edit</span></button>
+<button class="p-2 hover:bg-error-container/20 text-error rounded transition-colors"><span class="material-symbols-outlined" data-icon="delete_outline">delete_outline</span></button>
+</div>
+</div>
+<!-- Member Card 3 (Inactive/Pending) -->
+<div class="bg-surface-container-lowest/60 p-6 rounded-xl shadow-sm flex flex-wrap items-center justify-between gap-6 border border-dashed border-outline-variant/30">
+<div class="flex items-center gap-4">
+<div class="w-12 h-12 rounded-full overflow-hidden bg-surface-container-high flex items-center justify-center">
+<span class="material-symbols-outlined text-outline-variant" data-icon="mail">mail</span>
+</div>
+<div>
+<h4 class="font-bold text-on-surface italic">mark.daniels@partner.com</h4>
+<p class="text-[10px] font-bold text-primary uppercase tracking-tighter">Invitation Pending</p>
+</div>
+</div>
+<div class="flex flex-wrap gap-8 items-center">
+<div class="text-center md:text-left opacity-60">
+<span class="block text-[10px] font-bold text-outline-variant uppercase tracking-widest mb-1">Role</span>
+<span class="text-sm font-semibold px-3 py-1 bg-surface-container-highest text-on-surface-variant rounded-full">Guest Viewer</span>
+</div>
+<div class="text-center md:text-left opacity-60">
+<span class="block text-[10px] font-bold text-outline-variant uppercase tracking-widest mb-1">Access</span>
+<span class="text-sm font-medium text-on-surface">Mayfair Estates</span>
+</div>
+</div>
+<div class="flex items-center gap-2">
+<button class="px-4 py-1.5 text-xs font-bold bg-surface-container text-on-surface rounded hover:bg-primary hover:text-white transition-all">Resend</button>
+<button class="p-2 hover:bg-error-container/20 text-error rounded transition-colors"><span class="material-symbols-outlined text-sm" data-icon="close">close</span></button>
+</div>
+</div>
+</div>
+</section>
+</div>
+</main>
+<!-- Footer Mobile Nav Shell -->
+<nav class="md:hidden fixed bottom-0 w-full bg-white/80 backdrop-blur-md h-16 flex items-center justify-around z-50">
+<button class="flex flex-col items-center gap-1 text-slate-500">
+<span class="material-symbols-outlined" data-icon="dashboard">dashboard</span>
+<span class="text-[10px] font-medium">Dashboard</span>
+</button>
+<button class="flex flex-col items-center gap-1 text-slate-500">
+<span class="material-symbols-outlined" data-icon="domain">domain</span>
+<span class="text-[10px] font-medium">Estates</span>
+</button>
+<button class="flex flex-col items-center gap-1 text-blue-800">
+<span class="material-symbols-outlined" data-icon="group" style="font-variation-settings: 'FILL' 1;">group</span>
+<span class="text-[10px] font-bold">Team</span>
+</button>
+<button class="flex flex-col items-center gap-1 text-slate-500">
+<span class="material-symbols-outlined" data-icon="settings">settings</span>
+<span class="text-[10px] font-medium">Settings</span>
+</button>
+</nav>
+</body></html>

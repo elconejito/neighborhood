@@ -1,0 +1,578 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<meta name="design_doc_mode" content="canvas">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@200..800&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200&display=swap" rel="stylesheet">
+<style>
+  body { margin:0; background:#e8ebed; font-family:'Manrope',ui-sans-serif,system-ui,sans-serif; -webkit-font-smoothing:antialiased; text-wrap:pretty; }
+  .material-symbols-outlined { font-family:'Material Symbols Outlined'; font-weight:normal; font-style:normal; line-height:1; letter-spacing:normal; text-transform:none; display:inline-block; white-space:nowrap; direction:ltr; font-variation-settings:'FILL' 0,'wght' 400,'GRAD' 0,'opsz' 24; vertical-align:middle; font-size:20px; }
+  a { color:#455f88; text-decoration:none; }
+  a:hover { color:#39537c; }
+</style>
+</helmet>
+
+<div style="padding:56px; display:flex; flex-direction:column; gap:64px; align-items:flex-start">
+
+  <div style="display:flex; flex-direction:column; gap:10px; max-width:860px">
+    <div style="font:800 13px/1 'Manrope'; letter-spacing:.18em; text-transform:uppercase; color:#586064">Proposal · Property index</div>
+    <div style="font:800 38px/1.08 'Manrope'; letter-spacing:-.02em; color:#2b3437">Baseline &amp; Difference</div>
+    <div style="font:500 16px/1.55 'Manrope'; color:#586064">The target stops being a row and becomes the page's baseline. Every comparable answers, in order: how much more or less did it cost, is the gap still there per square foot, and which two or three measured differences most plausibly explain it. Built on The Private Ledger — Manrope, tonal surfaces, no sectioning lines, deep blue instead of success green.</div>
+  </div>
+
+  <!-- ════════ A · DESKTOP ════════ -->
+  <div style="display:flex; flex-direction:column; gap:12px">
+    <div style="font:800 12px/1 'Manrope'; letter-spacing:.16em; text-transform:uppercase; color:#737c7f">A · Desktop 1440 × 1000 — page 1, default sort “Most similar to target”</div>
+    <div id="art-desktop" style="width:1440px; height:1000px; overflow:hidden; background:#f8f9fa; box-shadow:0 12px 40px rgba(43,52,55,.10); display:flex; flex-direction:column">
+
+      <div style="width:100%; height:64px; background:rgba(255,255,255,.8); backdrop-filter:blur(20px); box-shadow:0 1px 2px rgba(0,0,0,.05); display:flex; justify-content:space-between; align-items:center; padding:0 44px; box-sizing:border-box; flex-shrink:0">
+        <div style="display:flex; align-items:center; gap:32px">
+          <span style="font:700 20px/1 'Manrope'; letter-spacing:-.025em; color:#455f88">Neighborhood</span>
+          <div style="display:flex; align-items:center; gap:4px">
+            <span style="font:500 14px/1 'Manrope'; color:#586064; padding:6px 12px; border-radius:4px">Dashboard</span>
+            <span style="font:600 14px/1 'Manrope'; color:#455f88; padding:6px 12px; border-radius:4px; background:#eaeff1">Neighborhoods</span>
+            <span style="font:500 14px/1 'Manrope'; color:#586064; padding:6px 12px; border-radius:4px">Team</span>
+          </div>
+        </div>
+        <div style="display:flex; align-items:center; gap:12px">
+          <span class="material-symbols-outlined" style="color:#586064; padding:8px">notifications</span>
+          <span style="width:36px; height:36px; border-radius:9999px; background:#d6e3ff; color:#455f88; font:700 14px/1 'Manrope'; display:flex; align-items:center; justify-content:center">H</span>
+        </div>
+      </div>
+
+      <div style="flex:1; min-height:0; padding:28px 44px 0; box-sizing:border-box; display:flex; justify-content:center">
+        <div style="width:100%; max-width:1280px; display:flex; flex-direction:column; gap:20px; min-height:0">
+
+          <div style="display:flex; align-items:flex-end; justify-content:space-between; gap:24px">
+            <div>
+              <div style="display:flex; align-items:center; gap:4px; margin-bottom:10px; font:500 13px/1.4 'Manrope'; color:#586064"><span class="material-symbols-outlined" style="font-size:14px">arrow_back</span> Neighborhoods</div>
+              <h1 style="margin:0 0 6px; font:800 34px/1.1 'Manrope'; letter-spacing:-.025em; color:#2b3437">Residential Catalog</h1>
+              <p style="margin:0; font:500 14px/1.5 'Manrope'; color:#586064">14 comparables measured against your target · Martinsburg, WV</p>
+            </div>
+            <div style="display:flex; align-items:flex-end; gap:10px">
+              <div style="display:flex; flex-direction:column; gap:7px; align-items:flex-start">
+                <span style="font:700 10px/1 'Manrope'; letter-spacing:.14em; text-transform:uppercase; color:#586064">Status</span>
+                <span style="background:#dbe4e7; color:#2b3437; font:600 13px/1 'Manrope'; border-radius:4px; padding:11px 8px 11px 12px; display:flex; align-items:center; gap:12px; height:38px; box-sizing:border-box">All properties<span class="material-symbols-outlined" style="font-size:18px; color:#586064">expand_more</span></span>
+              </div>
+              <div style="display:flex; flex-direction:column; gap:7px; align-items:flex-start">
+                <span style="font:700 10px/1 'Manrope'; letter-spacing:.14em; text-transform:uppercase; color:#586064">Sort</span>
+                <span style="background:#dbe4e7; color:#2b3437; font:600 13px/1 'Manrope'; border-radius:4px; padding:11px 8px 11px 12px; display:flex; align-items:center; gap:12px; height:38px; box-sizing:border-box">Most similar to target<span class="material-symbols-outlined" style="font-size:18px; color:#586064">expand_more</span></span>
+              </div>
+              <span style="background:#e3e9ec; color:#2b3437; padding:0 14px; border-radius:4px; font:700 13px/1 'Manrope'; display:flex; align-items:center; gap:7px; height:38px"><span class="material-symbols-outlined" style="font-size:17px">bar_chart</span> Dashboard</span>
+              <span style="background:linear-gradient(145deg,#455f88,#39537c); color:#f6f7ff; padding:0 16px; border-radius:4px; font:700 13px/1 'Manrope'; display:flex; align-items:center; gap:7px; height:38px"><span class="material-symbols-outlined" style="font-size:17px">add</span> Add property</span>
+            </div>
+          </div>
+
+          <!-- baseline -->
+          <div style="background:#d6e3ff; border-radius:8px; padding:18px 24px; display:flex; align-items:center; justify-content:space-between; gap:32px">
+            <div style="min-width:0">
+              <div style="display:flex; align-items:center; gap:8px; margin-bottom:6px">
+                <span style="font:800 10px/1 'Manrope'; letter-spacing:.16em; text-transform:uppercase; color:#38527b">Target property</span>
+                <span style="font:700 10px/1 'Manrope'; letter-spacing:.06em; text-transform:uppercase; color:#455f88; background:rgba(255,255,255,.6); border-radius:4px; padding:4px 7px">Baseline for every comparison</span>
+              </div>
+              <div style="font:800 21px/1.2 'Manrope'; letter-spacing:-.01em; color:#2b3437">1347 Edwin Miller Boulevard</div>
+              <div style="font:500 12px/1.5 'Manrope'; color:#455f88; margin-top:3px">Martinsburg, WV · Sold Sep 15, 2024</div>
+            </div>
+            <div style="display:flex; align-items:stretch; gap:26px; flex-shrink:0">
+              <sc-for list="{{ baselineStats }}" as="s" hint-placeholder-count="6">
+                <div style="display:flex; flex-direction:column; gap:6px; align-items:flex-end">
+                  <span style="font:700 10px/1 'Manrope'; letter-spacing:.12em; text-transform:uppercase; color:#455f88">{{ s.label }}</span>
+                  <span style="font:800 17px/1 'Manrope'; letter-spacing:-.01em; color:#2b3437">{{ s.value }}</span>
+                </div>
+              </sc-for>
+            </div>
+          </div>
+
+          <!-- column headings -->
+          <div style="display:grid; grid-template-columns:minmax(0,1fr) 200px 150px 132px 300px; gap:20px; padding:0 24px; align-items:end">
+            <span style="font:700 10px/1 'Manrope'; letter-spacing:.14em; text-transform:uppercase; color:#737c7f">Property</span>
+            <span style="font:700 10px/1 'Manrope'; letter-spacing:.14em; text-transform:uppercase; color:#737c7f; text-align:right">Price · vs target</span>
+            <span style="font:700 10px/1 'Manrope'; letter-spacing:.14em; text-transform:uppercase; color:#737c7f; text-align:right">$/sq ft · vs target</span>
+            <span style="font:700 10px/1 'Manrope'; letter-spacing:.1em; text-transform:uppercase; color:#737c7f; white-space:nowrap; text-align:right">Closest neighbor</span>
+            <span style="font:700 10px/1 'Manrope'; letter-spacing:.14em; text-transform:uppercase; color:#737c7f">Why it may differ</span>
+          </div>
+
+          <div style="display:flex; flex-direction:column; gap:10px; overflow:hidden">
+            <sc-for list="{{ page1 }}" as="p" hint-placeholder-count="7">
+              <div style="background:#ffffff; border-radius:8px; padding:14px 24px; display:grid; grid-template-columns:minmax(0,1fr) 200px 150px 132px 300px; gap:20px; align-items:center; flex-shrink:0">
+                <div style="min-width:0">
+                  <div style="font:700 16px/1.3 'Manrope'; color:#2b3437">{{ p.address }}</div>
+                  <div style="display:flex; align-items:center; gap:8px; margin-top:5px">
+                    <span style="font:700 10px/1 'Manrope'; letter-spacing:.08em; text-transform:uppercase; padding:4px 7px; border-radius:4px; background: {{ p.statusBg }}; color: {{ p.statusFg }}">{{ p.statusLabel }}</span>
+                    <span style="font:500 12px/1 'Manrope'; color:#586064">{{ p.date }}</span>
+                  </div>
+                </div>
+
+                <div style="text-align:right">
+                  <div style="font:800 20px/1.1 'Manrope'; letter-spacing:-.015em; color:#2b3437">{{ p.price }}</div>
+                  <div style="font:600 12px/1.4 'Manrope'; color:#586064; margin-top:3px"><span style="font-size:8px; vertical-align:1px">{{ p.dir }}</span> {{ p.priceDelta }} · {{ p.pricePct }}</div>
+                  <div style="display:flex; align-items:center; margin-top:7px; height:5px">
+                    <div style="flex:1; display:flex; justify-content:flex-end; height:5px; background:#f1f4f6; border-radius:3px 0 0 3px"><div style="height:5px; background:#7f8b9c; border-radius:3px 0 0 3px; width: {{ p.negW }}"></div></div>
+                    <div style="width:1px; height:9px; background:#abb3b7"></div>
+                    <div style="flex:1; height:5px; background:#f1f4f6; border-radius:0 3px 3px 0"><div style="height:5px; background:#7f8b9c; border-radius:0 3px 3px 0; width: {{ p.posW }}"></div></div>
+                  </div>
+                </div>
+
+                <div style="text-align:right">
+                  <div style="font:700 16px/1.1 'Manrope'; color:#2b3437">{{ p.ppsf }}</div>
+                  <div style="font:600 12px/1.4 'Manrope'; color:#586064; margin-top:3px"><span style="font-size:8px; vertical-align:1px">{{ p.ppsfDir }}</span> {{ p.ppsfDelta }}</div>
+                </div>
+
+                <div style="text-align:right">
+                  <div style="font:700 16px/1.1 'Manrope'; color: {{ p.neighborColor }}">{{ p.neighborStr }}</div>
+                  <div style="font:600 12px/1.4 'Manrope'; color:#586064; margin-top:3px; white-space:nowrap">{{ p.neighborNote }}</div>
+                </div>
+
+                <div style="display:flex; flex-wrap:wrap; gap:6px">
+                  <sc-for list="{{ p.chips }}" as="c" hint-placeholder-count="3">
+                    <span style="font:600 12px/1 'Manrope'; color:#2b3437; background:#eaeff1; border-radius:4px; padding:6px 9px">{{ c }}</span>
+                  </sc-for>
+                </div>
+
+              </div>
+            </sc-for>
+          </div>
+
+        </div>
+      </div>
+    </div>
+    <div style="font:500 13px/1.5 'Manrope'; color:#586064; max-width:1440px">Column headings replace the per-row micro-labels. The empty <span style="color:#2b3437; font-weight:700">Neighbor</span> column is gone because no row in the result set has the data. The bar under each price is a neutral magnitude scale centred on the target — same information as the numbers, sorted by eye.</div>
+  </div>
+
+  <!-- ════════ D · DESKTOP PAGE 2 ════════ -->
+  <div style="display:flex; flex-direction:column; gap:12px">
+    <div style="font:800 12px/1 'Manrope'; letter-spacing:.16em; text-transform:uppercase; color:#737c7f">D · Desktop 1440 × 1000 — page 2, scrolled: baseline persists as a sticky bar</div>
+    <div id="art-page2" style="width:1440px; height:880px; overflow:hidden; background:#f8f9fa; box-shadow:0 12px 40px rgba(43,52,55,.10); display:flex; flex-direction:column">
+
+      <div style="width:100%; height:64px; background:rgba(255,255,255,.8); backdrop-filter:blur(20px); box-shadow:0 1px 2px rgba(0,0,0,.05); display:flex; justify-content:space-between; align-items:center; padding:0 44px; box-sizing:border-box; flex-shrink:0">
+        <div style="display:flex; align-items:center; gap:32px">
+          <span style="font:700 20px/1 'Manrope'; letter-spacing:-.025em; color:#455f88">Neighborhood</span>
+          <div style="display:flex; align-items:center; gap:4px">
+            <span style="font:500 14px/1 'Manrope'; color:#586064; padding:6px 12px; border-radius:4px">Dashboard</span>
+            <span style="font:600 14px/1 'Manrope'; color:#455f88; padding:6px 12px; border-radius:4px; background:#eaeff1">Neighborhoods</span>
+            <span style="font:500 14px/1 'Manrope'; color:#586064; padding:6px 12px; border-radius:4px">Team</span>
+          </div>
+        </div>
+        <div style="display:flex; align-items:center; gap:12px">
+          <span class="material-symbols-outlined" style="color:#586064; padding:8px">notifications</span>
+          <span style="width:36px; height:36px; border-radius:9999px; background:#d6e3ff; color:#455f88; font:700 14px/1 'Manrope'; display:flex; align-items:center; justify-content:center">H</span>
+        </div>
+      </div>
+
+      <!-- sticky compact baseline -->
+      <div style="background:#d6e3ff; box-shadow:0 6px 24px rgba(43,52,55,.07); padding:0 44px; height:56px; flex-shrink:0; display:flex; align-items:center; justify-content:center; box-sizing:border-box">
+        <div style="width:100%; max-width:1280px; display:flex; align-items:center; justify-content:space-between; gap:24px">
+          <div style="display:flex; align-items:center; gap:12px; min-width:0">
+            <span style="font:800 10px/1 'Manrope'; letter-spacing:.16em; text-transform:uppercase; color:#38527b">Target</span>
+            <span style="font:700 15px/1 'Manrope'; color:#2b3437">1347 Edwin Miller Boulevard</span>
+          </div>
+          <div style="display:flex; align-items:center; gap:18px; font:600 13px/1 'Manrope'; color:#38527b; flex-shrink:0">
+            <span style="font:800 15px/1 'Manrope'; color:#2b3437">$575,000</span>
+            <span>$206/sq ft</span><span style="color:rgba(69,95,136,.4)">·</span>
+            <span>3 bd</span><span style="color:rgba(69,95,136,.4)">·</span>
+            <span>3 ba</span><span style="color:rgba(69,95,136,.4)">·</span>
+            <span>2,792 sq ft</span><span style="color:rgba(69,95,136,.4)">·</span>
+            <span>0.36 ac</span><span style="color:rgba(69,95,136,.4)">·</span>
+            <span>96 ft to neighbor</span>
+          </div>
+        </div>
+      </div>
+
+      <div style="flex:1; min-height:0; padding:20px 44px 0; box-sizing:border-box; display:flex; justify-content:center">
+        <div style="width:100%; max-width:1280px; display:flex; flex-direction:column; gap:16px">
+
+          <div style="display:flex; align-items:center; justify-content:space-between; gap:24px">
+            <div style="font:500 13px/1.4 'Manrope'; color:#586064; white-space:nowrap">Showing <span style="color:#2b3437; font-weight:700">10–14</span> of 14 comparables · sorted by <span style="color:#2b3437; font-weight:700">Most similar to target</span></div>
+            <div style="display:flex; align-items:center; gap:10px">
+              <span style="background:#dbe4e7; color:#2b3437; font:600 13px/1 'Manrope'; border-radius:4px; padding:0 8px 0 12px; display:flex; align-items:center; gap:12px; height:36px">All properties<span class="material-symbols-outlined" style="font-size:18px; color:#586064">expand_more</span></span>
+              <span style="background:#dbe4e7; color:#2b3437; font:600 13px/1 'Manrope'; border-radius:4px; padding:0 8px 0 12px; display:flex; align-items:center; gap:12px; height:36px">Most similar to target<span class="material-symbols-outlined" style="font-size:18px; color:#586064">expand_more</span></span>
+            </div>
+          </div>
+
+          <div style="display:grid; grid-template-columns:minmax(0,1fr) 200px 150px 132px 300px; gap:20px; padding:0 24px; align-items:end">
+            <span style="font:700 10px/1 'Manrope'; letter-spacing:.14em; text-transform:uppercase; color:#737c7f">Property</span>
+            <span style="font:700 10px/1 'Manrope'; letter-spacing:.14em; text-transform:uppercase; color:#737c7f; text-align:right">Price · vs target</span>
+            <span style="font:700 10px/1 'Manrope'; letter-spacing:.14em; text-transform:uppercase; color:#737c7f; text-align:right">$/sq ft · vs target</span>
+            <span style="font:700 10px/1 'Manrope'; letter-spacing:.1em; text-transform:uppercase; color:#737c7f; white-space:nowrap; text-align:right">Closest neighbor</span>
+            <span style="font:700 10px/1 'Manrope'; letter-spacing:.14em; text-transform:uppercase; color:#737c7f">Why it may differ</span>
+          </div>
+
+          <div style="display:flex; flex-direction:column; gap:10px">
+            <sc-for list="{{ page2 }}" as="p" hint-placeholder-count="5">
+              <div style="background:#ffffff; border-radius:8px; padding:14px 24px; display:grid; grid-template-columns:minmax(0,1fr) 200px 150px 132px 300px; gap:20px; align-items:center">
+                <div style="min-width:0">
+                  <div style="font:700 16px/1.3 'Manrope'; color:#2b3437">{{ p.address }}</div>
+                  <div style="display:flex; align-items:center; gap:8px; margin-top:5px">
+                    <span style="font:700 10px/1 'Manrope'; letter-spacing:.08em; text-transform:uppercase; padding:4px 7px; border-radius:4px; background: {{ p.statusBg }}; color: {{ p.statusFg }}">{{ p.statusLabel }}</span>
+                    <span style="font:500 12px/1 'Manrope'; color:#586064">{{ p.date }}</span>
+                  </div>
+                </div>
+                <div style="text-align:right">
+                  <div style="font:800 20px/1.1 'Manrope'; letter-spacing:-.015em; color:#2b3437">{{ p.price }}</div>
+                  <div style="font:600 12px/1.4 'Manrope'; color:#586064; margin-top:3px"><span style="font-size:8px; vertical-align:1px">{{ p.dir }}</span> {{ p.priceDelta }} · {{ p.pricePct }}</div>
+                  <div style="display:flex; align-items:center; margin-top:7px; height:5px">
+                    <div style="flex:1; display:flex; justify-content:flex-end; height:5px; background:#f1f4f6; border-radius:3px 0 0 3px"><div style="height:5px; background:#7f8b9c; border-radius:3px 0 0 3px; width: {{ p.negW }}"></div></div>
+                    <div style="width:1px; height:9px; background:#abb3b7"></div>
+                    <div style="flex:1; height:5px; background:#f1f4f6; border-radius:0 3px 3px 0"><div style="height:5px; background:#7f8b9c; border-radius:0 3px 3px 0; width: {{ p.posW }}"></div></div>
+                  </div>
+                </div>
+                <div style="text-align:right">
+                  <div style="font:700 16px/1.1 'Manrope'; color:#2b3437">{{ p.ppsf }}</div>
+                  <div style="font:600 12px/1.4 'Manrope'; color:#586064; margin-top:3px"><span style="font-size:8px; vertical-align:1px">{{ p.ppsfDir }}</span> {{ p.ppsfDelta }}</div>
+                </div>
+
+                <div style="text-align:right">
+                  <div style="font:700 16px/1.1 'Manrope'; color: {{ p.neighborColor }}">{{ p.neighborStr }}</div>
+                  <div style="font:600 12px/1.4 'Manrope'; color:#586064; margin-top:3px; white-space:nowrap">{{ p.neighborNote }}</div>
+                </div>
+                <div style="display:flex; flex-wrap:wrap; gap:6px">
+                  <sc-for list="{{ p.chips }}" as="c" hint-placeholder-count="3">
+                    <span style="font:600 12px/1 'Manrope'; color:#2b3437; background:#eaeff1; border-radius:4px; padding:6px 9px">{{ c }}</span>
+                  </sc-for>
+                </div>
+              </div>
+            </sc-for>
+          </div>
+
+          <div style="display:flex; align-items:center; justify-content:space-between; padding:14px 24px 0">
+            <div style="display:flex; align-items:center; gap:10px; font:500 13px/1 'Manrope'; color:#586064">
+              Show
+              <span style="background:#dbe4e7; color:#2b3437; font:600 13px/1 'Manrope'; border-radius:4px; padding:0 8px 0 12px; display:flex; align-items:center; gap:10px; height:36px">10<span class="material-symbols-outlined" style="font-size:18px; color:#586064">expand_more</span></span>
+              of 14 comparables
+            </div>
+            <div style="display:flex; align-items:center; gap:6px">
+              <span style="width:36px; height:36px; border-radius:4px; background:#dbe4e7; color:#2b3437; display:flex; align-items:center; justify-content:center"><span class="material-symbols-outlined" style="font-size:19px">chevron_left</span></span>
+              <span style="width:36px; height:36px; border-radius:4px; background:#dbe4e7; color:#2b3437; font:700 13px/1 'Manrope'; display:flex; align-items:center; justify-content:center">1</span>
+              <span style="width:36px; height:36px; border-radius:4px; background:linear-gradient(145deg,#455f88,#39537c); color:#f6f7ff; font:700 13px/1 'Manrope'; display:flex; align-items:center; justify-content:center">2</span>
+              <span style="width:36px; height:36px; border-radius:4px; background:#eaeff1; color:#abb3b7; display:flex; align-items:center; justify-content:center"><span class="material-symbols-outlined" style="font-size:19px">chevron_right</span></span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div style="font:500 13px/1.5 'Manrope'; color:#586064; max-width:1440px">P0 fix. The target is returned outside the paginated set, so page two — and every filter and sort — keeps the baseline and all deltas. Past the first scroll the full panel collapses into this 56 px glass bar (<span style="color:#2b3437; font-weight:700">surface-container-lowest</span> at 92% with a 20 px blur, per the Glass rule).</div>
+  </div>
+
+  <!-- ════════ B · TABLET + C · MOBILE ════════ -->
+  <div style="display:flex; gap:56px; align-items:flex-start">
+
+    <div style="display:flex; flex-direction:column; gap:12px">
+      <div style="font:800 12px/1 'Manrope'; letter-spacing:.16em; text-transform:uppercase; color:#737c7f">B · Tablet 834 × 1112 — two-line row</div>
+      <div id="art-tablet" style="width:834px; height:1112px; overflow:hidden; background:#f8f9fa; box-shadow:0 12px 40px rgba(43,52,55,.10); display:flex; flex-direction:column">
+        <div style="width:100%; height:64px; background:rgba(255,255,255,.8); box-shadow:0 1px 2px rgba(0,0,0,.05); display:flex; justify-content:space-between; align-items:center; padding:0 32px; box-sizing:border-box; flex-shrink:0">
+          <div style="display:flex; align-items:center; gap:28px">
+            <span style="font:700 20px/1 'Manrope'; letter-spacing:-.025em; color:#455f88">Neighborhood</span>
+            <div style="display:flex; align-items:center; gap:4px">
+              <span style="font:500 14px/1 'Manrope'; color:#586064; padding:6px 10px">Dashboard</span>
+              <span style="font:600 14px/1 'Manrope'; color:#455f88; padding:6px 10px; border-radius:4px; background:#eaeff1">Neighborhoods</span>
+              <span style="font:500 14px/1 'Manrope'; color:#586064; padding:6px 10px">Team</span>
+            </div>
+          </div>
+          <div style="display:flex; align-items:center; gap:10px">
+            <span class="material-symbols-outlined" style="color:#586064; padding:8px">notifications</span>
+            <span style="width:36px; height:36px; border-radius:9999px; background:#d6e3ff; color:#455f88; font:700 14px/1 'Manrope'; display:flex; align-items:center; justify-content:center">H</span>
+          </div>
+        </div>
+
+        <div style="flex:1; min-height:0; padding:24px 32px 0; box-sizing:border-box; display:flex; flex-direction:column; gap:18px">
+          <div style="display:flex; align-items:flex-end; justify-content:space-between; gap:20px">
+            <div>
+              <div style="display:flex; align-items:center; gap:4px; margin-bottom:8px; font:500 13px/1.4 'Manrope'; color:#586064"><span class="material-symbols-outlined" style="font-size:14px">arrow_back</span> Neighborhoods</div>
+              <h1 style="margin:0 0 5px; font:800 30px/1.1 'Manrope'; letter-spacing:-.025em; color:#2b3437">Residential Catalog</h1>
+              <p style="margin:0; font:500 13px/1.5 'Manrope'; color:#586064">14 comparables · Martinsburg, WV</p>
+            </div>
+            <div style="display:flex; align-items:center; gap:8px">
+              <span style="background:#e3e9ec; color:#2b3437; padding:0 14px; border-radius:4px; font:700 13px/1 'Manrope'; display:flex; align-items:center; gap:7px; height:40px"><span class="material-symbols-outlined" style="font-size:18px">bar_chart</span> Dashboard</span>
+              <span style="background:linear-gradient(145deg,#455f88,#39537c); color:#f6f7ff; padding:0 16px; border-radius:4px; font:700 13px/1 'Manrope'; display:flex; align-items:center; gap:7px; height:40px"><span class="material-symbols-outlined" style="font-size:18px">add</span> Add property</span>
+            </div>
+          </div>
+
+          <div style="background:#d6e3ff; border-radius:8px; padding:16px 20px; display:flex; flex-direction:column; gap:10px">
+            <div style="display:flex; align-items:baseline; justify-content:space-between; gap:16px">
+              <div style="min-width:0">
+                <div style="font:800 10px/1 'Manrope'; letter-spacing:.16em; text-transform:uppercase; color:#38527b; margin-bottom:6px">Target property</div>
+                <div style="font:800 19px/1.2 'Manrope'; letter-spacing:-.01em; color:#2b3437">1347 Edwin Miller Boulevard</div>
+              </div>
+              <div style="text-align:right; flex-shrink:0">
+                <div style="font:800 19px/1.2 'Manrope'; letter-spacing:-.01em; color:#2b3437">$575,000</div>
+                <div style="font:600 12px/1.4 'Manrope'; color:#455f88">Sold Sep 15, 2024</div>
+              </div>
+            </div>
+            <div style="display:flex; align-items:center; gap:10px; font:600 13px/1 'Manrope'; color:#38527b; flex-wrap:wrap">
+              <span>$206/sq ft</span><span style="color:rgba(69,95,136,.4)">·</span>
+              <span>3 bd</span><span style="color:rgba(69,95,136,.4)">·</span>
+              <span>3 ba</span><span style="color:rgba(69,95,136,.4)">·</span>
+              <span>2,792 sq ft</span><span style="color:rgba(69,95,136,.4)">·</span>
+              <span>0.36 ac</span><span style="color:rgba(69,95,136,.4)">·</span>
+              <span>Built 2004</span><span style="color:rgba(69,95,136,.4)">·</span>
+              <span>96 ft to neighbor</span>
+            </div>
+          </div>
+
+          <div style="display:flex; align-items:center; justify-content:space-between; gap:12px">
+            <span style="font:700 10px/1 'Manrope'; letter-spacing:.14em; text-transform:uppercase; color:#737c7f">Comparables · most similar first</span>
+            <div style="display:flex; align-items:center; gap:8px">
+              <span style="background:#dbe4e7; color:#2b3437; font:600 12px/1 'Manrope'; border-radius:4px; padding:0 6px 0 10px; display:flex; align-items:center; gap:8px; height:32px">All properties<span class="material-symbols-outlined" style="font-size:17px; color:#586064">expand_more</span></span>
+              <span style="background:#dbe4e7; color:#2b3437; font:600 12px/1 'Manrope'; border-radius:4px; padding:0 6px 0 10px; display:flex; align-items:center; gap:8px; height:32px">Most similar<span class="material-symbols-outlined" style="font-size:17px; color:#586064">expand_more</span></span>
+            </div>
+          </div>
+
+          <div style="display:flex; flex-direction:column; gap:10px; overflow:hidden">
+            <sc-for list="{{ tabletRows }}" as="p" hint-placeholder-count="6">
+              <div style="background:#ffffff; border-radius:8px; padding:14px 20px; display:flex; flex-direction:column; gap:9px; flex-shrink:0">
+                <div style="display:flex; align-items:flex-start; justify-content:space-between; gap:20px">
+                  <div style="min-width:0">
+                    <div style="font:700 16px/1.3 'Manrope'; color:#2b3437">{{ p.address }}</div>
+                    <div style="display:flex; align-items:center; gap:7px; margin-top:5px">
+                      <span style="font:700 10px/1 'Manrope'; letter-spacing:.08em; text-transform:uppercase; padding:4px 7px; border-radius:4px; background: {{ p.statusBg }}; color: {{ p.statusFg }}">{{ p.statusLabel }}</span>
+                      <span style="font:500 12px/1 'Manrope'; color:#586064">{{ p.date }}</span>
+                    </div>
+                  </div>
+                  <div style="text-align:right; flex-shrink:0">
+                    <div style="font:800 19px/1.1 'Manrope'; letter-spacing:-.015em; color:#2b3437">{{ p.price }}</div>
+                    <div style="font:600 12px/1.4 'Manrope'; color:#586064; margin-top:4px"><span style="font-size:8px; vertical-align:1px">{{ p.dir }}</span> {{ p.priceDelta }} · {{ p.pricePct }} vs target</div>
+                  </div>
+                </div>
+                <div style="display:flex; align-items:center; justify-content:space-between; gap:20px">
+                  <div style="display:flex; align-items:center; gap:8px; font:600 13px/1 'Manrope'; color:#2b3437; flex-wrap:wrap; min-width:0">
+                    <span>{{ p.facts }}</span>
+                    <span style="color:#abb3b7">·</span>
+                    <span>{{ p.ppsf }}/sq ft</span>
+                    <span style="font:600 12px/1 'Manrope'; color:#586064">{{ p.ppsfDelta }}</span>
+                    <span style="color:#abb3b7">·</span>
+                    <span style="color: {{ p.neighborColor }}">{{ p.neighborFacts }}</span>
+                  </div>
+                  <div style="display:flex; gap:6px; flex-shrink:0">
+                    <sc-for list="{{ p.chips }}" as="c" hint-placeholder-count="3">
+                      <span style="font:600 12px/1 'Manrope'; color:#2b3437; background:#eaeff1; border-radius:4px; padding:6px 9px; white-space:nowrap">{{ c }}</span>
+                    </sc-for>
+                  </div>
+                </div>
+              </div>
+            </sc-for>
+          </div>
+        </div>
+      </div>
+      <div style="font:500 13px/1.5 'Manrope'; color:#586064; max-width:834px">P0 fix. Below 1024 px the 12-column row is abandoned entirely. Address and price hold line one, measured facts and the explanatory chips hold line two — nothing is compressed below its content width, so nothing collides.</div>
+    </div>
+
+    <div style="display:flex; flex-direction:column; gap:12px">
+      <div style="font:800 12px/1 'Manrope'; letter-spacing:.16em; text-transform:uppercase; color:#737c7f">C · Mobile 390 × 844</div>
+      <div id="art-mobile" style="width:390px; height:844px; overflow:hidden; background:#f8f9fa; box-shadow:0 12px 40px rgba(43,52,55,.10); display:flex; flex-direction:column">
+        <div style="width:100%; height:56px; background:rgba(255,255,255,.8); box-shadow:0 1px 2px rgba(0,0,0,.05); display:flex; justify-content:space-between; align-items:center; padding:0 20px; box-sizing:border-box; flex-shrink:0">
+          <span style="font:700 18px/1 'Manrope'; letter-spacing:-.025em; color:#455f88">Neighborhood</span>
+          <div style="display:flex; align-items:center; gap:6px">
+            <span class="material-symbols-outlined" style="color:#586064; padding:8px">notifications</span>
+            <span style="width:34px; height:34px; border-radius:9999px; background:#d6e3ff; color:#455f88; font:700 13px/1 'Manrope'; display:flex; align-items:center; justify-content:center">H</span>
+          </div>
+        </div>
+
+        <div style="flex:1; min-height:0; padding:16px 18px 0; box-sizing:border-box; display:flex; flex-direction:column; gap:14px">
+          <div style="display:flex; align-items:flex-start; justify-content:space-between; gap:12px">
+            <div style="min-width:0">
+              <div style="display:flex; align-items:center; gap:4px; margin-bottom:6px; font:500 12px/1.4 'Manrope'; color:#586064"><span class="material-symbols-outlined" style="font-size:14px">arrow_back</span> Neighborhoods</div>
+              <h1 style="margin:0 0 4px; font:800 26px/1.12 'Manrope'; letter-spacing:-.025em; color:#2b3437">Residential Catalog</h1>
+              <p style="margin:0; font:500 12px/1.4 'Manrope'; color:#586064">14 comparables · Martinsburg, WV</p>
+            </div>
+            <span style="background:linear-gradient(145deg,#455f88,#39537c); color:#f6f7ff; border-radius:4px; font:700 13px/1 'Manrope'; display:flex; align-items:center; justify-content:center; gap:6px; height:44px; padding:0 14px; flex-shrink:0"><span class="material-symbols-outlined" style="font-size:18px">add</span> Add</span>
+          </div>
+
+          <div style="background:#d6e3ff; border-radius:8px; padding:14px 16px; display:flex; flex-direction:column; gap:9px">
+            <div style="font:800 10px/1 'Manrope'; letter-spacing:.16em; text-transform:uppercase; color:#38527b">Target property</div>
+            <div style="font:800 17px/1.25 'Manrope'; letter-spacing:-.01em; color:#2b3437">1347 Edwin Miller Boulevard</div>
+            <div style="display:flex; align-items:baseline; gap:8px">
+              <span style="font:800 20px/1 'Manrope'; letter-spacing:-.015em; color:#2b3437">$575,000</span>
+              <span style="font:700 13px/1 'Manrope'; color:#38527b">$206/sq ft</span>
+            </div>
+            <div style="font:600 12px/1.5 'Manrope'; color:#455f88">3 bd · 3 ba · 2,792 sq ft · 0.36 ac · 96 ft to neighbor · Sold Sep 15, 2024</div>
+          </div>
+
+          <div style="display:flex; align-items:center; justify-content:space-between; gap:10px">
+            <span style="font:700 10px/1 'Manrope'; letter-spacing:.14em; text-transform:uppercase; color:#737c7f">Comparables</span>
+            <span style="background:#dbe4e7; color:#2b3437; font:600 12px/1 'Manrope'; border-radius:4px; padding:0 8px 0 12px; display:flex; align-items:center; gap:8px; height:36px">Most similar<span class="material-symbols-outlined" style="font-size:17px; color:#586064">expand_more</span></span>
+          </div>
+
+          <div style="display:flex; flex-direction:column; gap:10px; overflow:hidden">
+            <sc-for list="{{ mobileRows }}" as="p" hint-placeholder-count="4">
+              <div style="background:#ffffff; border-radius:8px; padding:14px 16px; display:flex; flex-direction:column; gap:11px; flex-shrink:0">
+                <div style="display:flex; align-items:flex-start; justify-content:space-between; gap:12px">
+                  <div style="min-width:0">
+                    <div style="font:700 15px/1.3 'Manrope'; color:#2b3437">{{ p.address }}</div>
+                    <div style="font:500 11px/1 'Manrope'; color:#586064; margin-top:5px">{{ p.statusLabel }} · {{ p.date }}</div>
+                  </div>
+                  <div style="text-align:right; flex-shrink:0">
+                    <div style="font:800 18px/1 'Manrope'; letter-spacing:-.015em; color:#2b3437">{{ p.price }}</div>
+                    <div style="font:600 12px/1 'Manrope'; color:#586064; margin-top:5px"><span style="font-size:8px; vertical-align:1px">{{ p.dir }}</span> {{ p.priceDelta }} · {{ p.pricePct }}</div>
+                  </div>
+                </div>
+                <div style="display:flex; flex-direction:column; gap:6px">
+                  <div style="font:700 9px/1 'Manrope'; letter-spacing:.12em; text-transform:uppercase; color:#737c7f">Compared with target</div>
+                  <div style="display:grid; grid-template-columns:repeat(3,1fr); gap:7px">
+                    <div style="background:#f1f4f6; border-radius:4px; padding:8px 9px">
+                      <div style="font:700 9px/1 'Manrope'; letter-spacing:.1em; text-transform:uppercase; color:#737c7f">$/sq ft</div>
+                      <div style="font:700 14px/1 'Manrope'; color:#2b3437; margin-top:6px">{{ p.ppsf }}</div>
+                      <div style="font:600 11px/1 'Manrope'; color:#586064; margin-top:4px"><span style="font-size:7px; vertical-align:1px">{{ p.ppsfDir }}</span> {{ p.ppsfTiny }}</div>
+                    </div>
+                    <div style="background:#f1f4f6; border-radius:4px; padding:8px 9px">
+                      <div style="font:700 9px/1 'Manrope'; letter-spacing:.1em; text-transform:uppercase; color:#737c7f">Sq ft</div>
+                      <div style="font:700 14px/1 'Manrope'; color:#2b3437; margin-top:6px">{{ p.sqftVal }}</div>
+                      <div style="font:600 11px/1 'Manrope'; color:#586064; margin-top:4px">{{ p.sqftTiny }}</div>
+                    </div>
+                    <div style="background:#f1f4f6; border-radius:4px; padding:8px 9px">
+                      <div style="font:700 9px/1 'Manrope'; letter-spacing:.1em; text-transform:uppercase; color:#737c7f">Neighbor</div>
+                      <div style="font:700 14px/1 'Manrope'; color: {{ p.neighborColor }}; margin-top:6px">{{ p.neighborStr }}</div>
+                      <div style="font:600 11px/1 'Manrope'; color:#586064; margin-top:4px">{{ p.neighborTiny }}</div>
+                    </div>
+                  </div>
+                </div>
+                <div style="display:flex; align-items:center; justify-content:space-between; gap:8px">
+                  <div style="display:flex; gap:6px; flex-wrap:wrap; min-width:0">
+                    <sc-for list="{{ p.chips2 }}" as="c" hint-placeholder-count="2">
+                      <span style="font:600 12px/1 'Manrope'; color:#2b3437; background:#eaeff1; border-radius:4px; padding:7px 9px; white-space:nowrap">{{ c }}</span>
+                    </sc-for>
+                  </div>
+                  <span style="font:700 12px/1 'Manrope'; color:#455f88; display:flex; align-items:center; gap:3px; height:44px; padding-left:8px; flex-shrink:0">All details<span class="material-symbols-outlined" style="font-size:16px">expand_more</span></span>
+                </div>
+              </div>
+            </sc-for>
+          </div>
+        </div>
+      </div>
+      <div style="font:500 13px/1.5 'Manrope'; color:#586064; max-width:390px">Gutters drop 40 → 18 px. One add action, in the header, at 44 px — the floating button is removed, so nothing covers the list. Two strongest differences show; the rest sit behind “All details”.</div>
+    </div>
+
+  </div>
+</div>
+
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:1560,&quot;height&quot;:1200}}">
+const T = { price: 575000, beds: 3, baths: 3, sqft: 2792, acres: 0.36, year: 2004, neighbor: 96 };
+const T_PPSF = T.price / T.sqft;
+
+/** Closest-neighbour distance at or above this many feet reads as well spaced. */
+const NEIGHBOR_GOOD_FT = 100;
+
+const UP = '\u25b2';
+const DOWN = '\u25bc';
+
+/* address, status, price, activity date, beds, baths, sqft, acres, year, closest neighbour (ft) */
+const COMPS = [
+  ['53 Monroe Street', 'sold', 511000, 'Feb 21, 2024', 4, 2.5, 2722, 0.46, 1998, 126],
+  ['173 Monroe Street', 'sold', 555000, 'Mar 22, 2024', 3, 2.5, 3193, 0.34, 2009, 74],
+  ['1355 Old Courthouse Square', 'sold', 451000, 'May 12, 2024', 3, 2.5, 1818, 0.35, 1989, 81],
+  ['5453 Williamsport Pike', 'sold', 571000, 'Jun 24, 2024', 4, 3, 2777, 0.41, 2006, 104],
+  ['159 Monroe Street', 'sold', 524000, 'Sep 19, 2024', 3, 3, 2888, 0.45, 2002, 118],
+  ['1317 Old Courthouse Square', 'sold', 465000, 'Oct 18, 2024', 3, 2, 1926, 0.33, 1991, null],
+  ['1129 Winchester Avenue', 'listed', 592000, 'Jan 30, 2025', 4, 3, 3047, 0.52, 2012, 138],
+  ['209 Monroe Street', 'sold', 498000, 'Apr 8, 2025', 3, 2.5, 2412, 0.31, 1995, 68],
+  ['1425 Edwin Miller Boulevard', 'sold', 623000, 'Jul 2, 2025', 4, 3.5, 3560, 0.61, 2014, 147],
+  ['183 Monroe Street', 'sold', 600000, 'Sep 13, 2025', 4, 4, 4118, 0.79, 2015, 171],
+  ['1212 North Queen Street', 'sold', 537000, 'Nov 8, 2025', 4, 2.5, 2988, 0.40, 2001, 88],
+  ['77 Monroe Street', 'sold', 570000, 'Dec 15, 2025', 4, 3, 2956, 0.42, 2007, 110],
+  ['1309 Edwin Miller Boulevard', 'sold', 557000, 'Mar 24, 2026', 4, 3, 2645, 0.37, 2005, 92],
+  ['93 Langston Boulevard', 'listed', 588000, 'Apr 21, 2026', 5, 3, 3391, 0.77, 2013, 162],
+];
+
+/** Normalisers: the span at which a difference counts as "one unit" of dissimilarity. */
+const NORM = { beds: 2, baths: 1.5, sqft: 1200, acres: 0.3, year: 20 };
+const BAR_SCALE = 25; // percent at which the magnitude bar is full
+
+const usd = new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD', maximumFractionDigits: 0 });
+
+function signed(n, fmt) {
+  if (n === 0) { return 'no change'; }
+  return (n > 0 ? '+' : '\u2212') + fmt(Math.abs(n));
+}
+
+function build([address, status, price, date, beds, baths, sqft, acres, year, neighbor]) {
+  const dPrice = price - T.price;
+  const dPct = (dPrice / T.price) * 100;
+  const ppsf = price / sqft;
+  const dPpsf = ppsf - T_PPSF;
+
+  const diffs = [
+    { d: beds - T.beds, n: NORM.beds, label: v => `${Math.abs(v)} bed${Math.abs(v) === 1 ? '' : 's'}`, signedLabel: true },
+    { d: baths - T.baths, n: NORM.baths, label: v => `${Math.abs(v)} bath`, signedLabel: true },
+    { d: sqft - T.sqft, n: NORM.sqft, label: v => `${Math.abs(v).toLocaleString()} sq ft`, signedLabel: true },
+    { d: acres - T.acres, n: NORM.acres, label: v => `${Math.abs(v).toFixed(2)} ac`, signedLabel: true },
+    { d: year - T.year, n: NORM.year, label: v => `${Math.abs(v)} yr ${v > 0 ? 'newer' : 'older'}`, signedLabel: false },
+  ];
+  const score = diffs.reduce((s, x) => s + Math.abs(x.d) / x.n, 0);
+  const ranked = diffs
+    .filter(x => Math.round(x.d * 100) !== 0)
+    .sort((a, b) => Math.abs(b.d) / b.n - Math.abs(a.d) / a.n)
+    .map(x => (x.signedLabel ? (x.d > 0 ? '+' : '\u2212') : '') + x.label(x.d));
+
+  const pctMag = Math.min(Math.abs(dPct) / BAR_SCALE, 1) * 100;
+
+  const dNeighbor = neighbor == null ? null : neighbor - T.neighbor;
+  const wellSpaced = neighbor != null && neighbor >= NEIGHBOR_GOOD_FT;
+
+  return {
+    address, score,
+    dir: dPrice === 0 ? '' : dPrice > 0 ? UP : DOWN,
+    ppsfDir: Math.abs(dPpsf) < 1 ? '' : dPpsf > 0 ? UP : DOWN,
+    neighborStr: neighbor == null ? 'Not surveyed' : neighbor + ' ft',
+    neighborColor: neighbor == null ? '#abb3b7' : wellSpaced ? '#455f88' : '#2b3437',
+    neighborNote: neighbor == null ? 'No survey data' : wellSpaced ? 'Well spaced' : 'Close',
+    neighborTiny: neighbor == null ? '\u2014' : wellSpaced ? 'Well spaced' : 'Close',
+    neighborInline: neighbor == null ? 'neighbor not surveyed' : neighbor + ' ft to neighbor',
+    statusLabel: status === 'sold' ? 'Sold' : 'Listed',
+    statusBg: status === 'sold' ? '#dbe4e7' : '#fdf2e2',
+    statusFg: status === 'sold' ? '#586064' : '#655e52',
+    date,
+    activity: date,
+    price: usd.format(price),
+    priceDelta: signed(dPrice, v => usd.format(v)),
+    pricePct: signed(dPct, v => v.toFixed(1) + '%'),
+    negW: dPrice < 0 ? pctMag + '%' : '0%',
+    posW: dPrice > 0 ? pctMag + '%' : '0%',
+    ppsf: '$' + Math.round(ppsf),
+    ppsfDelta: Math.abs(dPpsf) < 1 ? 'same as target' : signed(Math.round(dPpsf), v => '$' + v) + '/sq ft',
+    sqftStr: sqft.toLocaleString() + ' sq ft',
+    sqftVal: sqft.toLocaleString(),
+    sqftTiny: signed(sqft - T.sqft, v => v.toLocaleString()),
+    ppsfTiny: Math.abs(dPpsf) < 1 ? 'same' : signed(Math.round(dPpsf), v => '$' + v),
+    facts: `${beds} bd \u00b7 ${baths} ba \u00b7 ${sqft.toLocaleString()} sq ft \u00b7 ${acres.toFixed(2)} ac`,
+    neighborFacts: neighbor == null
+      ? 'neighbor not surveyed'
+      : (wellSpaced ? 'well spaced' : 'close') + ' \u00b7 ' + neighbor + ' ft to neighbor',
+    chips: ranked.slice(0, 3),
+    chips2: ranked.slice(0, 2),
+  };
+}
+
+class Component extends DCLogic {
+  renderVals() {
+    const rows = COMPS.map(build).sort((a, b) => a.score - b.score);
+    return {
+      page1: rows.slice(0, 7),
+      page2: rows.slice(9, 14),
+      tabletRows: rows.slice(0, 6),
+      mobileRows: rows.slice(0, 3),
+      baselineStats: [
+        { label: 'Baseline price', value: '$575,000' },
+        { label: '$/sq ft', value: '$206' },
+        { label: 'Beds', value: '3' },
+        { label: 'Baths', value: '3' },
+        { label: 'Size', value: '2,792 sq ft' },
+        { label: 'Lot', value: '0.36 ac' },
+        { label: 'Built', value: '2004' },
+        { label: 'Neighbor', value: '96 ft' },
+      ],
+    };
+  }
+}
+
+</script>
+</body>
+</html>
