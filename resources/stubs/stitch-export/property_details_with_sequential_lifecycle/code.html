@@ -1,0 +1,326 @@
+<!DOCTYPE html>
+
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Property Details | The Curated Estate</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@200;300;400;500;600;700;800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            colors: {
+              "primary": "#1A365D",
+              "on-primary": "#ffffff",
+              "surface": "#f8f9fa",
+              "on-surface": "#2b3437",
+              "surface-container-low": "#f1f4f6",
+              "surface-container-high": "#e3e9ec",
+              "on-surface-variant": "#586064",
+              "outline-variant": "#abb3b7",
+            },
+            fontFamily: {
+              "headline": ["Manrope", "sans-serif"],
+              "body": ["Manrope", "sans-serif"],
+            },
+            borderRadius: {
+                "DEFAULT": "0.25rem",
+                "lg": "0.5rem",
+                "xl": "1rem",
+            },
+          },
+        },
+      }
+    </script>
+<style>
+        body { font-family: 'Manrope', sans-serif; }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+    </style>
+</head>
+<body class="bg-surface text-on-surface">
+<!-- Top Navigation -->
+<nav class="fixed top-0 w-full z-50 bg-white/80 backdrop-blur-xl shadow-sm flex justify-between items-center px-8 py-4">
+<div class="flex items-center gap-8">
+<span class="text-xl font-bold text-primary tracking-tight">The Curated Estate</span>
+<div class="hidden md:flex gap-6 items-center">
+<a class="text-on-surface-variant hover:text-primary transition-colors px-3 py-1 rounded" href="#">Dashboard</a>
+<a class="text-primary font-bold px-3 py-1 rounded" href="#">Properties</a>
+<a class="text-on-surface-variant hover:text-primary transition-colors px-3 py-1 rounded" href="#">Comparison</a>
+</div>
+</div>
+<div class="flex items-center gap-4">
+<button class="p-2 hover:bg-surface-container-low transition-colors rounded-full">
+<span class="material-symbols-outlined">notifications</span>
+</button>
+<button class="p-2 hover:bg-surface-container-low transition-colors rounded-full">
+<span class="material-symbols-outlined">settings</span>
+</button>
+<div class="w-8 h-8 rounded-full bg-surface-container-high overflow-hidden">
+<img alt="User Avatar" class="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAIdebPIEiqYvhibu8t6m7ILqdf2Pdig_MmG_cMifZPgFvjrFc91FaMKytNjZLrz1DG8wykcRbxdT9dCDH0zhwvr6g5RPqwRSBnpNJdsqLW7JWv40nYYEiBI4ARi-oJv5LNI_5fUcFVlmBZtRUJMuGOcf9JPxaJEBtyx2NorBzGCCiLCFyLobkDQbdn-yGUNgzvGoOnb_dwhZ2_zCyQE8j9b82-yTftAsKHLGEs3hDY8QeefblyjJr8fxJEypvtNNC8wDlDNknzD-k"/>
+</div>
+</div>
+</nav>
+<main class="pt-24 pb-20 px-8 max-w-7xl mx-auto">
+<!-- Header Section -->
+<div class="flex flex-col lg:flex-row justify-between items-start gap-6 mb-8">
+<div>
+<h1 class="text-4xl font-extrabold tracking-tight text-primary mt-1">142 Oakwood Crest</h1>
+<p class="text-lg text-on-surface-variant">St. George's Hill, Weybridge, KT13</p>
+</div>
+<div class="flex flex-wrap lg:flex-nowrap gap-8 lg:text-right">
+<div class="flex flex-col">
+<span class="text-[10px] text-on-surface-variant font-bold uppercase tracking-widest">Days on Market</span>
+<span class="text-2xl font-bold text-primary">14 Days</span>
+</div>
+<div class="flex flex-col">
+<span class="text-[10px] text-on-surface-variant font-bold uppercase tracking-widest">+/- vs List Price</span>
+<span class="text-2xl font-bold text-red-600">-$25,000 / -0.5%</span>
+</div>
+<div class="flex flex-col">
+<span class="text-[10px] text-on-surface-variant font-bold uppercase tracking-widest">Last Sale Price</span>
+<span class="text-5xl font-black tracking-tighter text-primary">$4,850,000</span>
+</div>
+</div>
+</div>
+<!-- Hero Section & Reflowed Layout -->
+<div class="grid grid-cols-1 lg:grid-cols-12 gap-8 mb-12">
+<!-- Hero Photo (40-50% width on large screens) -->
+<div class="lg:col-span-5 aspect-[4/3] rounded-xl overflow-hidden bg-surface-container-low shadow-sm">
+<img alt="Property exterior" class="w-full h-full object-cover grayscale-[10%] hover:grayscale-0 transition-all duration-500" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCVdnsn8GiDdgIFBfQHm3Htx1XzrzZBuaKsdCjNF2ftZtYo0QK7g3T-dcQr7XvP9eipjuvgRYZFZq226xP_ElpLo-OqUGn6p0aihS_8bCxiaimO8c9d6RB5ZMtAW8JaLuUKwUVThPk3-_4uAggInSZWy5cop3zL7hqzBVOaWdic73GGM0tJ0fqmLUU4TOKUYyP9qHGTywpGxpEP8mmPoYHG5hwmGo6awbUfjPpxEfYzvUlOnVRDuwLjOmOuawGbu4qVFNOZT1M-Vxs"/>
+</div>
+<!-- Reflowed Content Column -->
+<div class="lg:col-span-7 flex flex-col justify-between space-y-4">
+<!-- Core Stats Grid -->
+<div class="grid grid-cols-2 md:grid-cols-3 gap-4">
+<div class="bg-white p-5 rounded-lg border border-outline-variant/20 shadow-sm">
+<p class="text-[10px] font-bold text-on-surface-variant uppercase tracking-widest mb-1">Bedrooms</p>
+<p class="text-2xl font-bold text-primary">6</p>
+</div>
+<div class="bg-white p-5 rounded-lg border border-outline-variant/20 shadow-sm">
+<p class="text-[10px] font-bold text-on-surface-variant uppercase tracking-widest mb-1">Bathrooms</p>
+<p class="text-2xl font-bold text-primary">5.5</p>
+</div>
+<div class="bg-white p-5 rounded-lg border border-outline-variant/20 shadow-sm">
+<p class="text-[10px] font-bold text-on-surface-variant uppercase tracking-widest mb-1">Square Footage</p>
+<p class="text-2xl font-bold text-primary">7,200 sqft</p>
+</div>
+<div class="bg-white p-5 rounded-lg border border-outline-variant/20 shadow-sm">
+<p class="text-[10px] font-bold text-on-surface-variant uppercase tracking-widest mb-1">Acreage</p>
+<p class="text-2xl font-bold text-primary">1.4 Acres</p>
+</div>
+<div class="bg-white p-5 rounded-lg border border-outline-variant/20 shadow-sm">
+<p class="text-[10px] font-bold text-on-surface-variant uppercase tracking-widest mb-1">Year Built</p>
+<p class="text-2xl font-bold text-primary">2018</p>
+</div>
+<div class="bg-white p-5 rounded-lg border border-outline-variant/20 shadow-sm">
+<p class="text-[10px] font-bold text-on-surface-variant uppercase tracking-widest mb-1">HOA</p>
+<p class="text-lg font-bold text-primary">$240 / Mo</p>
+</div>
+</div>
+<!-- Utilities Summary (Reflowed) -->
+<div class="bg-white p-5 rounded-lg border border-outline-variant/20 shadow-sm">
+<p class="text-[10px] font-bold text-on-surface-variant uppercase tracking-widest mb-2">Primary Utilities</p>
+<div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+<div class="flex items-center gap-1.5">
+<span class="material-symbols-outlined text-sm text-primary">water_drop</span>
+<span class="text-[11px] font-bold text-primary">Water: <span class="text-on-surface-variant font-medium">Public</span></span>
+</div>
+<div class="flex items-center gap-1.5">
+<span class="material-symbols-outlined text-sm text-primary">propane</span>
+<span class="text-[11px] font-bold text-primary">Gas: <span class="text-on-surface-variant font-medium">PG&amp;E</span></span>
+</div>
+<div class="flex items-center gap-1.5">
+<span class="material-symbols-outlined text-sm text-primary">bolt</span>
+<span class="text-[11px] font-bold text-primary">Electric: <span class="text-on-surface-variant font-medium">SCE</span></span>
+</div>
+<div class="flex items-center gap-1.5">
+<span class="material-symbols-outlined text-sm text-primary">language</span>
+<span class="text-[11px] font-bold text-primary">Web: <span class="text-on-surface-variant font-medium">Fiber</span></span>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- Main Content Area -->
+<div class="grid grid-cols-1 lg:grid-cols-12 gap-12">
+<!-- Left Side -->
+<div class="lg:col-span-8 space-y-8">
+<!-- Neighborhood Proximity -->
+<section class="bg-white p-8 rounded-xl border border-outline-variant/20 shadow-sm">
+<div class="flex justify-between items-center mb-6">
+<h2 class="text-xl font-bold text-primary tracking-tight">Neighborhood Proximity</h2>
+<span class="text-[10px] font-bold text-on-surface-variant uppercase tracking-widest">Survey v.04</span>
+</div>
+<div class="relative w-full aspect-video bg-surface-container-low rounded-lg overflow-hidden border border-outline-variant/10">
+<div class="absolute inset-0 opacity-10 pointer-events-none" style="background-image: radial-gradient(#1A365D 1px, transparent 1px); background-size: 32px 32px;"></div>
+<div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 flex flex-col items-center">
+<div class="bg-primary text-on-primary w-12 h-12 rounded-full flex items-center justify-center shadow-xl ring-4 ring-primary/5 z-10">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">home</span>
+</div>
+<span class="mt-2 text-[10px] font-black uppercase tracking-tighter bg-white px-2 py-0.5 rounded shadow-sm">Asset</span>
+</div>
+<svg class="absolute inset-0 w-full h-full pointer-events-none">
+<line opacity="0.2" stroke="#1A365D" stroke-dasharray="4 4" stroke-width="1.5" x1="25%" x2="50%" y1="25%" y2="50%"></line>
+<text fill="#1A365D" font-family="Manrope" font-size="10" font-weight="800" x="35%" y="38%">145 ft</text>
+<line opacity="0.2" stroke="#1A365D" stroke-dasharray="4 4" stroke-width="1.5" x1="75%" x2="50%" y1="66%" y2="50%"></line>
+<text fill="#1A365D" font-family="Manrope" font-size="10" font-weight="800" x="62%" y="58%">210 ft</text>
+</svg>
+<div class="absolute top-1/4 left-1/4 bg-white text-primary w-8 h-8 rounded-full flex items-center justify-center shadow-md border border-outline-variant/20">
+<span class="material-symbols-outlined text-sm">home</span>
+</div>
+<div class="absolute bottom-1/3 right-1/4 bg-white text-primary w-8 h-8 rounded-full flex items-center justify-center shadow-md border border-outline-variant/20">
+<span class="material-symbols-outlined text-sm">home</span>
+</div>
+<div class="absolute bottom-4 left-4 bg-white/90 px-3 py-1.5 rounded text-[10px] font-bold shadow-sm border border-outline-variant/10">
+<span class="text-on-surface-variant">LOCATION:</span> <span class="text-primary uppercase">Weybridge Park Area</span>
+</div>
+</div>
+</section>
+<!-- Listing Lifecycle (Moved here and updated for multiple cycles) -->
+<section class="bg-white p-8 rounded-xl border border-outline-variant/20 shadow-sm">
+<div class="flex justify-between items-center mb-6">
+<h2 class="text-xl font-bold text-primary tracking-tight">Listing Lifecycle</h2>
+<span class="text-[10px] font-bold text-on-surface-variant uppercase tracking-widest">Audit Archive</span>
+</div>
+<div class="space-y-8 relative">
+<!-- Vertical Timeline Line -->
+<div class="absolute left-[3px] top-4 bottom-4 w-0.5 bg-surface-container-high hidden md:block"></div>
+<!-- Cycle 1 -->
+<div class="relative md:pl-10">
+<div class="absolute left-0 top-1 w-2 h-2 rounded-full bg-primary ring-4 ring-surface hidden md:block"></div>
+<div class="flex items-center justify-between mb-4">
+<span class="text-[10px] font-black text-primary uppercase tracking-wider bg-surface-container-low px-2 py-0.5 rounded">Cycle 2: Jan 2024 - Mar 2024</span>
+<span class="text-xs font-bold text-green-600 bg-green-50 px-2 py-0.5 rounded border border-green-100">SOLD</span>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+<div class="bg-surface-container-low/30 p-4 rounded-lg border border-outline-variant/10">
+<p class="text-[9px] font-bold text-on-surface-variant uppercase tracking-widest mb-1">Listed</p>
+<p class="text-xs text-on-surface-variant">Jan 15, 2024</p>
+<p class="text-sm font-bold text-primary mt-1">$4,925,000</p>
+</div>
+<div class="bg-surface-container-low/30 p-4 rounded-lg border border-outline-variant/10">
+<p class="text-[9px] font-bold text-on-surface-variant uppercase tracking-widest mb-1">Price Drop</p>
+<p class="text-xs text-on-surface-variant">Feb 20, 2024</p>
+<p class="text-sm font-bold text-primary mt-1">$4,850,000</p>
+</div>
+<div class="bg-primary/5 p-4 rounded-lg border border-primary/10">
+<p class="text-[9px] font-bold text-primary uppercase tracking-widest mb-1">Closed</p>
+<p class="text-xs text-on-surface-variant">Mar 12, 2024</p>
+<p class="text-sm font-bold text-primary mt-1">$4,850,000</p>
+</div>
+</div>
+</div>
+<!-- Cycle 2 -->
+<div class="relative md:pl-10">
+<div class="absolute left-0 top-1 w-2 h-2 rounded-full bg-outline-variant ring-4 ring-surface hidden md:block"></div>
+<div class="flex items-center justify-between mb-4">
+<span class="text-[10px] font-black text-on-surface-variant uppercase tracking-wider bg-surface-container-low px-2 py-0.5 rounded">Cycle 1: Oct 2023 - Nov 2023</span>
+<span class="text-xs font-bold text-on-surface-variant bg-surface-container-high px-2 py-0.5 rounded border border-outline-variant/10">OFF-MARKET</span>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-2 gap-6 opacity-70">
+<div class="bg-surface-container-low/30 p-4 rounded-lg border border-outline-variant/10">
+<p class="text-[9px] font-bold text-on-surface-variant uppercase tracking-widest mb-1">Listed</p>
+<p class="text-xs text-on-surface-variant">Oct 12, 2023</p>
+<p class="text-sm font-bold text-primary mt-1">$4,875,000</p>
+</div>
+<div class="bg-surface-container-low/30 p-4 rounded-lg border border-outline-variant/10">
+<p class="text-[9px] font-bold text-on-surface-variant uppercase tracking-widest mb-1">Expired</p>
+<p class="text-xs text-on-surface-variant">Nov 30, 2023</p>
+<p class="text-sm font-bold text-primary mt-1">$4,875,000</p>
+</div>
+</div>
+</div>
+</div>
+</section>
+</div>
+<!-- Right Side: Sidebar -->
+<div class="lg:col-span-4 space-y-8">
+<!-- Nearby Infrastructure -->
+<section class="bg-white p-6 rounded-xl border border-outline-variant/20 shadow-sm">
+<h3 class="text-lg font-bold text-primary mb-6">Nearby Infrastructure</h3>
+<div class="space-y-6">
+<div>
+<div class="flex items-center gap-2 mb-4">
+<span class="material-symbols-outlined text-primary text-xl">medical_services</span>
+<span class="text-xs font-bold uppercase tracking-wider text-on-surface-variant">Medical &amp; Pharmacy Hub</span>
+</div>
+<div class="space-y-4">
+<div>
+<p class="text-[10px] font-bold text-primary/50 uppercase mb-2">Hospitals</p>
+<div class="space-y-2">
+<div class="flex justify-between items-center text-sm border-b border-surface-container-high pb-1.5">
+<span class="font-bold">St Peter’s Hospital</span>
+<span class="text-xs text-on-surface-variant">1.2 mi</span>
+</div>
+<div class="flex justify-between items-center text-sm border-b border-surface-container-high pb-1.5">
+<span class="font-bold">Weybridge Community</span>
+<span class="text-xs text-on-surface-variant">0.8 mi</span>
+</div>
+</div>
+</div>
+<div>
+<p class="text-[10px] font-bold text-primary/50 uppercase mb-2">Pharmacies</p>
+<div class="space-y-2">
+<div class="flex justify-between items-center text-sm border-b border-surface-container-high pb-1.5">
+<span class="font-bold">Boots Pharmacy</span>
+<span class="text-xs text-on-surface-variant">0.4 mi</span>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="pt-4 border-t border-outline-variant/10 space-y-5">
+<div class="flex items-center justify-between group cursor-pointer">
+<div class="flex items-center gap-3">
+<div class="w-10 h-10 bg-surface-container-low rounded flex items-center justify-center">
+<span class="material-symbols-outlined text-primary">school</span>
+</div>
+<div>
+<p class="text-sm font-bold leading-tight">Heathside School</p>
+<p class="text-[10px] text-on-surface-variant uppercase">0.5 mi</p>
+</div>
+</div>
+<span class="material-symbols-outlined text-outline-variant group-hover:text-primary transition-colors">chevron_right</span>
+</div>
+<div class="flex items-center justify-between group cursor-pointer">
+<div class="flex items-center gap-3">
+<div class="w-10 h-10 bg-surface-container-low rounded flex items-center justify-center">
+<span class="material-symbols-outlined text-primary">shopping_basket</span>
+</div>
+<div>
+<p class="text-sm font-bold leading-tight">Waitrose &amp; Partners</p>
+<p class="text-[10px] text-on-surface-variant uppercase">0.3 mi</p>
+</div>
+</div>
+<span class="material-symbols-outlined text-outline-variant group-hover:text-primary transition-colors">chevron_right</span>
+</div>
+</div>
+</div>
+</section>
+<!-- Documents Archive -->
+<div class="bg-primary p-6 rounded-xl text-on-primary shadow-lg">
+<h3 class="text-xs font-bold uppercase tracking-widest text-on-primary/60 mb-4">Documents</h3>
+<ul class="space-y-2">
+<li class="flex items-center gap-3 p-2 hover:bg-white/10 rounded cursor-pointer transition-colors border border-white/5">
+<span class="material-symbols-outlined">description</span>
+<span class="text-sm font-medium">Title Deed_142.pdf</span>
+</li>
+<li class="flex items-center gap-3 p-2 hover:bg-white/10 rounded cursor-pointer transition-colors border border-white/5">
+<span class="material-symbols-outlined">history_edu</span>
+<span class="text-sm font-medium">Mortgage Agreement</span>
+</li>
+<li class="flex items-center gap-3 p-2 hover:bg-white/10 rounded cursor-pointer transition-colors border border-white/5">
+<span class="material-symbols-outlined">verified_user</span>
+<span class="text-sm font-medium">Insurance 24/25</span>
+</li>
+</ul>
+</div>
+</div>
+</div>
+</main>
+</body></html>

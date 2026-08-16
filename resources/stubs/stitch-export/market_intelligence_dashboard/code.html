@@ -1,0 +1,345 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@200;300;400;500;600;700;800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            colors: {
+              "on-primary-fixed": "#254067",
+              "surface-container-lowest": "#ffffff",
+              "on-secondary-fixed": "#314055",
+              "inverse-surface": "#0c0f10",
+              "surface-variant": "#dbe4e7",
+              "on-secondary-fixed-variant": "#4d5d73",
+              "on-surface-variant": "#586064",
+              "primary-container": "#d6e3ff",
+              "on-error": "#fff7f6",
+              "surface-container-highest": "#dbe4e7",
+              "background": "#f8f9fa",
+              "surface-container-low": "#f1f4f6",
+              "tertiary": "#655e52",
+              "surface-container-high": "#e3e9ec",
+              "secondary-fixed-dim": "#c5d6f0",
+              "secondary-fixed": "#d3e4fe",
+              "on-primary": "#f6f7ff",
+              "error-dim": "#4e0309",
+              "primary": "#455f88",
+              "primary-dim": "#39537c",
+              "inverse-primary": "#b3cdfd",
+              "tertiary-dim": "#595246",
+              "inverse-on-surface": "#9b9d9e",
+              "outline": "#737c7f",
+              "surface-container": "#eaeff1",
+              "surface-bright": "#f8f9fa",
+              "secondary": "#506076",
+              "surface-tint": "#455f88",
+              "on-error-container": "#752121",
+              "on-background": "#2b3437",
+              "on-tertiary": "#fff8f0",
+              "on-secondary-container": "#435368",
+              "primary-fixed": "#d6e3ff",
+              "on-surface": "#2b3437",
+              "outline-variant": "#abb3b7",
+              "surface": "#f8f9fa",
+              "on-tertiary-container": "#625b4f",
+              "on-tertiary-fixed-variant": "#6d6559",
+              "primary-fixed-dim": "#bfd5ff",
+              "tertiary-fixed": "#fdf2e2",
+              "on-tertiary-fixed": "#4f493d",
+              "secondary-dim": "#44546a",
+              "on-primary-container": "#38527b",
+              "tertiary-fixed-dim": "#efe4d4",
+              "tertiary-container": "#fdf2e2",
+              "error": "#9f403d",
+              "on-secondary": "#f7f9ff",
+              "secondary-container": "#d3e4fe",
+              "surface-dim": "#d1dce0",
+              "on-primary-fixed-variant": "#425c85",
+              "error-container": "#fe8983"
+            },
+            fontFamily: {
+              "headline": ["Manrope"],
+              "body": ["Manrope"],
+              "label": ["Manrope"]
+            },
+            borderRadius: {"DEFAULT": "0.125rem", "lg": "0.25rem", "xl": "0.5rem", "full": "0.75rem"},
+          },
+        },
+      }
+    </script>
+<style>
+        body { font-family: 'Manrope', sans-serif; }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+    </style>
+</head>
+<body class="bg-surface text-on-surface selection:bg-primary-container">
+<!-- Top Navigation Shell -->
+<header class="fixed top-0 w-full z-50 bg-slate-50/80 backdrop-blur-xl shadow-sm flex justify-between items-center px-8 py-4 w-full">
+<div class="flex items-center gap-8">
+<span class="text-xl font-bold text-blue-900 tracking-tight">The Curated Estate</span>
+<nav class="hidden md:flex items-center gap-6">
+<a class="text-blue-800 font-semibold transition-colors" href="#">Dashboard</a>
+<a class="text-slate-500 hover:bg-slate-200/50 px-3 py-1 rounded transition-colors" href="#">Properties</a>
+<a class="text-slate-500 hover:bg-slate-200/50 px-3 py-1 rounded transition-colors" href="#">Comparison</a>
+</nav>
+</div>
+<div class="flex items-center gap-4">
+<div class="relative group">
+<span class="material-symbols-outlined text-on-surface-variant p-2 hover:bg-slate-200/50 rounded-full cursor-pointer transition-all">notifications</span>
+</div>
+<div class="relative group">
+<span class="material-symbols-outlined text-on-surface-variant p-2 hover:bg-slate-200/50 rounded-full cursor-pointer transition-all">settings</span>
+</div>
+<div class="w-8 h-8 rounded-full bg-surface-container-highest overflow-hidden">
+<img alt="Account Profile" class="w-full h-full object-cover" data-alt="User professional profile headshot" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAWCMHBwsJLk56750doKY_I2qGRx9u2oOYkMNfly3aiRa8TlD4SVdw9chuZfnVHanUJMyMHvozXOZQpbxHdfngxVcDVjxB0tybARWmPNgdIuyDHIIVRGI3FkJWYUs6yxyt9bvdxC1GmOQO6m-SMJgb2jywFMECPVBEh8ThKcmVPcnUjGtF5mWN-THx7w2iSc19zX4gQCHut2BHwQWaih0twuSSGo2NmkdFIbVnz7_4HVBKcEOZy-j_SmzDD8fF5zm5ho4MGgKtKT4M"/>
+</div>
+</div>
+</header>
+<div class="flex pt-20">
+<!-- Side Navigation Shell -->
+<aside class="hidden md:flex flex-col h-[calc(100vh-80px)] w-64 py-8 px-6 bg-slate-50 fixed left-0">
+<div class="mb-10">
+<h2 class="text-lg font-black text-blue-900">Portfolio</h2>
+<p class="text-xs text-on-surface-variant uppercase tracking-widest mt-1">Private Ledger</p>
+</div>
+<nav class="flex-1 space-y-2">
+<a class="flex items-center gap-3 py-3 px-4 text-slate-500 hover:text-blue-700 hover:translate-x-1 transition-transform duration-200" href="#">
+<span class="material-symbols-outlined">dashboard</span>
+<span class="font-medium text-sm">Dashboard</span>
+</a>
+<a class="flex items-center gap-3 py-3 px-4 text-blue-900 font-bold border-r-4 border-blue-800 bg-white/50 transition-all" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">insights</span>
+<span class="font-medium text-sm">Market Trends</span>
+</a>
+<a class="flex items-center gap-3 py-3 px-4 text-slate-500 hover:text-blue-700 hover:translate-x-1 transition-transform duration-200" href="#">
+<span class="material-symbols-outlined">domain</span>
+<span class="font-medium text-sm">Properties</span>
+</a>
+<a class="flex items-center gap-3 py-3 px-4 text-slate-500 hover:text-blue-700 hover:translate-x-1 transition-transform duration-200" href="#">
+<span class="material-symbols-outlined">compare_arrows</span>
+<span class="font-medium text-sm">Comparison</span>
+</a>
+</nav>
+<button class="mb-8 py-3 px-4 bg-gradient-to-br from-primary to-primary-dim text-on-primary rounded-lg text-sm font-semibold shadow-sm hover:opacity-90 transition-opacity">
+                Add Asset
+            </button>
+<div class="space-y-2 pt-6 border-t border-surface-container-high">
+<a class="flex items-center gap-3 py-2 px-4 text-slate-500 hover:text-blue-700 text-sm" href="#">
+<span class="material-symbols-outlined">help_outline</span>
+<span>Support</span>
+</a>
+<a class="flex items-center gap-3 py-2 px-4 text-slate-500 hover:text-blue-700 text-sm" href="#">
+<span class="material-symbols-outlined">logout</span>
+<span>Sign Out</span>
+</a>
+</div>
+</aside>
+<!-- Main Content Area -->
+<main class="flex-1 md:ml-64 p-8 bg-surface">
+<!-- Editorial Header -->
+<div class="mb-12">
+<span class="text-primary font-bold tracking-widest text-xs uppercase mb-2 block">Market Intel</span>
+<h1 class="text-4xl font-extrabold tracking-tight text-on-surface mb-2">Market Trends</h1>
+<p class="text-on-surface-variant max-w-2xl leading-relaxed">A comprehensive overview of global real estate shifts and portfolio equity performance. Data refined as of Today.</p>
+</div>
+<!-- Bento Grid Layout -->
+<div class="grid grid-cols-1 md:grid-cols-12 gap-6">
+<!-- Primary Insight Card -->
+<div class="md:col-span-8 bg-primary-container/40 p-8 rounded-xl relative overflow-hidden flex flex-col justify-between">
+<div class="relative z-10">
+<h3 class="text-on-primary-container text-sm font-bold uppercase tracking-widest mb-4">Portfolio Appreciation</h3>
+<div class="flex items-baseline gap-2">
+<span class="text-6xl font-black text-on-primary-container tracking-tighter">+12.4%</span>
+<span class="text-primary-dim font-medium">YTD Yield</span>
+</div>
+</div>
+<!-- Simplified Visual Chart Placeholder -->
+<div class="mt-12 h-48 flex items-end gap-2">
+<div class="w-full bg-primary/10 rounded-t-sm h-1/4"></div>
+<div class="w-full bg-primary/20 rounded-t-sm h-2/4"></div>
+<div class="w-full bg-primary/15 rounded-t-sm h-1/3"></div>
+<div class="w-full bg-primary/30 rounded-t-sm h-3/4"></div>
+<div class="w-full bg-primary/25 rounded-t-sm h-2/3"></div>
+<div class="w-full bg-primary/40 rounded-t-sm h-5/6"></div>
+<div class="w-full bg-primary/60 rounded-t-sm h-full"></div>
+<div class="w-full bg-primary/45 rounded-t-sm h-3/4"></div>
+<div class="w-full bg-primary/70 rounded-t-sm h-5/6"></div>
+<div class="w-full bg-primary h-full rounded-t-sm shadow-xl shadow-primary/20"></div>
+</div>
+</div>
+<!-- Secondary Metric Cards Stack -->
+<div class="md:col-span-4 flex flex-col gap-6">
+<div class="bg-surface-container-low p-6 rounded-xl flex items-center justify-between">
+<div>
+<p class="text-xs text-on-surface-variant font-bold uppercase tracking-widest mb-1">Average PSF</p>
+<p class="text-2xl font-bold text-on-surface">$1,420</p>
+</div>
+<div class="p-3 bg-surface-container-lowest rounded-full shadow-sm">
+<span class="material-symbols-outlined text-primary">square_foot</span>
+</div>
+</div>
+<div class="bg-surface-container-low p-6 rounded-xl flex items-center justify-between">
+<div>
+<p class="text-xs text-on-surface-variant font-bold uppercase tracking-widest mb-1">Market Velocity</p>
+<p class="text-2xl font-bold text-on-surface">18 Days</p>
+</div>
+<div class="p-3 bg-surface-container-lowest rounded-full shadow-sm">
+<span class="material-symbols-outlined text-primary">speed</span>
+</div>
+</div>
+<div class="bg-surface-container-low p-6 rounded-xl flex flex-col gap-4">
+<div class="flex justify-between items-center">
+<p class="text-xs text-on-surface-variant font-bold uppercase tracking-widest">Equity Build</p>
+<span class="text-primary font-bold text-xs">68%</span>
+</div>
+<div class="w-full h-2 bg-surface-container-high rounded-full overflow-hidden">
+<div class="h-full bg-primary w-[68%]"></div>
+</div>
+</div>
+</div>
+<!-- Recent Activity Section -->
+<div class="md:col-span-12 mt-4">
+<div class="flex items-center justify-between mb-8">
+<h2 class="text-2xl font-bold tracking-tight">Recent Activity</h2>
+<button class="text-primary font-bold text-sm hover:underline">View Ledger</button>
+</div>
+<div class="space-y-4">
+<!-- Activity Item 1 -->
+<div class="group bg-surface-container-lowest p-5 rounded-xl flex items-center gap-6 hover:bg-white hover:shadow-xl hover:shadow-on-surface/5 transition-all cursor-pointer">
+<div class="w-20 h-20 bg-surface-container-highest rounded-lg overflow-hidden shrink-0">
+<img alt="Property Image" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" data-alt="Modern luxury villa with pool" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAJ4Q_QC3MAwfugqviOXn2wnWns987hqoUVbeTgCsXzoD-erOHvO95Qa3H9lqhnuHCQQm36I6SjVgo38lezORdeL9JeWGCnC4jC2zCZsclNSBXpaJ1rpGq1gCFFVRz3TEZ1oXJ-ZkeoTUIpnrFtO014PLIUucQK6KAHdwkZuNRnLaqZCYDqFcJ2K2Gtqij9XmI8OlfLlLKyn-aCllSDohbPE235j-wWIchS9yo61YpslD3s9uFSKB6G5Uhr9rVs2GNW2DCr0oIh-iw"/>
+</div>
+<div class="flex-1 flex flex-col md:flex-row md:items-center justify-between gap-4">
+<div>
+<h4 class="font-bold text-lg text-on-surface">The Glass Pavilion</h4>
+<p class="text-sm text-on-surface-variant">Aspen, Colorado • Residential</p>
+</div>
+<div class="flex items-center gap-12">
+<div class="text-right">
+<p class="text-xs text-on-surface-variant font-bold uppercase tracking-widest">Current Valuation</p>
+<p class="font-bold text-on-surface">$4.2M</p>
+</div>
+<div class="text-right min-w-[80px]">
+<p class="text-xs text-on-surface-variant font-bold uppercase tracking-widest">Trend</p>
+<div class="flex items-center justify-end text-primary font-bold">
+<span class="material-symbols-outlined text-sm">trending_up</span>
+<span>4.2%</span>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- Activity Item 2 -->
+<div class="group bg-surface-container-lowest p-5 rounded-xl flex items-center gap-6 hover:bg-white hover:shadow-xl hover:shadow-on-surface/5 transition-all cursor-pointer">
+<div class="w-20 h-20 bg-surface-container-highest rounded-lg overflow-hidden shrink-0">
+<img alt="Property Image" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" data-alt="Brutalist architectural apartment exterior" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDhJmQ5uFa5upnssvPtNPDJmGwRhxasBl1yVJLeb_pwlSwqdldGfmjCRPUqidDIkkXFNXwbB0fUcIK6tuC3qEr1w6Me86bSMrM0Nh7X2JH_UZ-CzmLWSATgkAPBF-Py4DURXB_ibrkGeFsu9udbjaZMn8stiHTjfuJfrujlXVWWa1puxL-MPmliEymcCdgr3G95OV2XJQSo5PxOTkC6G0z-4RRYPuotZPoygLvDZP6GiyYj8en130dyAIGV3yJ0IdrGOYBTfWxt3Q4"/>
+</div>
+<div class="flex-1 flex flex-col md:flex-row md:items-center justify-between gap-4">
+<div>
+<h4 class="font-bold text-lg text-on-surface">Harbor View Penthouse</h4>
+<p class="text-sm text-on-surface-variant">Manhattan, NY • Multi-family</p>
+</div>
+<div class="flex items-center gap-12">
+<div class="text-right">
+<p class="text-xs text-on-surface-variant font-bold uppercase tracking-widest">Current Valuation</p>
+<p class="font-bold text-on-surface">$12.8M</p>
+</div>
+<div class="text-right min-w-[80px]">
+<p class="text-xs text-on-surface-variant font-bold uppercase tracking-widest">Trend</p>
+<div class="flex items-center justify-end text-primary font-bold">
+<span class="material-symbols-outlined text-sm">trending_up</span>
+<span>1.8%</span>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- Activity Item 3 -->
+<div class="group bg-surface-container-lowest p-5 rounded-xl flex items-center gap-6 hover:bg-white hover:shadow-xl hover:shadow-on-surface/5 transition-all cursor-pointer">
+<div class="w-20 h-20 bg-surface-container-highest rounded-lg overflow-hidden shrink-0">
+<img alt="Property Image" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" data-alt="High-end suburban family estate" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCLAv5PdJdIqPWA_lvpRLJHNvv_sXSnwDuB5nVyxhKoDot0tcD1S-gPBroFkuPjIz0ei9Vo-VfwHvobZTOLYhU-aX21c-_9E54xZxd2PifXnGxX1xJIJVrX73trKnmXgu0sRXDBsxo9fYVG3B0n9EdnOdeVJ1mdjqgHP-BdJ2AAbJKWfElRpXrxb8AsPDpfEKzfirXmRyjPWxLWM3-PRMrHwpJYodA0zmY3kQrLuYgwyEUy-apgRSAXuSrE8F5el6wId_6EiGs-HMs"/>
+</div>
+<div class="flex-1 flex flex-col md:flex-row md:items-center justify-between gap-4">
+<div>
+<h4 class="font-bold text-lg text-on-surface">Greenwich Estate</h4>
+<p class="text-sm text-on-surface-variant">Greenwich, CT • Residential</p>
+</div>
+<div class="flex items-center gap-12">
+<div class="text-right">
+<p class="text-xs text-on-surface-variant font-bold uppercase tracking-widest">Current Valuation</p>
+<p class="font-bold text-on-surface">$2.4M</p>
+</div>
+<div class="text-right min-w-[80px]">
+<p class="text-xs text-on-surface-variant font-bold uppercase tracking-widest">Trend</p>
+<div class="flex items-center justify-end text-error font-bold">
+<span class="material-symbols-outlined text-sm">trending_down</span>
+<span>0.4%</span>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- Market Hotspots Section -->
+<div class="md:col-span-12 grid grid-cols-1 md:grid-cols-3 gap-6 mt-8">
+<div class="bg-surface-container-low p-8 rounded-xl relative overflow-hidden h-64 flex flex-col justify-end">
+<img alt="London Map" class="absolute inset-0 w-full h-full object-cover opacity-20 grayscale" data-alt="Abstract aerial view of London city" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBfRNMaV9GstPY8ndYVLfgXPsvHNUBKcBf9C2XEhZ1x80hgK6oUASwxpn5EG-nE6UcyqhDzOjMi6y74ScY_eHg1OPudlgV3odaMzdVcnrXV7L3okuJk2N3KYLkSbwYVMfyIaHV8Pfc1l3R1mpT_LAigWU6iiAUnpF_33Qvx_D8WqcbJIfaHTHvU05tjZn9EHjP6m6hVe6SDEMC6RrbtN-cWD37nTosONPMe7f364fOkqxWMPQs29I9EakT28iLl_hyxmKvzMpwAlhg"/>
+<div class="relative z-10">
+<p class="text-xs font-bold text-primary mb-1">CITY SPOTLIGHT</p>
+<h3 class="text-2xl font-extrabold text-on-surface">London, UK</h3>
+<p class="text-sm text-on-surface-variant">Luxury segment seeing 5.2% uptick in foreign investment.</p>
+</div>
+</div>
+<div class="bg-surface-container-low p-8 rounded-xl relative overflow-hidden h-64 flex flex-col justify-end">
+<img alt="Dubai Map" class="absolute inset-0 w-full h-full object-cover opacity-20 grayscale" data-alt="Futuristic skyline of Dubai" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBUZp7pLnPQP0FgLfCNI66u38cVDVivqJoBO6HsLjgIE1WSsKt_5oCZoE4eTjJ5RbKxeWRz0i0Jh9OPaMJlad-jNSeOOsx9lW-XPA0qfc8hAFLkki9f-qXuXyWVdSNv9afxZCLesFRHrpFbF7Bw_kepsfYQr2ehL6QBbw8K6rsvot1gwMAhElDC9fPIAKxdGztBajOrYZ2jO_llHy71TW271_r-7RwI0duP9PpWHiqwW18JnbesOlKUaz7sJ5Fz-CtbnpMzRP-II5Q"/>
+<div class="relative z-10">
+<p class="text-xs font-bold text-primary mb-1">CITY SPOTLIGHT</p>
+<h3 class="text-2xl font-extrabold text-on-surface">Dubai, UAE</h3>
+<p class="text-sm text-on-surface-variant">Yield rates holding strong at 7.4% for beachfront units.</p>
+</div>
+</div>
+<div class="bg-surface-container-low p-8 rounded-xl relative overflow-hidden h-64 flex flex-col justify-end">
+<img alt="Austin Map" class="absolute inset-0 w-full h-full object-cover opacity-20 grayscale" data-alt="Technological hub skyline of Austin Texas" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDSGgPdIAi4XugVa0PDBVCOehMOwMIElTXVOorYgw1O6OiGuOysfnsaDI1JNa5kukC8IgvXwRFsudz9OhAfLJQFUYHX0TAptwBF15JmnRkBKz9mmMBDVUY6oKr71Jt6J1qEF-Llm_Md75LwTw51YgGRTX5Cl8_FEvgcfRSJwxIX42EaQa-Uyiduwx5F9io1VrJwigytz4otyHhEaER4jUDf1Qk3OhpiM2Y8zrsnj7zml0iyRzJs4BxM9Nn75TFEq0aSRT6WKpaEiWY"/>
+<div class="relative z-10">
+<p class="text-xs font-bold text-primary mb-1">CITY SPOTLIGHT</p>
+<h3 class="text-2xl font-extrabold text-on-surface">Austin, TX</h3>
+<p class="text-sm text-on-surface-variant">Correcting market provides unique entry points for HNWIs.</p>
+</div>
+</div>
+</div>
+</div>
+<!-- Spacing footer -->
+<div class="h-16"></div>
+</main>
+</div>
+<!-- Mobile Navigation Shell -->
+<div class="md:hidden fixed bottom-0 left-0 right-0 bg-slate-50/90 backdrop-blur-xl border-t-0 flex justify-around items-center py-4 px-6 z-50">
+<div class="flex flex-col items-center text-slate-500">
+<span class="material-symbols-outlined">dashboard</span>
+<span class="text-[10px] mt-1 font-medium">Dashboard</span>
+</div>
+<div class="flex flex-col items-center text-blue-800 font-semibold">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">insights</span>
+<span class="text-[10px] mt-1">Trends</span>
+</div>
+<div class="flex flex-col items-center text-slate-500">
+<span class="material-symbols-outlined">domain</span>
+<span class="text-[10px] mt-1 font-medium">Assets</span>
+</div>
+<div class="flex flex-col items-center text-slate-500">
+<span class="material-symbols-outlined">compare_arrows</span>
+<span class="text-[10px] mt-1 font-medium">Compare</span>
+</div>
+</div>
+</body></html>

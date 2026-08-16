@@ -1,16 +1,67 @@
 <?php
 
-use Illuminate\Http\Request;
-/*
-|--------------------------------------------------------------------------
-| API Routes
-|--------------------------------------------------------------------------
-|
-| Here is where you can register API routes for your application. These
-| routes are loaded by the RouteServiceProvider within a group which
-| is assigned the "api" middleware group. Enjoy building your API!
-|
-*/
+use App\Http\Controllers\Api\V1\AuthController;
+use App\Http\Controllers\Api\V1\DashboardController;
+use App\Http\Controllers\Api\V1\ListingCycleController;
+use App\Http\Controllers\Api\V1\NeighborhoodController;
+use App\Http\Controllers\Api\V1\PriceHistoryController;
+use App\Http\Controllers\Api\V1\PropertyController;
+use App\Http\Controllers\Api\V1\TeamController;
+use Illuminate\Support\Facades\Route;
 
-Route::get('stats/{method}', 'PriceController@stats');
-Route::get('locations', 'LocationController@search');
+Route::prefix('v1')->group(function () {
+    // Public auth routes
+    Route::post('auth/register', [AuthController::class, 'register']);
+    Route::post('auth/login', [AuthController::class, 'login']);
+    Route::post('auth/forgot-password', [AuthController::class, 'forgotPassword']);
+    Route::post('auth/reset-password', [AuthController::class, 'resetPassword']);
+    Route::post('auth/refresh', [AuthController::class, 'refresh']);
+
+    // Protected routes
+    Route::middleware('auth:api')->group(function () {
+        // Auth
+        Route::post('auth/logout', [AuthController::class, 'logout']);
+        Route::get('auth/me', [AuthController::class, 'me']);
+
+        // Dashboard
+        Route::get('dashboard/stats', [DashboardController::class, 'stats']);
+        Route::get('neighborhoods/{neighborhood}/stats', [DashboardController::class, 'stats']);
+
+        // Distance Check
+        Route::post('properties/distance-check', [PropertyController::class, 'distanceCheck']);
+
+        // Properties (nested under neighborhoods)
+        Route::apiResource('neighborhoods.properties', PropertyController::class);
+        Route::post('neighborhoods/{neighborhood}/properties/{property}/analyze', [PropertyController::class, 'analyze']);
+        Route::post('neighborhoods/{neighborhood}/properties/{property}/analyze/{section}', [PropertyController::class, 'analyzeSection']);
+        Route::post('neighborhoods/{neighborhood}/properties/{property}/location', [PropertyController::class, 'setLocation']);
+        Route::post('neighborhoods/{neighborhood}/properties/{property}/geocode', [PropertyController::class, 'geocode']);
+
+        // Listing Cycles
+        Route::post('neighborhoods/{neighborhood}/properties/{property}/listing-cycles', [ListingCycleController::class, 'store']);
+        Route::put('listing-cycles/{listingCycle}', [ListingCycleController::class, 'update']);
+        Route::delete('listing-cycles/{listingCycle}', [ListingCycleController::class, 'destroy']);
+
+        // Price History Events
+        Route::post('listing-cycles/{listingCycle}/price-histories', [PriceHistoryController::class, 'store']);
+        Route::put('price-histories/{priceHistory}', [PriceHistoryController::class, 'update']);
+        Route::delete('price-histories/{priceHistory}', [PriceHistoryController::class, 'destroy']);
+
+        // Neighborhoods
+        Route::apiResource('neighborhoods', NeighborhoodController::class);
+
+        // Reference Data
+        Route::get('reference/hvac-types', function () {
+            return response()->json(['data' => \App\Models\ReferenceHvacType::all(['id', 'label'])]);
+        });
+
+        // Team
+        Route::apiResource('teams', TeamController::class)->only(['index', 'store', 'update']);
+        Route::prefix('teams')->group(function () {
+            Route::post('{team}/switch', [TeamController::class, 'switch']);
+            Route::get('members', [TeamController::class, 'members']);
+            Route::post('invite', [TeamController::class, 'invite']);
+            Route::delete('members/{member}', [TeamController::class, 'remove']);
+        });
+    });
+});

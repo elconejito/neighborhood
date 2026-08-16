@@ -1,39 +1,32 @@
 {
-  "name": "neighborhood",
-  "version": "0.3.0",
-  "homepage": "https://github.com/elconejito/neighborhood",
-  "private": true,
-  "scripts": {
-    "dev": "npm run development",
-    "development": "cross-env NODE_ENV=development node_modules/webpack/bin/webpack.js --progress --hide-modules --config=node_modules/laravel-mix/setup/webpack.config.js",
-    "watch": "npm run development -- --watch",
-    "watch-poll": "npm run watch -- --watch-poll",
-    "hot": "cross-env NODE_ENV=development node_modules/webpack-dev-server/bin/webpack-dev-server.js --inline --hot --config=node_modules/laravel-mix/setup/webpack.config.js",
-    "prod": "npm run production",
-    "production": "cross-env NODE_ENV=production node_modules/webpack/bin/webpack.js --no-progress --hide-modules --config=node_modules/laravel-mix/setup/webpack.config.js"
-  },
-  "devDependencies": {
-    "@babel/preset-react": "^7.8.3",
-    "axios": "^0.19",
-    "cross-env": "^7.0",
-    "laravel-mix": "^5.0.1",
-    "lodash": "^4.17.13",
-    "resolve-url-loader": "^3.1.0",
-    "sass": "^1.26.2",
-    "sass-loader": "^9.0.2"
-  },
-  "dependencies": {
-    "@fortawesome/fontawesome-free": "^5.12.1",
-    "@fortawesome/fontawesome-svg-core": "^1.2.27",
-    "@fortawesome/free-brands-svg-icons": "^5.12.1",
-    "@fortawesome/free-regular-svg-icons": "^5.12.1",
-    "@fortawesome/free-solid-svg-icons": "^5.12.1",
-    "bootstrap": "^4.4.1",
-    "d3": "^5.15.0",
-    "jquery": "^3.3.1",
-    "moment": "^2.24.0",
-    "popper.js": "^1.16.1",
-    "react": "^16.13.0",
-    "react-dom": "^16.13.0"
-  }
+    "$schema": "https://www.schemastore.org/package.json",
+    "private": true,
+    "type": "module",
+    "scripts": {
+        "build": "vite build",
+        "dev": "vite"
+    },
+    "devDependencies": {
+        "@tailwindcss/forms": "^0.5.11",
+        "@tailwindcss/typography": "^0.5.19",
+        "@tailwindcss/vite": "^4.0.0",
+        "@types/leaflet": "^1.9.21",
+        "autoprefixer": "^10.4.24",
+        "axios": "^1.13.5",
+        "concurrently": "^9.0.1",
+        "laravel-vite-plugin": "^2.0.0",
+        "postcss": "^8.5.6",
+        "prettier": "^3.8.1",
+        "tailwindcss": "^4.2.0",
+        "vite": "^7.0.7"
+    },
+    "dependencies": {
+        "@vitejs/plugin-vue": "^6.0.4",
+        "apexcharts": "^5.10.6",
+        "leaflet": "^1.9.4",
+        "pinia": "^3.0.4",
+        "vue": "^3.5.28",
+        "vue-router": "^4.6.4",
+        "vue3-apexcharts": "^1.11.1"
+    }
 }
