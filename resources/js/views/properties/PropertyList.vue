@@ -27,7 +27,7 @@
                 </div>
             </header>
 
-            <section v-if="target" class="target-panel" aria-labelledby="target-heading">
+            <section v-if="target" ref="targetPanel" class="target-panel" aria-labelledby="target-heading">
                 <div class="target-panel__intro">
                     <div class="target-panel__label-row"><span id="target-heading" class="eyebrow">Target property</span><span class="baseline-tag">Baseline for every comparison</span><span v-if="target.matches_current_filter === false" class="target-filter-note">Not in current filter</span></div>
                     <h2 class="target-panel__address">{{ target.address }}</h2>
@@ -46,7 +46,7 @@
                 </div>
             </section>
 
-            <section v-if="target && isScrolled" class="target-summary-sticky" aria-label="Pinned target summary">
+            <section v-if="target && showStickyTarget" class="target-summary-sticky" aria-label="Pinned target summary">
                 <div class="target-summary-sticky__address"><span class="eyebrow">Target property</span><strong>{{ target.address }}</strong></div>
                 <div class="target-summary-sticky__facts"><span v-if="target.market_price != null">{{ formatPrice(target.market_price) }}</span><span v-if="targetPricePerSquareFoot != null">{{ formatPrice(targetPricePerSquareFoot) }}/sq ft</span><span v-if="target.bedrooms != null">{{ target.bedrooms }} bd</span><span v-if="target.bathrooms != null">{{ target.bathrooms }} ba</span><span v-if="target.square_feet != null">{{ formatNumber(target.square_feet) }} sq ft</span><span v-if="target.acreage != null">{{ Number(target.acreage).toFixed(2) }} ac</span><span v-if="targetNeighborFeet != null">{{ targetNeighborFeet }} ft neighbor</span></div>
             </section>
@@ -85,6 +85,7 @@ import { useRoute, useRouter } from 'vue-router';
 import api from '@/api';
 import EmptyState from '@/components/EmptyState.vue';
 import PropertyListItem from '@/components/properties/PropertyListItem.vue';
+import { shouldShowStickyTarget } from '@/helpers';
 
 const route = useRoute();
 const router = useRouter();
@@ -97,7 +98,8 @@ const currentPage = ref(1);
 const perPage = ref(10);
 const sortKey = ref('similarity');
 const saleStatus = ref('all');
-const isScrolled = ref(false);
+const showStickyTarget = ref(false);
+const targetPanel = ref(null);
 const listHeading = ref(null);
 const pagination = ref({ total: 0, count: 0, per_page: 10, current_page: 1, total_pages: 1 });
 
@@ -138,9 +140,15 @@ onMounted(async () => {
     if (route.query.sort && sortOptions.some(option => option.value === route.query.sort)) sortKey.value = route.query.sort;
     if (['sold', 'unsold'].includes(route.query.status)) saleStatus.value = route.query.status;
     window.addEventListener('scroll', updateScrollState, { passive: true });
+    window.addEventListener('resize', updateScrollState, { passive: true });
     await fetchProperties();
+    await nextTick();
+    updateScrollState();
 });
-onUnmounted(() => window.removeEventListener('scroll', updateScrollState));
+onUnmounted(() => {
+    window.removeEventListener('scroll', updateScrollState);
+    window.removeEventListener('resize', updateScrollState);
+});
 
 async function fetchProperties() {
     loading.value = true;
@@ -166,7 +174,7 @@ async function fetchProperties() {
     }
 }
 
-function updateScrollState() { isScrolled.value = window.scrollY >= 120 && window.innerWidth >= 768; }
+function updateScrollState() { showStickyTarget.value = shouldShowStickyTarget(targetPanel.value, window.innerWidth); }
 async function goToPage(page) { if (page < 1 || page > pagination.value.total_pages) return; currentPage.value = page; syncToUrl(); await fetchProperties(); await nextTick(); const heading = document.getElementById('comparables-heading'); heading?.focus(); heading?.scrollIntoView({ behavior: 'smooth', block: 'start' }); }
 function changePerPage(value) { perPage.value = value; currentPage.value = 1; syncToUrl(); fetchProperties(); }
 function changeSort(value) { sortKey.value = value; currentPage.value = 1; syncToUrl(); fetchProperties(); }
@@ -221,7 +229,7 @@ function marketEventLabel(type) {
 .target-panel__stats > div { text-align: right; }
 .target-panel__stats span { display: block; color: var(--color-on-primary-container); font-size: 10px; font-weight: 700; letter-spacing: .14em; text-transform: uppercase; }
 .target-panel__stats strong { display: block; margin-top: 6px; color: var(--color-on-surface); font-size: 17px; font-weight: 800; line-height: 1; white-space: nowrap; }
-.target-summary-sticky { position: sticky; top: 64px; z-index: 10; display: flex; align-items: center; justify-content: space-between; min-height: 56px; margin: -1px 0 16px; border-radius: 8px; background: rgba(214, 227, 255, .95); padding: 10px 20px; box-shadow: 0 6px 24px rgba(43, 52, 55, .07); backdrop-filter: blur(20px); }
+.target-summary-sticky { position: sticky; top: 0; z-index: 10; display: flex; align-items: center; justify-content: space-between; min-height: 56px; margin: -1px 0 16px; border-radius: 8px; background: rgba(214, 227, 255, .95); padding: 10px 20px; box-shadow: 0 6px 24px rgba(43, 52, 55, .07); backdrop-filter: blur(20px); }
 .target-summary-sticky__address { display: flex; align-items: center; gap: 12px; min-width: 0; }
 .target-summary-sticky__address strong { overflow: hidden; color: var(--color-on-surface); font-size: 14px; text-overflow: ellipsis; white-space: nowrap; }
 .target-summary-sticky__facts { display: flex; flex-wrap: wrap; justify-content: flex-end; gap: 4px 14px; color: var(--color-on-primary-container); font-size: 12px; font-weight: 700; }
