@@ -14,6 +14,32 @@ class PropertyIndexTest extends TestCase
 {
     use RefreshDatabase;
 
+    public function test_property_index_searches_addresses_and_includes_a_matching_pinned_property(): void
+    {
+        $user = User::factory()->create();
+        $neighborhood = Neighborhood::factory()->create();
+        $target = Property::factory()->create([
+            'user_id' => $user->id,
+            'neighborhood_id' => $neighborhood->id,
+            'address' => '142 Cedar Lane',
+            'is_pinned' => true,
+        ]);
+        Property::factory()->create([
+            'user_id' => $user->id,
+            'neighborhood_id' => $neighborhood->id,
+            'address' => '9 Oak Street',
+            'is_pinned' => false,
+        ]);
+
+        $response = $this->actingAs($user, 'api')
+            ->getJson("/api/v1/neighborhoods/{$neighborhood->id}/properties?search=Cedar&searchFields=address:like");
+
+        $response->assertOk()
+            ->assertJsonPath('meta.pagination.total', 1)
+            ->assertJsonPath('data.0.id', $target->id)
+            ->assertJsonPath('data.0.address', '142 Cedar Lane');
+    }
+
     public function test_property_index_includes_last_sale_date(): void
     {
         $user = User::factory()->create();

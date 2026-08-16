@@ -60,6 +60,53 @@ class PropertyManagementTest extends TestCase
         ]);
     }
 
+    public function test_user_cannot_create_the_same_address_twice_in_a_neighborhood(): void
+    {
+        $user = User::factory()->create();
+        $neighborhood = Neighborhood::factory()->create();
+        $existingProperty = Property::factory()->create([
+            'user_id' => $user->id,
+            'neighborhood_id' => $neighborhood->id,
+            'address' => '123 Test St',
+        ]);
+
+        $response = $this->actingAs($user, 'api')
+            ->postJson("/api/v1/neighborhoods/{$neighborhood->id}/properties", [
+                'address' => "  {$existingProperty->address}  ",
+                'city' => $existingProperty->city,
+                'state' => strtolower($existingProperty->state),
+                'zip_code' => $existingProperty->zip_code,
+            ]);
+
+        $response->assertUnprocessable()
+            ->assertJsonPath('errors.address.0', 'This address is already in the neighborhood.');
+
+        $this->assertDatabaseCount('properties', 1);
+    }
+
+    public function test_same_address_can_exist_in_different_neighborhoods(): void
+    {
+        $user = User::factory()->create();
+        $firstNeighborhood = Neighborhood::factory()->create();
+        $secondNeighborhood = Neighborhood::factory()->create();
+        $existingProperty = Property::factory()->create([
+            'user_id' => $user->id,
+            'neighborhood_id' => $firstNeighborhood->id,
+            'address' => '123 Test St',
+        ]);
+
+        $response = $this->actingAs($user, 'api')
+            ->postJson("/api/v1/neighborhoods/{$secondNeighborhood->id}/properties", [
+                'address' => $existingProperty->address,
+                'city' => $existingProperty->city,
+                'state' => $existingProperty->state,
+                'zip_code' => $existingProperty->zip_code,
+            ]);
+
+        $response->assertCreated();
+        $this->assertDatabaseCount('properties', 2);
+    }
+
     public function test_user_can_update_property_with_new_fields(): void
     {
         $user = User::factory()->create();

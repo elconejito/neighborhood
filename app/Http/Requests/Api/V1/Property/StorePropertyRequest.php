@@ -2,8 +2,12 @@
 
 namespace App\Http\Requests\Api\V1\Property;
 
+use App\Models\Neighborhood;
+use App\Models\Property;
 use Illuminate\Contracts\Validation\ValidationRule;
+use Illuminate\Database\Query\Builder;
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rule;
 
 class StorePropertyRequest extends FormRequest
 {
@@ -22,9 +26,18 @@ class StorePropertyRequest extends FormRequest
      */
     public function rules(): array
     {
+        /** @var Neighborhood $neighborhood */
+        $neighborhood = $this->route('neighborhood');
+
         return [
             'neighborhood_id' => ['nullable', 'exists:neighborhoods,id'],
-            'address' => ['required', 'string', 'max:255'],
+            'address' => [
+                'required',
+                'string',
+                'max:255',
+                Rule::unique(Property::class, 'address')
+                    ->where(fn (Builder $query): Builder => $query->where('neighborhood_id', $neighborhood->id)),
+            ],
             'city' => ['required', 'string', 'max:255'],
             'state' => ['required', 'string', 'size:2'],
             'zip_code' => ['required', 'string', 'max:10'],
@@ -50,5 +63,27 @@ class StorePropertyRequest extends FormRequest
             'listing_url' => ['nullable', 'url', 'max:255'],
             'notes' => ['nullable', 'string'],
         ];
+    }
+
+    /**
+     * Get the validation error messages for the request.
+     *
+     * @return array<string, string>
+     */
+    public function messages(): array
+    {
+        return [
+            'address.unique' => 'This address is already in the neighborhood.',
+        ];
+    }
+
+    protected function prepareForValidation(): void
+    {
+        $this->merge([
+            'address' => trim((string) $this->input('address')),
+            'city' => trim((string) $this->input('city')),
+            'state' => strtoupper(trim((string) $this->input('state'))),
+            'zip_code' => trim((string) $this->input('zip_code')),
+        ]);
     }
 }
