@@ -25,6 +25,24 @@
                             placeholder="123 Main St"
                             class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-emerald-500 focus:border-emerald-500"
                         />
+                        <p v-if="checkingAddress" class="mt-2 flex items-center gap-2 text-sm text-gray-500" role="status">
+                            <span class="material-symbols-outlined animate-spin text-base" aria-hidden="true">progress_activity</span> Checking this neighborhood…
+                        </p>
+                        <div v-else-if="duplicateMatches.length" class="mt-3 rounded-lg border border-amber-300 bg-amber-50 p-4" aria-live="polite">
+                            <div class="flex items-start gap-3">
+                                <span class="material-symbols-outlined text-amber-700" aria-hidden="true">location_on</span>
+                                <div class="min-w-0 flex-1">
+                                    <p class="font-semibold text-amber-950">{{ exactMatch ? 'This property is already in the neighborhood' : 'Is this property already here?' }}</p>
+                                    <p class="mt-1 text-sm text-amber-900">{{ exactMatch ? 'Open the existing record instead of creating a duplicate.' : 'We found similar addresses. Check them before filling out the rest of the form.' }}</p>
+                                    <ul class="mt-3 grid gap-2">
+                                        <li v-for="property in duplicateMatches" :key="property.id" class="flex items-center justify-between gap-3 rounded-md bg-white px-3 py-2 text-sm shadow-sm">
+                                            <span class="min-w-0"><strong class="block truncate text-gray-900">{{ property.address }}</strong><span class="text-gray-600">{{ property.city }}, {{ property.state }} {{ property.zip_code }}</span></span>
+                                            <router-link :to="propertyRoute(property)" class="shrink-0 font-semibold text-emerald-700 hover:text-emerald-900">Open</router-link>
+                                        </li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
                     </div>
 
                     <div class="grid grid-cols-6 gap-6">
@@ -320,10 +338,10 @@
                     </router-link>
                     <button
                         type="submit"
-                        :disabled="loading"
+                        :disabled="loading || Boolean(exactMatch)"
                         class="inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-emerald-600 hover:bg-emerald-700 disabled:opacity-50"
                     >
-                        {{ loading ? 'Saving...' : 'Save Property' }}
+                        {{ loading ? 'Saving...' : exactMatch ? 'Property already exists' : 'Save Property' }}
                     </button>
                 </div>
             </form>
@@ -332,7 +350,7 @@
 </template>
 
 <script setup>
-import { ref, reactive, onMounted } from 'vue';
+import { computed, onMounted, onUnmounted, reactive, ref, watch } from 'vue';
 import { useRouter, useRoute } from 'vue-router';
 import api from '@/api';
 
@@ -368,8 +386,62 @@ const form = reactive({
 
 const loading = ref(false);
 const error = ref(null);
+const checkingAddress = ref(false);
+const duplicateMatches = ref([]);
+const exactMatch = computed(() => duplicateMatches.value.find(property => normalizeAddress(property.address) === normalizeAddress(form.address)) ?? null);
+let addressCheckTimer;
+let addressCheckSequence = 0;
+
+watch(() => form.address, () => {
+    window.clearTimeout(addressCheckTimer);
+    addressCheckSequence += 1;
+    duplicateMatches.value = [];
+
+    if (form.address.trim().length < 3) {
+        checkingAddress.value = false;
+        return;
+    }
+
+    checkingAddress.value = true;
+    addressCheckTimer = window.setTimeout(checkAddress, 350);
+});
+
+async function checkAddress() {
+    const sequence = addressCheckSequence;
+    const neighborhoodId = route.params.neighborhoodId;
+
+    try {
+        const response = await api.get(`/neighborhoods/${neighborhoodId}/properties`, {
+            params: { search: form.address.trim(), searchFields: 'address:like', orderBy: 'address', sortedBy: 'asc', per_page: 10 },
+        });
+
+        if (sequence === addressCheckSequence) {
+            duplicateMatches.value = response.data.data ?? [];
+        }
+    } catch {
+        if (sequence === addressCheckSequence) {
+            duplicateMatches.value = [];
+        }
+    } finally {
+        if (sequence === addressCheckSequence) {
+            checkingAddress.value = false;
+        }
+    }
+}
+
+function normalizeAddress(address) {
+    return String(address ?? '').trim().replace(/\s+/g, ' ').toLocaleLowerCase('en-US');
+}
+
+function propertyRoute(property) {
+    return `/neighborhoods/${route.params.neighborhoodId}/properties/${property.id}`;
+}
 
 const handleSubmit = async () => {
+    if (exactMatch.value) {
+        return;
+    }
+
     loading.value = true;
     error.value = null;
 
@@ -385,6 +457,11 @@ const handleSubmit = async () => {
 };
 
 onMounted(async () => {
+    if (form.address.trim().length >= 3) {
+        checkingAddress.value = true;
+        await checkAddress();
+    }
+
     try {
         const response = await api.get('/reference/hvac-types');
         hvacTypes.value = response.data.data;
@@ -392,4 +469,6 @@ onMounted(async () => {
         console.error('Failed to load HVAC types', e);
     }
 });
+
+onUnmounted(() => window.clearTimeout(addressCheckTimer));
 </script>

@@ -37,7 +37,7 @@ class PropertyController extends Controller
         $properties = Property::where('neighborhood_id', $neighborhood->id)
             ->withMarketSummary()
             ->with(['neighborhood', 'lastSoldHistory', 'lastListingHistory', 'lastSoldCycle', 'lastListingCycle'])
-            ->when($target, fn ($query) => $query->whereKeyNot($target->id))
+            ->when($target && ! $request->filled('search'), fn ($query) => $query->whereKeyNot($target->id))
             ->whereSaleStatus($request->input('sale_status'))
             ->filter($request)
             ->when(

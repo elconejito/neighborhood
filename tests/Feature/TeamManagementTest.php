@@ -99,7 +99,7 @@ class TeamManagementTest extends TestCase
         $this->assertNotNull($user->team_id);
 
         $team = Team::find($user->team_id);
-        $this->assertEquals('Private', $team->name);
+        $this->assertEquals('My Team', $team->name);
         $this->assertTrue($user->teams()->where('teams.id', $team->id)->exists());
     }
 

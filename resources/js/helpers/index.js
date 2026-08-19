@@ -22,4 +22,10 @@ const formatRelativeDistance = (distance, unit = null) => {
     }
 }
 
-export { formatRelativeDistance };
+const shouldShowStickyTarget = (targetPanel, viewportWidth) => {
+    return viewportWidth >= 768
+        && targetPanel !== null
+        && targetPanel.getBoundingClientRect().bottom <= 0;
+};
+
+export { formatRelativeDistance, shouldShowStickyTarget };

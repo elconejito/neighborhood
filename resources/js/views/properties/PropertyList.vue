@@ -27,7 +27,21 @@
                 </div>
             </header>
 
-            <section v-if="target" class="target-panel" aria-labelledby="target-heading">
+            <form class="property-search" role="search" @submit.prevent="applySearch">
+                <label for="property-search" class="sr-only">Search properties in this neighborhood</label>
+                <span class="material-symbols-outlined property-search__icon" aria-hidden="true">search</span>
+                <input id="property-search" v-model="searchQuery" type="search" autocomplete="street-address" placeholder="Search by street address" @input="scheduleSearch" />
+                <button v-if="searchQuery" type="button" class="property-search__clear" aria-label="Clear property search" @click="clearSearch"><span class="material-symbols-outlined" aria-hidden="true">close</span></button>
+                <button type="submit" class="property-search__submit">Search</button>
+            </form>
+
+            <div v-if="isSearching && !loading" class="search-context">
+                <p><strong>{{ pagination.total }}</strong> {{ pagination.total === 1 ? 'property' : 'properties' }} found for “{{ activeSearch }}”</p>
+                <router-link v-if="exactSearchResult" :to="propertyRoute(exactSearchResult)" class="secondary-action"><span class="material-symbols-outlined text-base" aria-hidden="true">arrow_forward</span> Open existing property</router-link>
+                <router-link v-else :to="createPropertyRoute" class="secondary-action"><span class="material-symbols-outlined text-base" aria-hidden="true">add</span> Add “{{ activeSearch }}”</router-link>
+            </div>
+
+            <section v-if="target && !isSearching" ref="targetPanel" class="target-panel" aria-labelledby="target-heading">
                 <div class="target-panel__intro">
                     <div class="target-panel__label-row"><span id="target-heading" class="eyebrow">Target property</span><span class="baseline-tag">Baseline for every comparison</span><span v-if="target.matches_current_filter === false" class="target-filter-note">Not in current filter</span></div>
                     <h2 class="target-panel__address">{{ target.address }}</h2>
@@ -46,7 +60,7 @@
                 </div>
             </section>
 
-            <section v-if="target && isScrolled" class="target-summary-sticky" aria-label="Pinned target summary">
+            <section v-if="target && showStickyTarget && !isSearching" class="target-summary-sticky" aria-label="Pinned target summary">
                 <div class="target-summary-sticky__address"><span class="eyebrow">Target property</span><strong>{{ target.address }}</strong></div>
                 <div class="target-summary-sticky__facts"><span v-if="target.market_price != null">{{ formatPrice(target.market_price) }}</span><span v-if="targetPricePerSquareFoot != null">{{ formatPrice(targetPricePerSquareFoot) }}/sq ft</span><span v-if="target.bedrooms != null">{{ target.bedrooms }} bd</span><span v-if="target.bathrooms != null">{{ target.bathrooms }} ba</span><span v-if="target.square_feet != null">{{ formatNumber(target.square_feet) }} sq ft</span><span v-if="target.acreage != null">{{ Number(target.acreage).toFixed(2) }} ac</span><span v-if="targetNeighborFeet != null">{{ targetNeighborFeet }} ft neighbor</span></div>
             </section>
@@ -55,23 +69,24 @@
                 <div v-for="index in 5" :key="index" class="skeleton-row"><span></span><span></span><span></span><span></span></div>
             </div>
             <div v-else-if="errorMessage" class="state-card" role="alert"><h2>We couldn't load the comparables</h2><p>{{ errorMessage }}</p><button type="button" class="primary-action mx-auto mt-5" @click="fetchProperties">Try again</button></div>
-            <EmptyState v-else-if="properties.length === 0" :title="target ? 'No comparables match this filter' : 'No properties found'" :description="target ? 'Try clearing the status filter to see the rest of this neighborhood.' : 'Get started by adding your first property to track its price history and neighborhood performance.'">
+            <EmptyState v-else-if="properties.length === 0" :title="isSearching ? 'No matching property' : target ? 'No comparables match this filter' : 'No properties found'" :description="isSearching ? `No property in this neighborhood matches “${activeSearch}”. You can add it without retyping the address.` : target ? 'Try clearing the status filter to see the rest of this neighborhood.' : 'Get started by adding your first property to track its price history and neighborhood performance.'">
                 <template #action>
-                    <button v-if="target && saleStatus !== 'all'" type="button" class="secondary-action mx-auto" @click="changeSaleStatus('all')">Clear filter</button>
+                    <router-link v-if="isSearching" :to="createPropertyRoute" class="primary-action mx-auto"><span class="material-symbols-outlined text-base" aria-hidden="true">add</span> Add this property</router-link>
+                    <button v-else-if="target && saleStatus !== 'all'" type="button" class="secondary-action mx-auto" @click="changeSaleStatus('all')">Clear filter</button>
                     <router-link v-else :to="`/neighborhoods/${neighborhoodId}/properties/create`" class="primary-action mx-auto"><span class="material-symbols-outlined text-base" aria-hidden="true">add</span> Add property</router-link>
                 </template>
             </EmptyState>
             <template v-else>
                 <div class="comparables-toolbar">
-                    <h2 id="comparables-heading" tabindex="-1">Comparables<span class="hidden md:inline"> · {{ sortLabel }}</span></h2>
+                    <h2 id="comparables-heading" tabindex="-1">{{ isSearching ? 'Search results' : 'Comparables' }}<span v-if="!isSearching" class="hidden md:inline"> · {{ sortLabel }}</span></h2>
                     <div class="comparables-toolbar__mobile-controls"><label class="control-label"><span class="sr-only">Status</span><select :value="saleStatus" aria-label="Filter by status" @change="changeSaleStatus($event.target.value)"><option value="all">All properties</option><option value="sold">Sold</option><option value="unsold">Unsold</option></select></label><label class="control-label"><span class="sr-only">Sort</span><select :value="sortKey" aria-label="Sort comparables" @change="changeSort($event.target.value)"><option v-for="option in availableSortOptions" :key="option.value" :value="option.value">{{ option.shortLabel ?? option.label }}</option></select></label></div>
                 </div>
                 <div class="column-headings" :class="{ 'column-headings--with-neighbor': hasNeighborData }" aria-hidden="true"><span>Property</span><span>Price · vs target</span><span>$/sq ft · vs target</span><span v-if="hasNeighborData">Closest neighbor</span><span>Why it may differ</span></div>
                 <div ref="listHeading" class="property-list" aria-labelledby="comparables-heading">
-                    <PropertyListItem v-for="property in properties" :key="property.id" :property="property" :target="target" :show-neighbor="hasNeighborData" :neighborhood-id="neighborhoodId" />
+                    <PropertyListItem v-for="property in properties" :key="property.id" :property="property" :target="isSearching ? null : target" :show-neighbor="hasNeighborData" :neighborhood-id="neighborhoodId" />
                 </div>
                 <nav v-if="pagination.total > 0" class="pagination-wrap" aria-label="Property list pagination">
-                    <div class="pagination-count"><span>Showing {{ showingStart }}–{{ showingEnd }} of {{ pagination.total }} comparables</span><label><span class="sr-only">Properties per page</span><select :value="perPage" @change="changePerPage(Number($event.target.value))"><option value="10">10</option><option value="25">25</option><option value="50">50</option></select></label></div>
+                    <div class="pagination-count"><span>Showing {{ showingStart }}–{{ showingEnd }} of {{ pagination.total }} {{ isSearching ? 'properties' : 'comparables' }}</span><label><span class="sr-only">Properties per page</span><select :value="perPage" @change="changePerPage(Number($event.target.value))"><option value="10">10</option><option value="25">25</option><option value="50">50</option></select></label></div>
                     <div v-if="pagination.total_pages > 1" class="pagination-buttons"><button type="button" :disabled="currentPage === 1" aria-label="Previous page" :aria-disabled="currentPage === 1" @click="goToPage(currentPage - 1)"><span class="material-symbols-outlined text-base" aria-hidden="true">chevron_left</span></button><template v-for="page in pageRange" :key="page"><span v-if="page === '...'" class="pagination-ellipsis">…</span><button v-else type="button" :aria-label="`Page ${page}`" :aria-current="page === currentPage ? 'page' : undefined" :class="{ 'is-current': page === currentPage }" @click="goToPage(page)">{{ page }}</button></template><button type="button" :disabled="currentPage === pagination.total_pages" aria-label="Next page" :aria-disabled="currentPage === pagination.total_pages" @click="goToPage(currentPage + 1)"><span class="material-symbols-outlined text-base" aria-hidden="true">chevron_right</span></button></div>
                 </nav>
             </template>
@@ -85,6 +100,7 @@ import { useRoute, useRouter } from 'vue-router';
 import api from '@/api';
 import EmptyState from '@/components/EmptyState.vue';
 import PropertyListItem from '@/components/properties/PropertyListItem.vue';
+import { shouldShowStickyTarget } from '@/helpers';
 
 const route = useRoute();
 const router = useRouter();
@@ -97,7 +113,10 @@ const currentPage = ref(1);
 const perPage = ref(10);
 const sortKey = ref('similarity');
 const saleStatus = ref('all');
-const isScrolled = ref(false);
+const searchQuery = ref('');
+const activeSearch = ref('');
+const showStickyTarget = ref(false);
+const targetPanel = ref(null);
 const listHeading = ref(null);
 const pagination = ref({ total: 0, count: 0, per_page: 10, current_page: 1, total_pages: 1 });
 
@@ -117,7 +136,15 @@ const targetOnlySorts = new Set(['similarity', 'price_gap_desc', 'price_gap_asc'
 const hasNeighborData = computed(() => properties.value.some(property => neighborMeters(property) != null));
 const availableSortOptions = computed(() => target.value ? sortOptions : sortOptions.filter(option => !['similarity', 'price_gap_desc', 'price_gap_asc'].includes(option.value)));
 const sortLabel = computed(() => sortOptions.find(option => option.value === sortKey.value)?.label ?? 'Most similar to target');
-const comparableSummary = computed(() => `${pagination.value.total} comparables${target.value?.city ? ` measured against your target · ${target.value.city}, ${target.value.state}` : ''}`);
+const isSearching = computed(() => activeSearch.value.length > 0);
+const exactSearchResult = computed(() => properties.value.find(property => normalizeAddress(property.address) === normalizeAddress(activeSearch.value)) ?? null);
+const comparableSummary = computed(() => isSearching.value
+    ? `Search this neighborhood before adding another property`
+    : `${pagination.value.total} comparables${target.value?.city ? ` measured against your target · ${target.value.city}, ${target.value.state}` : ''}`);
+const createPropertyRoute = computed(() => ({
+    path: `/neighborhoods/${neighborhoodId.value}/properties/create`,
+    query: activeSearch.value ? { address: activeSearch.value } : {},
+}));
 const pageRange = computed(() => {
     const total = pagination.value.total_pages;
     const current = currentPage.value;
@@ -131,22 +158,32 @@ const showingEnd = computed(() => Math.min(currentPage.value * perPage.value, pa
 const targetPricePerSquareFoot = computed(() => target.value?.price_per_square_foot != null ? Number(target.value.price_per_square_foot) : target.value?.market_price && target.value.square_feet ? Number(target.value.market_price) / Number(target.value.square_feet) : null);
 const targetNeighborFeet = computed(() => target.value ? formatNeighborFeet(target.value) : null);
 const targetEvent = computed(() => marketEvent(target.value));
+let searchTimer;
 
 onMounted(async () => {
     currentPage.value = Number(route.query.page ?? 1);
     perPage.value = Number(route.query.per_page ?? 10);
     if (route.query.sort && sortOptions.some(option => option.value === route.query.sort)) sortKey.value = route.query.sort;
     if (['sold', 'unsold'].includes(route.query.status)) saleStatus.value = route.query.status;
+    searchQuery.value = String(route.query.search ?? '');
+    activeSearch.value = searchQuery.value.trim();
     window.addEventListener('scroll', updateScrollState, { passive: true });
+    window.addEventListener('resize', updateScrollState, { passive: true });
     await fetchProperties();
+    await nextTick();
+    updateScrollState();
 });
-onUnmounted(() => window.removeEventListener('scroll', updateScrollState));
+onUnmounted(() => {
+    window.removeEventListener('scroll', updateScrollState);
+    window.removeEventListener('resize', updateScrollState);
+    window.clearTimeout(searchTimer);
+});
 
 async function fetchProperties() {
     loading.value = true;
     errorMessage.value = '';
     try {
-        const params = { page: currentPage.value, per_page: perPage.value, ...(saleStatus.value !== 'all' ? { sale_status: saleStatus.value } : {}), ...selectedSortParams() };
+        const params = { page: currentPage.value, per_page: perPage.value, ...(activeSearch.value ? { search: activeSearch.value, searchFields: 'address:like' } : {}), ...(saleStatus.value !== 'all' ? { sale_status: saleStatus.value } : {}), ...selectedSortParams() };
         const response = await api.get(`/neighborhoods/${neighborhoodId.value}/properties`, { params });
         const responseProperties = response.data.data ?? [];
         target.value = response.data.meta?.target ?? responseProperties.find(property => property.is_pinned) ?? null;
@@ -157,7 +194,7 @@ async function fetchProperties() {
             return;
         }
         properties.value = responseProperties;
-        properties.value = properties.value.filter(property => !property.is_pinned && property.id !== target.value?.id);
+        properties.value = properties.value.filter(property => isSearching.value || (!property.is_pinned && property.id !== target.value?.id));
         pagination.value = response.data.meta?.pagination ?? pagination.value;
     } catch (error) {
         errorMessage.value = error.response?.data?.message ?? 'Please try again in a moment.';
@@ -166,13 +203,18 @@ async function fetchProperties() {
     }
 }
 
-function updateScrollState() { isScrolled.value = window.scrollY >= 120 && window.innerWidth >= 768; }
+function updateScrollState() { showStickyTarget.value = shouldShowStickyTarget(targetPanel.value, window.innerWidth); }
 async function goToPage(page) { if (page < 1 || page > pagination.value.total_pages) return; currentPage.value = page; syncToUrl(); await fetchProperties(); await nextTick(); const heading = document.getElementById('comparables-heading'); heading?.focus(); heading?.scrollIntoView({ behavior: 'smooth', block: 'start' }); }
 function changePerPage(value) { perPage.value = value; currentPage.value = 1; syncToUrl(); fetchProperties(); }
 function changeSort(value) { sortKey.value = value; currentPage.value = 1; syncToUrl(); fetchProperties(); }
 function changeSaleStatus(value) { saleStatus.value = value; currentPage.value = 1; syncToUrl(); fetchProperties(); }
+function scheduleSearch() { window.clearTimeout(searchTimer); searchTimer = window.setTimeout(applySearch, 350); }
+function applySearch() { window.clearTimeout(searchTimer); activeSearch.value = searchQuery.value.trim(); currentPage.value = 1; syncToUrl(); fetchProperties(); }
+function clearSearch() { searchQuery.value = ''; activeSearch.value = ''; currentPage.value = 1; syncToUrl(); fetchProperties(); }
+function normalizeAddress(address) { return String(address ?? '').trim().replace(/\s+/g, ' ').toLocaleLowerCase('en-US'); }
+function propertyRoute(property) { return `/neighborhoods/${neighborhoodId.value}/properties/${property.id}`; }
 function selectedSortParams() { return sortOptions.find(option => option.value === sortKey.value)?.params ?? {}; }
-function syncToUrl() { const query = {}; if (currentPage.value > 1) query.page = currentPage.value; if (perPage.value !== 10) query.per_page = perPage.value; if (sortKey.value !== 'similarity') query.sort = sortKey.value; if (saleStatus.value !== 'all') query.status = saleStatus.value; router.replace({ query }); }
+function syncToUrl() { const query = {}; if (currentPage.value > 1) query.page = currentPage.value; if (perPage.value !== 10) query.per_page = perPage.value; if (sortKey.value !== 'similarity') query.sort = sortKey.value; if (saleStatus.value !== 'all') query.status = saleStatus.value; if (activeSearch.value) query.search = activeSearch.value; router.replace({ query }); }
 
 function formatPrice(value) { return value == null ? null : new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD', maximumFractionDigits: 0 }).format(value); }
 function formatNumber(value) { return value == null ? null : Number(value).toLocaleString('en-US'); }
@@ -200,6 +242,16 @@ function marketEventLabel(type) {
 .back-link { display: inline-flex; align-items: center; gap: 4px; color: var(--color-on-surface-variant); font-size: 14px; font-weight: 600; text-decoration: none; }
 .back-link:hover, .back-link:focus-visible { color: var(--color-primary); }
 .property-index__actions { display: flex; align-items: flex-end; gap: 12px; }
+.property-search { position: relative; display: flex; min-height: 52px; margin-bottom: 18px; border: 1px solid var(--color-outline-variant); border-radius: 8px; background: var(--color-surface-container-lowest); box-shadow: 0 1px 3px rgba(43, 52, 55, 0.05); }
+.property-search:focus-within { border-color: var(--color-primary); box-shadow: 0 0 0 3px color-mix(in srgb, var(--color-primary) 16%, transparent); }
+.property-search__icon { align-self: center; margin-left: 17px; color: var(--color-on-surface-variant); }
+.property-search input { min-width: 0; flex: 1; border: 0; background: transparent; padding: 0 14px; color: var(--color-on-surface); font-size: 16px; outline: none; }
+.property-search input::placeholder { color: var(--color-outline); }
+.property-search__clear { display: grid; width: 44px; place-items: center; color: var(--color-on-surface-variant); }
+.property-search__clear:hover, .property-search__clear:focus-visible { color: var(--color-primary); }
+.property-search__submit { margin: 6px; border-radius: 5px; background: var(--color-primary); padding: 0 20px; color: var(--color-on-primary); font-size: 14px; font-weight: 700; }
+.search-context { display: flex; align-items: center; justify-content: space-between; gap: 18px; margin: 0 0 22px; color: var(--color-on-surface-variant); font-size: 14px; }
+.search-context strong { color: var(--color-on-surface); }
 .control-label { display: flex; min-width: 0; flex-direction: column; gap: 7px; color: var(--color-on-surface-variant); font-size: 10px; font-weight: 700; letter-spacing: .14em; text-transform: uppercase; }
 .control-label select, .pagination-count select { min-height: 44px; border: 0; border-radius: 4px; background-color: var(--color-surface-container-highest); color: var(--color-on-surface); padding: 0 34px 0 12px; font-size: 14px; font-weight: 600; letter-spacing: 0; text-transform: none; outline: none; }
 .control-label select { appearance: none; background-image: linear-gradient(45deg, transparent 50%, var(--color-on-surface-variant) 50%), linear-gradient(135deg, var(--color-on-surface-variant) 50%, transparent 50%); background-position: calc(100% - 16px) 19px, calc(100% - 11px) 19px; background-repeat: no-repeat; background-size: 5px 5px, 5px 5px; }
@@ -221,7 +273,7 @@ function marketEventLabel(type) {
 .target-panel__stats > div { text-align: right; }
 .target-panel__stats span { display: block; color: var(--color-on-primary-container); font-size: 10px; font-weight: 700; letter-spacing: .14em; text-transform: uppercase; }
 .target-panel__stats strong { display: block; margin-top: 6px; color: var(--color-on-surface); font-size: 17px; font-weight: 800; line-height: 1; white-space: nowrap; }
-.target-summary-sticky { position: sticky; top: 64px; z-index: 10; display: flex; align-items: center; justify-content: space-between; min-height: 56px; margin: -1px 0 16px; border-radius: 8px; background: rgba(214, 227, 255, .95); padding: 10px 20px; box-shadow: 0 6px 24px rgba(43, 52, 55, .07); backdrop-filter: blur(20px); }
+.target-summary-sticky { position: sticky; top: 0; z-index: 10; display: flex; align-items: center; justify-content: space-between; min-height: 56px; margin: -1px 0 16px; border-radius: 8px; background: rgba(214, 227, 255, .95); padding: 10px 20px; box-shadow: 0 6px 24px rgba(43, 52, 55, .07); backdrop-filter: blur(20px); }
 .target-summary-sticky__address { display: flex; align-items: center; gap: 12px; min-width: 0; }
 .target-summary-sticky__address strong { overflow: hidden; color: var(--color-on-surface); font-size: 14px; text-overflow: ellipsis; white-space: nowrap; }
 .target-summary-sticky__facts { display: flex; flex-wrap: wrap; justify-content: flex-end; gap: 4px 14px; color: var(--color-on-primary-container); font-size: 12px; font-weight: 700; }
@@ -260,6 +312,8 @@ function marketEventLabel(type) {
     .property-index__actions { flex-shrink: 0; }
     .property-index__actions .control-label, .property-index__actions .secondary-action { display: none; }
     .primary-action { padding: 0 14px; }
+    .property-search__submit { padding: 0 14px; }
+    .search-context { align-items: flex-start; flex-direction: column; }
     .target-panel { display: block; padding: 26px 32px; }
     .target-panel__stats { display: none; }
     .target-panel__mobile-metrics { display: grid; grid-template-columns: max-content max-content; align-items: baseline; gap: 0 12px; margin-top: 12px; }
