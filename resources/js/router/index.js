@@ -51,9 +51,17 @@ const routes = [
         meta: { requiresAuth: true },
     },
     {
-        path: '/neighborhoods/:neighborhoodId/dashboard',
+        path: '/neighborhoods/:neighborhoodId',
         name: 'neighborhood-dashboard',
         component: Dashboard,
+        meta: { requiresAuth: true },
+    },
+    {
+        path: '/neighborhoods/:neighborhoodId/dashboard',
+        redirect: to => ({
+            name: 'neighborhood-dashboard',
+            params: { neighborhoodId: to.params.neighborhoodId },
+        }),
         meta: { requiresAuth: true },
     },
     {

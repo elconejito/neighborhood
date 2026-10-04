@@ -153,4 +153,58 @@ class DashboardStatsTest extends TestCase
             ->assertJsonPath('data.analytics.monthly_days_on_market.2.avg_days', 30)
             ->assertJsonPath('data.analytics.monthly_sold_counts.2.count', 1);
     }
+
+    public function test_neighborhood_dashboard_includes_mapped_homes_and_recent_transactions(): void
+    {
+        $team = Team::factory()->create();
+        $user = User::factory()->create(['team_id' => $team->id]);
+        $neighborhood = Neighborhood::factory()->create(['team_id' => $team->id]);
+        $otherNeighborhood = Neighborhood::factory()->create(['team_id' => $team->id]);
+
+        $mappedProperty = Property::factory()->create([
+            'neighborhood_id' => $neighborhood->id,
+            'address' => '12 Maple Lane',
+            'latitude' => 39.6295,
+            'longitude' => -79.9559,
+        ]);
+        Property::factory()->create([
+            'neighborhood_id' => $neighborhood->id,
+            'latitude' => null,
+            'longitude' => null,
+        ]);
+        $otherProperty = Property::factory()->create(['neighborhood_id' => $otherNeighborhood->id]);
+
+        PriceHistory::factory()->create([
+            'property_id' => $mappedProperty->id,
+            'type' => 'listing',
+            'price' => 410000,
+            'price_date' => '2026-07-10',
+        ]);
+        PriceHistory::factory()->create([
+            'property_id' => $mappedProperty->id,
+            'type' => 'sold',
+            'price' => 405000,
+            'price_date' => '2026-07-22',
+        ]);
+        PriceHistory::factory()->create([
+            'property_id' => $otherProperty->id,
+            'type' => 'sold',
+            'price' => 900000,
+            'price_date' => '2026-08-01',
+        ]);
+
+        $response = $this->actingAs($user, 'api')
+            ->getJson("/api/v1/neighborhoods/{$neighborhood->id}/stats");
+
+        $response->assertOk()
+            ->assertJsonPath('data.properties_with_location', 1)
+            ->assertJsonCount(1, 'data.map_properties')
+            ->assertJsonPath('data.map_properties.0.address', '12 Maple Lane')
+            ->assertJsonPath('data.map_properties.0.latitude', 39.6295)
+            ->assertJsonCount(2, 'data.recent_transactions')
+            ->assertJsonPath('data.recent_transactions.0.type', 'sold')
+            ->assertJsonPath('data.recent_transactions.0.price', 405000)
+            ->assertJsonPath('data.recent_transactions.0.property.address', '12 Maple Lane')
+            ->assertJsonPath('data.recent_transactions.1.type', 'listing');
+    }
 }

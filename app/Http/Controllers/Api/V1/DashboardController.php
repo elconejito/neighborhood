@@ -62,11 +62,69 @@ class DashboardController extends Controller
             ->take(5)
             ->get();
 
+        $mapProperties = (clone $propertiesQuery)
+            ->whereNotNull('latitude')
+            ->whereNotNull('longitude')
+            ->orderBy('address')
+            ->get([
+                'id',
+                'neighborhood_id',
+                'address',
+                'city',
+                'state',
+                'zip_code',
+                'latitude',
+                'longitude',
+                'is_pinned',
+            ])
+            ->map(fn (Property $property): array => [
+                'id' => (int) $property->id,
+                'neighborhood_id' => $property->neighborhood_id ? (int) $property->neighborhood_id : null,
+                'address' => $property->address,
+                'city' => $property->city,
+                'state' => $property->state,
+                'zip_code' => $property->zip_code,
+                'latitude' => (float) $property->latitude,
+                'longitude' => (float) $property->longitude,
+                'is_pinned' => (bool) $property->is_pinned,
+            ])
+            ->values();
+
+        $recentTransactions = PriceHistory::query()
+            ->whereIn('type', ['listing', 'reduction', 'increase', 'sold', 'off_market'])
+            ->whereHas('property', $propertyScope)
+            ->with('property:id,neighborhood_id,address,city,state,zip_code')
+            ->orderByDesc('price_date')
+            ->orderByDesc('id')
+            ->take(6)
+            ->get()
+            ->map(fn (PriceHistory $transaction): array => [
+                'id' => (int) $transaction->id,
+                'property_id' => (int) $transaction->property_id,
+                'price' => (float) $transaction->price,
+                'price_date' => $transaction->price_date?->toDateString(),
+                'type' => $transaction->type,
+                'property' => [
+                    'id' => (int) $transaction->property->id,
+                    'neighborhood_id' => $transaction->property->neighborhood_id
+                        ? (int) $transaction->property->neighborhood_id
+                        : null,
+                    'address' => $transaction->property->address,
+                    'city' => $transaction->property->city,
+                    'state' => $transaction->property->state,
+                    'zip_code' => $transaction->property->zip_code,
+                ],
+            ])
+            ->values();
+
         return response()->json([
             'data' => [
                 'neighborhood_name' => $neighborhood && $neighborhood->exists ? $neighborhood->name : null,
                 'total_properties' => $totalProperties,
                 'analyzed_properties' => $analyzedProperties,
+                'properties_with_location' => $mapProperties->count(),
+                'map_properties' => $mapProperties,
+                'recent_transactions' => $recentTransactions,
                 'recently_sold' => fractal($recentlySold, new PriceHistoryTransformer)
                     ->parseIncludes(['property'])
                     ->toArray()['data'],
