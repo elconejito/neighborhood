@@ -22,7 +22,7 @@
                             <option v-for="option in availableSortOptions" :key="option.value" :value="option.value">{{ option.label }}</option>
                         </select>
                     </label>
-                    <router-link :to="`/neighborhoods/${neighborhoodId}/dashboard`" class="secondary-action"><span class="material-symbols-outlined text-base" aria-hidden="true">bar_chart</span> Dashboard</router-link>
+                    <router-link :to="`/neighborhoods/${neighborhoodId}`" class="secondary-action"><span class="material-symbols-outlined text-base" aria-hidden="true">space_dashboard</span> Dashboard</router-link>
                     <router-link :to="`/neighborhoods/${neighborhoodId}/properties/create`" class="primary-action"><span class="material-symbols-outlined text-base" aria-hidden="true">add</span><span class="hidden sm:inline">Add property</span><span class="sm:hidden">Add</span></router-link>
                 </div>
             </header>

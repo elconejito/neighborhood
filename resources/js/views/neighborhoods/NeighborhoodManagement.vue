@@ -45,7 +45,7 @@
 
                         <!-- Name -->
                         <div class="md:col-span-5">
-                            <router-link :to="`/neighborhoods/${neighborhood.id}/properties`" class="text-xl font-bold text-on-surface hover:text-primary transition-colors">{{ neighborhood.name }}</router-link>
+                            <router-link :to="`/neighborhoods/${neighborhood.id}`" class="text-xl font-bold text-on-surface hover:text-primary transition-colors">{{ neighborhood.name }}</router-link>
                         </div>
 
                         <!-- Properties count placeholder -->
@@ -66,7 +66,7 @@
                                 <span class="material-symbols-outlined">home_work</span>
                             </router-link>
                             <router-link
-                                :to="`/neighborhoods/${neighborhood.id}/dashboard`"
+                                :to="`/neighborhoods/${neighborhood.id}`"
                                 class="p-2 hover:bg-surface-container-high rounded transition-colors text-on-surface-variant"
                                 title="Dashboard"
                             >
